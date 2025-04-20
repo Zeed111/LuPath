@@ -7,6 +7,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.lupath.ui.screen.datePicker.DatePickerScreen
 import com.example.lupath.ui.screen.getstarted.GetStartedScreen
 import com.example.lupath.ui.screen.getstarted.GetStartedScreen
 import com.example.lupath.ui.screen.home.HomeScreen
@@ -35,6 +36,10 @@ fun AppNavGraph(navController: NavHostController) {
                 mountainName = mountainName,
                 navController = navController
             )
+        }
+
+        composable("datepicker") {
+            DatePickerScreen(navController)
         }
     }
 }

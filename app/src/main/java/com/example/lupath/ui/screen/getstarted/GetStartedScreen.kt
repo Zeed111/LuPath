@@ -24,7 +24,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import androidx.compose.foundation.Image
 import androidx.compose.ui.res.painterResource
-
+import com.example.lupath.ui.theme.GreenDark
 
 
 @Composable
@@ -80,7 +80,7 @@ fun GetStartedScreen(
                     onNavigateToHome()
                 },
                 colors = buttonColors(
-                    containerColor = GreenLight,
+                    containerColor = GreenDark,
                     contentColor = Color.White
                 ),
                 shape = RoundedCornerShape(15.dp),

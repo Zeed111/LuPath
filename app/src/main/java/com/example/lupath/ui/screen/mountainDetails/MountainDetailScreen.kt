@@ -50,6 +50,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.painterResource
+import com.example.lupath.ui.theme.GreenDark
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
@@ -65,15 +66,18 @@ fun MountainDetailScreen(
         containerColor = Color.White,
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { /* Open date picker */ },
+                onClick = { navController.navigate("datepicker") },
                 containerColor = Color.White,
-                shape = CircleShape
+                shape = RoundedCornerShape(30),
+                modifier = Modifier
+                    .padding(16.dp)
+                    .wrapContentSize()
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Pick Date", tint = Color.Black)
             }
         },
         bottomBar = {
-            HomeBottomNav(navController) // use your existing bottom nav
+            HomeBottomNav(navController) // bottom nav
         }
     ) { padding ->
         Column(modifier = Modifier
@@ -81,23 +85,20 @@ fun MountainDetailScreen(
             .fillMaxSize()
         ) {
 
-            // Swipeable Image Section with Back Button
+            // Swipeable Image
             Box {
                 ImageCarouselSection()
 
                 IconButton(
                     onClick = { navController.popBackStack() },
                     modifier = Modifier
-                        .padding(16.dp)
-                        .background(Color.White.copy(alpha = 0.7f), CircleShape)
-                ) {
+                        .padding(16.dp)) {
                     Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                 }
             }
 
             Spacer(Modifier.height(12.dp))
 
-            // Mountain Info
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -114,7 +115,7 @@ fun MountainDetailScreen(
                     Row {
                         repeat(3) {
                             Icon(
-                                imageVector = Icons.Default.ThumbUp, // change if you have custom icons
+                                imageVector = Icons.Default.ThumbUp, // change pa sa need na icon, pansamantala lang
                                 contentDescription = null,
                                 modifier = Modifier.size(16.dp),
                                 tint = Color.Black
@@ -141,15 +142,15 @@ fun MountainDetailScreen(
                         onClick = { selectedTab = index },
                         shape = RoundedCornerShape(10.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = if (selectedTab == index) GreenLight else Color.LightGray
+                            containerColor = if (selectedTab == index) GreenDark else Color.LightGray
                         ),
                         elevation = null,
                         modifier = Modifier
-                            .width(105.dp) // Width: 106px
-                            .height(40.dp), // Height: 41px
+                            .width(105.dp)
+                            .height(40.dp),
                         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
                     ) {
-                        Text(title, color = Color.Black, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(title, color = Color.Black, fontSize = 12.sp, maxLines = 1)
                     }
                 }
             }
@@ -176,8 +177,8 @@ fun ImageCarouselSection() {
             .height(280.dp)
             .clip(
                 RoundedCornerShape(
-                    bottomStart = 20.dp, // Radius for bottom-left corner
-                    bottomEnd = 20.dp    // Radius for bottom-right corner
+                    bottomStart = 20.dp, // bottom-left corner
+                    bottomEnd = 20.dp    // bottom-right corner
                 )
             )
     ) {
@@ -196,11 +197,11 @@ fun ImageCarouselSection() {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(GreenLight), // Placeholder background color
+                    .background(GreenDark),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Placeholder $page", // Placeholder text
+                    text = "Image $page",
                     color = Color.White,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
@@ -227,7 +228,7 @@ fun DetailsTabContent() {
             fontSize = 14.sp
         )
         Spacer(modifier = Modifier.height(8.dp))
-//        Text("The mountain is home to different ecosystems...", fontSize = 14.sp)
+//        Text
     }
 }
 
@@ -241,7 +242,7 @@ fun CampingSpotTabContent() {
             fontSize = 14.sp
         )
         Spacer(modifier = Modifier.height(8.dp))
-//        Text("The mountain is home to different ecosystems...", fontSize = 14.sp)
+//        Text
     }
 }
 
@@ -255,6 +256,6 @@ fun GuidelinesTabContent() {
             fontSize = 14.sp
         )
         Spacer(modifier = Modifier.height(8.dp))
-//        Text("The mountain is home to different ecosystems...", fontSize = 14.sp)
+//        Text
     }
 }

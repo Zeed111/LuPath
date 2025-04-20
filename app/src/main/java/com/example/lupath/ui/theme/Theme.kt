@@ -32,20 +32,29 @@ private val LightColorScheme = lightColorScheme(
 
 )
 
+private val CustomColorScheme = lightColorScheme(
+    primary = GreenLight,
+    onPrimary = OnGreen,
+    surface = GreenLight,
+    onSurface = OnGreen,
+    background = GreenLight,
+    onBackground = OnGreen,
+    secondary = GreenDark
+)
+
 @Composable
 fun LuPathTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+//    darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            dynamicDarkColorScheme(context)
         }
 
-        darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
 
