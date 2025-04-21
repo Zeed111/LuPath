@@ -51,6 +51,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.painterResource
 import com.example.lupath.ui.theme.GreenDark
+import com.example.lupath.ui.theme.Lato
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
@@ -107,8 +108,10 @@ fun MountainDetailScreen(
                 verticalAlignment = Alignment.Top
             ) {
                 Column {
-                    Text("Mountain Pulag", fontWeight = FontWeight.Bold, fontSize = 20.sp)
-                    Text("Lusod Kabayan, Benguet", fontSize = 14.sp, color = Color.Black)
+                    Text("Mountain Pulag", fontWeight = FontWeight.Bold, fontSize = 20.sp,
+                        fontFamily = Lato)
+                    Text("Lusod Kabayan, Benguet", fontSize = 14.sp, color = Color.Black,
+                        fontFamily = Lato)
                 }
 
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -124,7 +127,7 @@ fun MountainDetailScreen(
                         }
                     }
                     Spacer(Modifier.height(4.dp))
-                    Text("Difficulty: Beginner", fontSize = 12.sp)
+                    Text("Difficulty: Beginner", fontSize = 12.sp, fontFamily = Lato)
                 }
             }
 
@@ -150,7 +153,8 @@ fun MountainDetailScreen(
                             .height(40.dp),
                         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
                     ) {
-                        Text(title, color = Color.Black, fontSize = 12.sp, maxLines = 1)
+                        Text(title, color = Color.Black, fontSize = 12.sp, maxLines = 1,
+                            fontFamily = Lato)
                     }
                 }
             }
@@ -204,7 +208,8 @@ fun ImageCarouselSection() {
                     text = "Image $page",
                     color = Color.White,
                     fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = Lato
                 )
             }
         }
@@ -225,7 +230,8 @@ fun DetailsTabContent() {
         .padding(horizontal = 16.dp, vertical = 8.dp)) {
         Text(
             "Deatils of the Mountain Soon to be Added",
-            fontSize = 14.sp
+            fontSize = 14.sp,
+            fontFamily = Lato
         )
         Spacer(modifier = Modifier.height(8.dp))
 //        Text
@@ -239,7 +245,8 @@ fun CampingSpotTabContent() {
         .padding(horizontal = 16.dp, vertical = 8.dp)) {
         Text(
             "Camping Spot of the Mountain Soon to be Added",
-            fontSize = 14.sp
+            fontSize = 14.sp,
+            fontFamily = Lato
         )
         Spacer(modifier = Modifier.height(8.dp))
 //        Text
@@ -253,7 +260,8 @@ fun GuidelinesTabContent() {
         .padding(horizontal = 16.dp, vertical = 8.dp)) {
         Text(
             "Guidelines of the Mountain Soon to be Added",
-            fontSize = 14.sp
+            fontSize = 14.sp,
+            fontFamily = Lato
         )
         Spacer(modifier = Modifier.height(8.dp))
 //        Text

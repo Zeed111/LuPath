@@ -11,6 +11,7 @@ import com.example.lupath.ui.screen.datePicker.DatePickerScreen
 import com.example.lupath.ui.screen.getstarted.GetStartedScreen
 import com.example.lupath.ui.screen.getstarted.GetStartedScreen
 import com.example.lupath.ui.screen.home.HomeScreen
+import com.example.lupath.ui.screen.lupathList.LuPathListScreen
 import com.example.lupath.ui.screen.mountainDetails.MountainDetailScreen
 
 @Composable
@@ -31,7 +32,8 @@ fun AppNavGraph(navController: NavHostController) {
             route = "mountainDetail/{mountainName}",
             arguments = listOf(navArgument("mountainName") { type = NavType.StringType })
         ) { backStackEntry ->
-            val mountainName = backStackEntry.arguments?.getString("mountainName") ?: "Unknown Mountain"
+            val mountainName =
+                backStackEntry.arguments?.getString("mountainName") ?: "Unknown Mountain"
             MountainDetailScreen(
                 mountainName = mountainName,
                 navController = navController
@@ -40,6 +42,22 @@ fun AppNavGraph(navController: NavHostController) {
 
         composable("datepicker") {
             DatePickerScreen(navController)
+        }
+
+        composable(
+            "lupath_list/{mountainName}/{selectedDate}",
+            arguments = listOf(
+                navArgument("mountainName") { type = NavType.StringType },
+                navArgument("selectedDate") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val mountainName = backStackEntry.arguments?.getString("mountainName") ?: ""
+            val selectedDate = backStackEntry.arguments?.getString("selectedDate") ?: ""
+            LuPathListScreen(
+                navController = navController,
+                mountainName = mountainName,
+                selectedDate = selectedDate
+            )
         }
     }
 }

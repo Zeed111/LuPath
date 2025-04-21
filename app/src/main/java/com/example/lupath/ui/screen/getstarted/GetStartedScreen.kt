@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.StateFlow
 import androidx.compose.foundation.Image
 import androidx.compose.ui.res.painterResource
 import com.example.lupath.ui.theme.GreenDark
+import com.example.lupath.ui.theme.Lato
 
 
 @Composable
@@ -68,7 +69,8 @@ fun GetStartedScreen(
                         .padding(top = 10.dp, start = 35.dp, end = 35.dp)
                         .width(341.dp)
                         .height(72.dp),
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    fontFamily = Lato
                 )
             }
 
@@ -90,7 +92,7 @@ fun GetStartedScreen(
                     .width(335.dp)
                     .height(67.dp)
             ) {
-                Text("Get Started", fontSize = 30.sp)
+                Text("Get Started", fontSize = 30.sp, fontFamily = Lato)
             }
         }
     }

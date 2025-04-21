@@ -1,5 +1,6 @@
 package com.example.lupath.ui.screen.datePicker
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.material3.*
@@ -53,9 +54,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.painterResource
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.lupath.data.model.HikePlan
+import com.example.lupath.data.model.HikePlanViewModel
+import com.example.lupath.ui.theme.Lato
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 //@OptIn(ExperimentalMaterial3Api::class)
 //@Composable
@@ -177,7 +185,7 @@ import java.time.ZoneId
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DatePickerScreen(navController: NavHostController) {
+fun DatePickerScreen(navController: NavHostController, viewModel: HikePlanViewModel = viewModel()) {
     var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
     val datePickerState = rememberDatePickerState()
 
@@ -185,7 +193,29 @@ fun DatePickerScreen(navController: NavHostController) {
         containerColor = Color.White,
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { /* My Lupath List */},
+                onClick = {
+                    if (selectedDate == null) {
+                        println("No date selected")
+                    } else {
+                        val date = selectedDate!!
+                        val newHikePlan = HikePlan(
+                            mountainName = "Mt. Pulag", // Example, make dynamic if needed
+                            date = date,
+                            difficulty = "Beginner"
+                        )
+                        viewModel.addHikePlan(newHikePlan)
+
+                        val selectedDateText = try {
+                            date.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")).let {
+                                URLEncoder.encode(it, StandardCharsets.UTF_8.toString())
+                            }
+                        } catch (e: Exception) {
+                            "Invalid Date"
+                        }
+
+                        navController.navigate("lupath_list/Mt. Pulag/$selectedDateText")
+                    }
+                },
                 shape = RoundedCornerShape(30),
                 modifier = Modifier
                     .padding(16.dp)
@@ -194,15 +224,12 @@ fun DatePickerScreen(navController: NavHostController) {
             ) {
                 Row(
                     modifier = Modifier
-                        .padding(horizontal = 20.dp, vertical = 12.dp)
-                        .clickable {
-                            // You can later pass selectedDate to the List screen
-                        },
+                        .padding(horizontal = 20.dp, vertical = 12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(Icons.Default.Edit, contentDescription = "Add", tint = Color.Black)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Add Plan", color = Color.Black)
+                    Text("Add Plan", color = Color.Black, fontFamily = Lato)
                 }
             }
         }
@@ -239,7 +266,8 @@ fun DatePickerScreen(navController: NavHostController) {
                 text = "Calendar",
                 modifier = Modifier.padding(start = 16.dp, bottom = 8.dp),
                 fontWeight = FontWeight.Bold,
-                fontSize = 20.sp
+                fontSize = 20.sp,
+                fontFamily = Lato
             )
 
             // Calendar Card

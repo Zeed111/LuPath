@@ -33,8 +33,11 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.navigation.compose.rememberNavController
 import com.example.lupath.ui.theme.GreenLight
+import com.example.lupath.ui.theme.Lato
 import java.net.URLEncoder
 
 @Composable
@@ -55,10 +58,12 @@ fun HomeBottomNav(navController: NavHostController) {
     ) {
         NavigationBarItem(
             selected = false,
-            onClick = { /* Navigate to Lupath */ },
+            onClick = { navController.navigate("lupath_list/Mt. Pulag/No%20date") {
+                launchSingleTop = true
+            } },
             icon = { Icon( painter = painterResource(id = R.drawable.lupath), contentDescription = "Lupath",
                 modifier = Modifier.size(37.dp), tint = Color.Black) },
-            label = { Text("Lupath", color = Color.Black) }
+            label = { Text("Lupath", color = Color.Black, fontFamily = Lato) }
         )
         NavigationBarItem(
             selected = false,
@@ -67,14 +72,14 @@ fun HomeBottomNav(navController: NavHostController) {
             } },
             icon = { Icon(Icons.Default.Home, contentDescription = "Home", modifier = Modifier.size(37.dp),
                 tint = Color.Black) },
-            label = { Text("Home", color = Color.Black) },
+            label = { Text("Home", color = Color.Black, fontFamily = Lato) },
         )
         NavigationBarItem(
             selected = false,
             onClick = { /* Navigate to List */ },
             icon = { Icon(Icons.AutoMirrored.Filled.List, contentDescription = "List",
                 modifier = Modifier.size(37.dp), tint = Color.Black) },
-            label = { Text("List", color = Color.Black) }
+            label = { Text("List", color = Color.Black, fontFamily = Lato) }
         )
     }
 }
@@ -113,7 +118,8 @@ fun HomeTopBar() {
                     modifier = Modifier.size(40.dp)
                 )
                 Spacer(Modifier.width(8.dp))
-                Text("LuPath", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                Text("LuPath", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color.Black,
+                    fontFamily = Lato)
             }
             IconButton(onClick = { /* open settings */ }) {
                 Icon(imageVector = Icons.Default.Settings, contentDescription = "Settings")
@@ -127,7 +133,7 @@ fun SearchBar() {
     OutlinedTextField(
         value = "",
         onValueChange = {},
-        placeholder = { Text("Search for mountains...") },
+        placeholder = { Text("Search for mountains...", fontFamily = Lato) },
         shape = RoundedCornerShape(15.dp),
         modifier = Modifier
             .fillMaxWidth()
@@ -139,7 +145,7 @@ fun SearchBar() {
 @Composable
 fun PopularMountainsSection(navController: NavHostController) {
     Column(modifier = Modifier.padding(16.dp)) {
-        Text("Popular Mountains", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+        Text("Popular Mountains", fontWeight = FontWeight.Bold, fontSize = 18.sp, fontFamily = Lato)
         Spacer(modifier = Modifier.height(8.dp))
         LazyRow {
             items(5) { index ->
@@ -160,7 +166,7 @@ fun MountainListSection(navController: NavHostController) {
     val visibleMountains = if (showAll) allMountains else allMountains.take(5)
 
     Column(modifier = Modifier.padding(16.dp)) {
-        Text("All Mountains", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+        Text("All Mountains", fontWeight = FontWeight.Bold, fontSize = 18.sp, fontFamily = Lato)
         Spacer(modifier = Modifier.height(8.dp))
 
         visibleMountains.forEach { mountain ->
@@ -178,10 +184,15 @@ fun MountainListSection(navController: NavHostController) {
             modifier = Modifier.align(Alignment.CenterHorizontally),
             colors = ButtonDefaults.buttonColors(
                 contentColor = Color.Black,
-                containerColor = Color.Gray
+                containerColor = (Color(0xFFD9D9D9))
             )
         ) {
-            Text(if (showAll) "View Less" else "View More")
+            Text(
+                text = if (showAll) "View Less" else "View More",
+                fontWeight = FontWeight.Bold,
+                fontSize = 15.sp,
+                fontFamily = Lato
+            )
         }
     }
 }
@@ -190,10 +201,10 @@ fun MountainListSection(navController: NavHostController) {
 fun PopularMountainCard(name: String, location: String, navController: NavHostController) {
     Card(
         shape = RoundedCornerShape(10.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         modifier = Modifier
             .width(150.dp)
-            .padding(end = 8.dp)
+            .padding(end = 16.dp)
             .clickable {
                 navController.navigate("mountainDetail/${URLEncoder.encode(name, "UTF-8")}")
             }
@@ -202,7 +213,7 @@ fun PopularMountainCard(name: String, location: String, navController: NavHostCo
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color(0xFFD9D9D9)) // Optional: Keeps it bright even in dark mode
-                .padding(8.dp),
+                .padding(10.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
@@ -214,8 +225,9 @@ fun PopularMountainCard(name: String, location: String, navController: NavHostCo
                 Text("Image", color = Color.White)
             }
             Spacer(Modifier.height(8.dp))
-            Text(name, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color.Black)
-            Text(location, fontSize = 12.sp, color = Color.Black)
+            Text(name, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color.Black,
+                fontFamily = Lato)
+            Text(location, fontSize = 12.sp, color = Color.Black, fontFamily = Lato)
         }
     }
 }
@@ -224,10 +236,10 @@ fun PopularMountainCard(name: String, location: String, navController: NavHostCo
 fun MountainListCard(name: String, difficulty: String, description: String, navController: NavHostController) {
     Card(
         shape = RoundedCornerShape(10.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 15.dp, vertical = 5.dp)
+            .padding(horizontal = 15.dp, vertical = 8.dp)
             .clickable {
                 navController.navigate("mountainDetail/${URLEncoder.encode(name, "UTF-8")}")
             }
@@ -254,10 +266,11 @@ fun MountainListCard(name: String, difficulty: String, description: String, navC
                 verticalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxHeight()
             ) {
-                Text(name, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.Black)
-                Text(difficulty, fontSize = 14.sp, color = Color.Black)
+                Text(name, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.Black,
+                    fontFamily = Lato)
+                Text(difficulty, fontSize = 14.sp, color = Color.Black, fontFamily = Lato)
                 Text(description, fontSize = 12.sp, maxLines = 2, overflow = TextOverflow.Ellipsis,
-                    color = Color.Black)
+                    color = Color.Black, fontFamily = Lato)
             }
         }
     }
