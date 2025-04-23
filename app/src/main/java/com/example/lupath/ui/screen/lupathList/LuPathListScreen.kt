@@ -266,33 +266,29 @@ fun PlanCard(
 fun CustomCalendarM3Style(
     hikePlans: List<HikePlan>,
     modifier: Modifier = Modifier,
-    onDateClick: (LocalDate) -> Unit = {} // Optional: Callback for clicking a date
+    onDateClick: (LocalDate) -> Unit = {}
 ) {
-    // State for the currently displayed month
     var currentMonth by remember { mutableStateOf(YearMonth.now()) }
 
-    // Generate the days to display, including padding for the start of the month
     val daysInMonth = currentMonth.lengthOfMonth()
     val firstOfMonth = currentMonth.atDay(1)
-    // Adjust start day based on Sunday as the first day (value 7). Monday is 1.
-    val startDayOfWeek = firstOfMonth.dayOfWeek.value % 7 // Sunday = 0, Monday = 1, ... Saturday = 6
+
+    val startDayOfWeek = firstOfMonth.dayOfWeek.value % 7
     val paddingDays = startDayOfWeek
 
     val monthName = currentMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy"))
     val daysOfWeek = remember { getWeekDayAbbreviationList() } // Get S, M, T...
 
-    // Create a set of planned dates for efficient lookup
     val plannedDates = remember(hikePlans) {
         hikePlans.map { it.date }.toSet()
     }
 
-    Card( // Wrap in a Card for elevation and shape similar to DatePicker dialog
+    Card(
         modifier = modifier,
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        shape = MaterialTheme.shapes.medium // Or small/large as preferred
+        shape = MaterialTheme.shapes.medium
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            // Header: Month Name and Navigation
             CalendarHeader(
                 monthName = monthName,
                 onPreviousMonth = { currentMonth = currentMonth.minusMonths(1) },
@@ -301,23 +297,20 @@ fun CustomCalendarM3Style(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Days of the Week Labels
+
             DaysOfWeekHeader(daysOfWeek)
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Days Grid
             LazyVerticalGrid(
                 columns = GridCells.Fixed(7),
                 // Calculate appropriate height or let it wrap content
                 // modifier = Modifier.height(300.dp) // Example fixed height
             ) {
-                // Add empty boxes for padding days before the 1st
                 items(paddingDays) {
-                    Box(modifier = Modifier.size(40.dp)) // Placeholder box
+                    Box(modifier = Modifier.size(40.dp))
                 }
 
-                // Add actual day cells
                 items(daysInMonth) { dayOfMonth ->
                     val day = dayOfMonth + 1
                     val date = currentMonth.atDay(day)
@@ -337,16 +330,11 @@ fun CustomCalendarM3Style(
     }
 }
 
-// Helper to get abbreviated day names (S, M, T...)
 private fun getWeekDayAbbreviationList(): List<String> {
-    // Ensure Sunday is first if that's the desired calendar layout
-    // val days = DayOfWeek.values() // Default order might be Monday-first
-    // Adjust order if needed. Example for Sun-Sat:
     val days = listOf(DayOfWeek.SUNDAY, DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY)
     return days.map { it.getDisplayName(TextStyle.NARROW, Locale.getDefault()) }
 }
 
-// Composable for the Calendar Header (Month + Arrows)
 @Composable
 private fun CalendarHeader(
     monthName: String,
@@ -372,28 +360,27 @@ private fun CalendarHeader(
     }
 }
 
-// Composable for the Days of the Week Header (S, M, T...)
+
 @Composable
 private fun DaysOfWeekHeader(daysOfWeek: List<String>) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 4.dp),
-        horizontalArrangement = Arrangement.SpaceAround // Distribute evenly
+        horizontalArrangement = Arrangement.SpaceAround
     ) {
         daysOfWeek.forEach { day ->
             Text(
                 text = day,
-                style = MaterialTheme.typography.labelSmall, // Use a smaller label style
+                style = MaterialTheme.typography.labelSmall,
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurfaceVariant, // Subtle color
-                modifier = Modifier.width(40.dp) // Match DayCell width approx
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.width(40.dp)
             )
         }
     }
 }
 
-// Composable for a single Day cell in the grid
 @Composable
 private fun DayCell(
     day: Int,
@@ -403,15 +390,15 @@ private fun DayCell(
     onClick: () -> Unit
 ) {
     val backgroundColor = when {
-        isPlanned -> MaterialTheme.colorScheme.primary // Highlight planned dates
+        isPlanned -> MaterialTheme.colorScheme.primary
         else -> Color.Transparent
     }
     val contentColor = when {
-        isPlanned -> MaterialTheme.colorScheme.onPrimary // Text color on highlight
-        isToday -> MaterialTheme.colorScheme.primary // Highlight today's number
-        else -> MaterialTheme.colorScheme.onSurface // Default text color
+        isPlanned -> MaterialTheme.colorScheme.onPrimary
+        isToday -> MaterialTheme.colorScheme.primary
+        else -> MaterialTheme.colorScheme.onSurface
     }
-    val borderModifier = if (isToday && !isPlanned) { // Add border only for today if not planned
+    val borderModifier = if (isToday && !isPlanned) {
         Modifier.border(1.dp, MaterialTheme.colorScheme.primary, CircleShape)
     } else {
         Modifier
@@ -419,10 +406,10 @@ private fun DayCell(
 
     Box(
         modifier = Modifier
-            .size(40.dp) // Fixed size for each cell
-            .clip(CircleShape) // Clip content to circle
+            .size(40.dp)
+            .clip(CircleShape)
             .background(backgroundColor)
-            .then(borderModifier) // Apply border if needed
+            .then(borderModifier)
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
