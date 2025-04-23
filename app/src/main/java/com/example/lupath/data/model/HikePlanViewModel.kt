@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import java.time.LocalDate
 
 class HikePlanViewModel : ViewModel() {
-//    val hikePlans = mutableStateListOf<HikePlan>()
 
     val hikePlans = mutableStateListOf(
         HikePlan("Mt. Pulag", LocalDate.of(2025, 4, 28), "Beginner"),

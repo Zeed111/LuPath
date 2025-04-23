@@ -186,7 +186,6 @@ import java.time.format.DateTimeFormatter
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerScreen(navController: NavHostController, viewModel: HikePlanViewModel = viewModel()) {
-    var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
     val datePickerState = rememberDatePickerState()
 
     Scaffold(
@@ -194,10 +193,13 @@ fun DatePickerScreen(navController: NavHostController, viewModel: HikePlanViewMo
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    if (selectedDate == null) {
+                    val selectedMillis = datePickerState.selectedDateMillis
+                    if (selectedMillis == null) {
                         println("No date selected")
                     } else {
-                        val date = selectedDate!!
+                        val date = Instant.ofEpochMilli(selectedMillis)
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalDate()
                         val newHikePlan = HikePlan(
                             mountainName = "Mt. Pulag", // Example, make dynamic if needed
                             date = date,
@@ -213,7 +215,7 @@ fun DatePickerScreen(navController: NavHostController, viewModel: HikePlanViewMo
                             "Invalid Date"
                         }
 
-                        navController.navigate("lupath_list/Mt. Pulag/$selectedDateText")
+                        navController.navigate("lupath_list")
                     }
                 },
                 shape = RoundedCornerShape(30),
@@ -292,17 +294,9 @@ fun DatePickerScreen(navController: NavHostController, viewModel: HikePlanViewMo
                 ) {
                     DatePicker(
                         state = datePickerState,
-                        modifier = Modifier
+                        modifier = Modifier.fillMaxWidth()
 
                     )
-                }
-//                DatePicker(
-//                    state = datePickerState,
-//                    modifier = Modifier.padding(16.dp)
-//                )
-
-                selectedDate = datePickerState.selectedDateMillis?.let {
-                    Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate()
                 }
             }
         }

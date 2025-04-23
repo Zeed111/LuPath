@@ -58,7 +58,7 @@ fun HomeBottomNav(navController: NavHostController) {
     ) {
         NavigationBarItem(
             selected = false,
-            onClick = { navController.navigate("lupath_list/Mt. Pulag/No%20date") {
+            onClick = { navController.navigate("lupath_list") {
                 launchSingleTop = true
             } },
             icon = { Icon( painter = painterResource(id = R.drawable.lupath), contentDescription = "Lupath",
@@ -76,7 +76,9 @@ fun HomeBottomNav(navController: NavHostController) {
         )
         NavigationBarItem(
             selected = false,
-            onClick = { /* Navigate to List */ },
+            onClick = { navController.navigate("check_list") {
+              launchSingleTop = true
+            } },
             icon = { Icon(Icons.AutoMirrored.Filled.List, contentDescription = "List",
                 modifier = Modifier.size(37.dp), tint = Color.Black) },
             label = { Text("List", color = Color.Black, fontFamily = Lato) }

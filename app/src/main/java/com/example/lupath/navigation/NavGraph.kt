@@ -13,6 +13,8 @@ import com.example.lupath.ui.screen.getstarted.GetStartedScreen
 import com.example.lupath.ui.screen.home.HomeScreen
 import com.example.lupath.ui.screen.lupathList.LuPathListScreen
 import com.example.lupath.ui.screen.mountainDetails.MountainDetailScreen
+import com.example.lupath.ui.screen.toBringList.CheckListScreen
+
 
 @Composable
 fun AppNavGraph(navController: NavHostController) {
@@ -44,21 +46,32 @@ fun AppNavGraph(navController: NavHostController) {
             DatePickerScreen(navController)
         }
 
-        composable(
-            "lupath_list/{mountainName}/{selectedDate}",
-            arguments = listOf(
-                navArgument("mountainName") { type = NavType.StringType },
-                navArgument("selectedDate") { type = NavType.StringType }
-            )
-        ) { backStackEntry ->
-            val mountainName = backStackEntry.arguments?.getString("mountainName") ?: ""
-            val selectedDate = backStackEntry.arguments?.getString("selectedDate") ?: ""
-            LuPathListScreen(
-                navController = navController,
-                mountainName = mountainName,
-                selectedDate = selectedDate
-            )
+        composable(route = "lupath_list") {
+            // LuPathListScreen gets the ViewModel automatically
+            LuPathListScreen(navController = navController)
         }
+
+        composable("check_list") {
+            CheckListScreen(navController = navController)
+        }
+
+//        composable(
+//            route =  "lupath_list",
+//            arguments = listOf(
+//                navArgument("mountainName") { type = NavType.StringType; nullable = true  },
+//                navArgument("selectedDate") { type = NavType.StringType; nullable = true }
+//            )
+//        ) { backStackEntry ->
+//
+//            val mountain = backStackEntry.arguments?.getString("mountainName")
+//            val dateStr = backStackEntry.arguments?.getString("selectedDate")
+//
+//            LuPathListScreen(
+//                navController = navController, // Pass if needed by the simplified screen
+//                mountainName = mountain,
+//                selectedDate = dateStr
+//            )
+//        }
     }
 }
 
