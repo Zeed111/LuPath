@@ -70,7 +70,7 @@ fun CheckListScreen(
     var showAddDialog by remember { mutableStateOf(false) }
 
     Scaffold(
-        topBar = { LuPathTopBar(navController) },
+        topBar = { LuPathTopBar(navController = navController) },
         containerColor = Color.White,
         bottomBar = { HomeBottomNav(navController) }
     ) { paddingValues ->
@@ -203,7 +203,9 @@ fun LuPathTopBar(navController: NavHostController) {
             modifier = Modifier.size(40.dp)
         )
 
-        IconButton(onClick = { /* Navigate to settings */ }) {
+        IconButton(onClick = {
+            navController.navigate("settings")
+        }) {
             Icon(
                 imageVector = Icons.Default.Settings,
                 contentDescription = "Settings",

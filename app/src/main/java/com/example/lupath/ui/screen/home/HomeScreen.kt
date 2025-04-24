@@ -44,7 +44,7 @@ import java.net.URLEncoder
 fun HomeScreen(navController: NavHostController) {
     Scaffold(
         containerColor = Color.White,
-        topBar = { HomeTopBar() },
+        topBar = { HomeTopBar(navController = navController) },
         bottomBar = { HomeBottomNav(navController) }
     ) { padding ->
         HomeContent(Modifier.padding(padding), navController = navController)
@@ -101,7 +101,7 @@ fun HomeContent(modifier: Modifier = Modifier, navController: NavHostController)
 }
 
 @Composable
-fun HomeTopBar() {
+fun HomeTopBar(navController: NavHostController) {
     Box(
         modifier = Modifier
             .background(Color.White)
@@ -123,7 +123,9 @@ fun HomeTopBar() {
                 Text("LuPath", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color.Black,
                     fontFamily = Lato)
             }
-            IconButton(onClick = { /* open settings */ }) {
+            IconButton(onClick = {
+                navController.navigate("settings")
+            }) {
                 Icon(imageVector = Icons.Default.Settings, contentDescription = "Settings")
             }
         }

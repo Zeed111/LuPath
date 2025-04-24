@@ -4,26 +4,57 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -32,20 +63,13 @@ import com.example.lupath.R
 import com.example.lupath.data.model.HikePlan
 import com.example.lupath.data.model.HikePlanViewModel
 import com.example.lupath.ui.screen.home.HomeBottomNav
+import com.example.lupath.ui.theme.GreenDark
+import com.example.lupath.ui.theme.GreenLight
 import com.example.lupath.ui.theme.Lato
-import java.net.URLDecoder
-import java.nio.charset.StandardCharsets
-import java.time.YearMonth
-import java.time.format.DateTimeFormatter
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.style.TextAlign
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.YearMonth
+import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
 
@@ -57,7 +81,7 @@ fun LuPathListScreen(
     viewModel: HikePlanViewModel = viewModel()
 ) {
     Scaffold(
-        topBar = { LuPathTopBar(navController) },
+        topBar = { LuPathTopBar(navController = navController) },
         containerColor = Color.White,
         bottomBar = { HomeBottomNav(navController) }
     ) { padding ->
@@ -69,10 +93,10 @@ fun LuPathListScreen(
         ) {
             Text(
                 text = "My LuPath",
-                fontSize = 45.sp,
+                fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = Lato,
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(10.dp)
             )
 
             Text(
@@ -90,7 +114,7 @@ fun LuPathListScreen(
                 hikePlans = viewModel.hikePlans,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal=16.dp, vertical=8.dp),
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
 
                 onDateClick = { clickedDate ->
                     println("Clicked on date: $clickedDate")
@@ -175,7 +199,7 @@ fun LuPathTopBar(navController: NavHostController) {
             }
         }) {
             Icon(
-                imageVector = Icons.Default.ArrowBack,
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Back",
                 tint = Color.Black
             )
@@ -187,7 +211,9 @@ fun LuPathTopBar(navController: NavHostController) {
             modifier = Modifier.size(40.dp)
         )
 
-        IconButton(onClick = { /* Navigate to settings */ }) {
+        IconButton(onClick = {
+            navController.navigate("settings")
+        }) {
             Icon(
                 imageVector = Icons.Default.Settings,
                 contentDescription = "Settings",
@@ -211,14 +237,19 @@ fun PlanCard(
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .fillMaxWidth()
             .height(100.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors( // Add the 'colors' parameter
+            containerColor = Color(0xFFD9D9D9))
     ) {
-        Row(modifier = Modifier.fillMaxSize()) {
+        Row(modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFD9D9D9))
+        ) {
             Box(
                 modifier = Modifier
                     .width(100.dp)
                     .fillMaxHeight()
-                    .background(Color.Gray)
+                    .background(Color.DarkGray)
             )
 
             Column(
@@ -269,65 +300,112 @@ fun CustomCalendarM3Style(
     onDateClick: (LocalDate) -> Unit = {}
 ) {
     var currentMonth by remember { mutableStateOf(YearMonth.now()) }
+    val density = LocalDensity.current
+
+    val onPreviousMonth = { currentMonth = currentMonth.minusMonths(1) }
+    val onNextMonth = { currentMonth = currentMonth.plusMonths(1) }
 
     val daysInMonth = currentMonth.lengthOfMonth()
     val firstOfMonth = currentMonth.atDay(1)
-
     val startDayOfWeek = firstOfMonth.dayOfWeek.value % 7
     val paddingDays = startDayOfWeek
-
     val monthName = currentMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy"))
     val daysOfWeek = remember { getWeekDayAbbreviationList() } // Get S, M, T...
-
     val plannedDates = remember(hikePlans) {
         hikePlans.map { it.date }.toSet()
     }
+// Swipe gesture tracking
+    var swipeOffsetX by remember { mutableFloatStateOf(0f) }
+    var gestureConsumed by remember { mutableStateOf(false) } // To prevent multiple month changes per swipe
 
     Card(
         modifier = modifier,
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        shape = MaterialTheme.shapes.medium
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors( // Add the 'colors' parameter
+            containerColor = Color(0xFFD9D9D9))
+
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             CalendarHeader(
                 monthName = monthName,
-                onPreviousMonth = { currentMonth = currentMonth.minusMonths(1) },
-                onNextMonth = { currentMonth = currentMonth.plusMonths(1) }
+                onPreviousMonth = onPreviousMonth,
+                onNextMonth = onNextMonth
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            Column(
+                modifier = Modifier.pointerInput(currentMonth) { // Pass currentMonth as key to reset detector on month change
+                    detectHorizontalDragGestures(
+                        onDragStart = {
+                            swipeOffsetX = 0f // Reset offset at the start of a drag
+                            gestureConsumed = false // Reset consumed flag
+                        },
+                        onHorizontalDrag = { change, dragAmount ->
+                            // Only consume if not already consumed in this gesture
+                            if (!gestureConsumed) {
+                                swipeOffsetX += dragAmount
+                                // Optional: Consume the pointer event if handling drag
+                                // change.consume()
+                            }
+                        },
+                        onDragEnd = {
+                            if (!gestureConsumed) {
+                                val swipeThresholdPx = with(density) { 60.dp.toPx() } // Threshold in pixels
 
-            DaysOfWeekHeader(daysOfWeek)
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(7),
-                // Calculate appropriate height or let it wrap content
-                // modifier = Modifier.height(300.dp) // Example fixed height
-            ) {
-                items(paddingDays) {
-                    Box(modifier = Modifier.size(40.dp))
-                }
-
-                items(daysInMonth) { dayOfMonth ->
-                    val day = dayOfMonth + 1
-                    val date = currentMonth.atDay(day)
-                    val isPlanned = plannedDates.contains(date)
-                    val isToday = date == LocalDate.now()
-
-                    DayCell(
-                        day = day,
-                        date = date,
-                        isPlanned = isPlanned,
-                        isToday = isToday,
-                        onClick = { onDateClick(date) }
+                                if (swipeOffsetX > swipeThresholdPx) {
+                                    // Swiped Right (finger moved right) -> Previous Month
+                                    onPreviousMonth()
+                                    gestureConsumed = true
+                                } else if (swipeOffsetX < -swipeThresholdPx) {
+                                    // Swiped Left (finger moved left) -> Next Month
+                                    onNextMonth()
+                                    gestureConsumed = true
+                                }
+                                // Reset offset after drag ends, regardless of threshold met
+                                swipeOffsetX = 0f
+                            }
+                        }
                     )
                 }
-            }
-        }
-    }
+            ) {
+                DaysOfWeekHeader(daysOfWeek)
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(7),
+                    // Let the grid determine its height based on content
+                    // Apply minimum height if needed, but avoid fixed large height
+                    modifier = Modifier.heightIn(min = 240.dp), // Ensure minimum touch area
+                    userScrollEnabled = false // Disable grid's own scrolling to prevent conflicts
+                ) {
+                    // --- Padding Items ---
+                    items(paddingDays) {
+                        // Render empty boxes for padding days at the start of the month
+                        Box(modifier = Modifier.size(40.dp)) // Same size as DayCell
+                    }
+
+                    // --- Day Items ---
+                    items(daysInMonth) { dayOfMonth ->
+                        val day = dayOfMonth + 1
+                        val date = currentMonth.atDay(day)
+                        val isPlanned = plannedDates.contains(date)
+                        val isToday = date == LocalDate.now()
+
+                        DayCell(
+                            day = day,
+                            date = date,
+                            isPlanned = isPlanned,
+                            isToday = isToday,
+                            onClick = { onDateClick(date) }
+                        )
+                    }
+                }
+            } // End of swipeable Column
+        } // End of Card's Column
+    } // End of Card
 }
 
 private fun getWeekDayAbbreviationList(): List<String> {
@@ -390,16 +468,16 @@ private fun DayCell(
     onClick: () -> Unit
 ) {
     val backgroundColor = when {
-        isPlanned -> MaterialTheme.colorScheme.primary
+        isPlanned -> GreenLight
         else -> Color.Transparent
     }
     val contentColor = when {
-        isPlanned -> MaterialTheme.colorScheme.onPrimary
-        isToday -> MaterialTheme.colorScheme.primary
+        isPlanned -> Color.Black
+        isToday -> Color.Black
         else -> MaterialTheme.colorScheme.onSurface
     }
     val borderModifier = if (isToday && !isPlanned) {
-        Modifier.border(1.dp, MaterialTheme.colorScheme.primary, CircleShape)
+        Modifier.border(1.dp, GreenDark, CircleShape)
     } else {
         Modifier
     }

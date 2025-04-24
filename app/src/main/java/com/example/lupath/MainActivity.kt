@@ -21,9 +21,15 @@ class MainActivity : ComponentActivity() {
         setContent {
             LuPathTheme {
                 val navController = rememberNavController()
-                AppNavGraph(navController = navController)
+                AppNavGraph(
+                    navController = navController,
+                    exitApp = ::exitApp
+                )
             }
         }
     }
-}
 
+    private fun exitApp() {
+        finishAffinity()
+    }
+}
