@@ -258,7 +258,7 @@ fun PlanCard(
                     .padding(12.dp)
             ) {
                 Text(mountainName, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                Text(date, fontSize = 12.sp, color = Color.Gray)
+                Text(date, fontSize = 12.sp, color = Color.Black)
                 Text("Difficulty: $difficulty", fontSize = 12.sp)
             }
 
