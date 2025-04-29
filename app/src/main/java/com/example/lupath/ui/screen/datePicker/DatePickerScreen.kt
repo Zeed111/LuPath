@@ -52,6 +52,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialogDefaults.containerColor
 import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -187,6 +188,8 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun DatePickerScreen(navController: NavHostController, viewModel: HikePlanViewModel = viewModel()) {
     val datePickerState = rememberDatePickerState()
+    val screenScrollState = rememberScrollState()
+    val context = LocalContext.current
 
     Scaffold(
         containerColor = Color.White,
@@ -240,6 +243,8 @@ fun DatePickerScreen(navController: NavHostController, viewModel: HikePlanViewMo
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .verticalScroll(screenScrollState)
+                .padding(bottom = 80.dp)
         ) {
             // 🔙 Back, Logo, Settings
             Row(
@@ -258,7 +263,9 @@ fun DatePickerScreen(navController: NavHostController, viewModel: HikePlanViewMo
                     contentDescription = "Logo",
                     modifier = Modifier.size(40.dp)
                 )
-                IconButton(onClick = { /* Settings */ }) {
+                IconButton(onClick = {
+                    navController.navigate("settings")
+                }) {
                     Icon(Icons.Default.Settings, contentDescription = "Settings")
                 }
             }
@@ -285,19 +292,10 @@ fun DatePickerScreen(navController: NavHostController, viewModel: HikePlanViewMo
                     containerColor = GreenLight
                 )
             ) {
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(GreenLight)
-                        .wrapContentHeight()
-                ) {
-                    DatePicker(
-                        state = datePickerState,
-                        modifier = Modifier.fillMaxWidth()
-
-                    )
-                }
+                DatePicker(
+                    state = datePickerState,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
     }

@@ -29,8 +29,10 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -49,9 +51,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.lupath.R
 import com.example.lupath.ui.theme.Lato
 import java.net.URLEncoder
+
+object Routes {
+    const val LUPATH_LIST = "lupath_list"
+    const val HOME = "home"
+    const val CHECK_LIST = "check_list"
+    // Add other routes...
+}
 
 @Composable
 fun HomeScreen(navController: NavHostController) {
@@ -65,36 +75,101 @@ fun HomeScreen(navController: NavHostController) {
 }
 
 @Composable
-fun HomeBottomNav(navController: NavHostController) {
-    NavigationBar (
+fun HomeBottomNav(navController: NavHostController,) {
+    // 1. Observe the current back stack entry
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    // 2. Get the current route name
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    NavigationBar(
         containerColor = Color(0xFFC0D9C6)
+        // Consider using MaterialTheme.colorScheme.surfaceVariant or similar
     ) {
+        // --- Lupath Item ---
         NavigationBarItem(
-            selected = false,
-            onClick = { navController.navigate("lupath_list") {
-                launchSingleTop = true
-            } },
-            icon = { Icon( painter = painterResource(id = R.drawable.lupath), contentDescription = "Lupath",
-                modifier = Modifier.size(37.dp), tint = Color.Black) },
-            label = { Text("Lupath", color = Color.Black, fontFamily = Lato) }
+            // 3. Set selected based on current route
+            selected = currentRoute == Routes.LUPATH_LIST,
+            onClick = {
+                // 4. Navigate only if not already on this screen
+                if (currentRoute != Routes.LUPATH_LIST) {
+                    navController.navigate(Routes.LUPATH_LIST) {
+                        // Optional: Pop up to the start destination graph to avoid building up back stack
+                        // popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        // Optional: Restore state if popping up
+                        // restoreState = true
+                    }
+                }
+            },
+            icon = {
+                Icon(
+                    painter = painterResource(id = R.drawable.lupath),
+                    contentDescription = "Lupath",
+                    modifier = Modifier.size(37.dp),
+                    tint = if (currentRoute == Routes.LUPATH_LIST) MaterialTheme.colorScheme.onSecondaryContainer else Color.Black // Example selected tint
+                )
+            },
+            label = { Text("Lupath", color = Color.Black, fontFamily = Lato) },
+            // Customize colors for selected/unselected states
+            colors = NavigationBarItemDefaults.colors(
+                indicatorColor = Color.Gray // Example indicator color
+                // unselectedIconColor = Color.Black,
+                // selectedIconColor = ..., // Set explicitly if needed
+                // unselectedTextColor = Color.Black,
+                // selectedTextColor = ...
+            )
         )
+
+        // --- Home Item ---
         NavigationBarItem(
-            selected = false,
-            onClick = { navController.navigate("home"){
-                launchSingleTop = true
-            } },
-            icon = { Icon(Icons.Default.Home, contentDescription = "Home", modifier = Modifier.size(37.dp),
-                tint = Color.Black) },
+            selected = currentRoute == Routes.HOME,
+            onClick = {
+                if (currentRoute != Routes.HOME) {
+                    navController.navigate(Routes.HOME) {
+                        // popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        // restoreState = true
+                    }
+                }
+            },
+            icon = {
+                Icon(
+                    Icons.Default.Home,
+                    contentDescription = "Home",
+                    modifier = Modifier.size(37.dp),
+                    tint = if (currentRoute == Routes.HOME) MaterialTheme.colorScheme.onSecondaryContainer else Color.Black // Example selected tint
+                )
+            },
             label = { Text("Home", color = Color.Black, fontFamily = Lato) },
+            colors = NavigationBarItemDefaults.colors(
+                indicatorColor = Color.Gray
+            )
         )
+
+        // --- List Item ---
         NavigationBarItem(
-            selected = false,
-            onClick = { navController.navigate("check_list") {
-              launchSingleTop = true
-            } },
-            icon = { Icon(Icons.AutoMirrored.Filled.List, contentDescription = "List",
-                modifier = Modifier.size(37.dp), tint = Color.Black) },
-            label = { Text("List", color = Color.Black, fontFamily = Lato) }
+            selected = currentRoute == Routes.CHECK_LIST,
+            onClick = {
+                if (currentRoute != Routes.CHECK_LIST) {
+                    navController.navigate(Routes.CHECK_LIST) {
+                        // popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        // restoreState = true
+                    }
+                }
+            },
+            icon = {
+                Icon(
+                    Icons.AutoMirrored.Filled.List,
+                    contentDescription = "List",
+                    modifier = Modifier.size(37.dp),
+                    tint = if (currentRoute == Routes.CHECK_LIST) MaterialTheme.colorScheme.onSecondaryContainer else Color.Black // Example selected tint
+                )
+            },
+            label = { Text("List", color = Color.Black, fontFamily = Lato) },
+            colors = NavigationBarItemDefaults.colors(
+                indicatorColor = Color.Gray
+            )
         )
     }
 }
@@ -253,35 +328,45 @@ fun PopularMountainCard(name: String, location: String, navController: NavHostCo
 fun MountainListCard(name: String, difficulty: String, description: String, navController: NavHostController) {
     Card(
         shape = RoundedCornerShape(10.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         modifier = Modifier
-            .fillMaxWidth()
             .padding(horizontal = 15.dp, vertical = 8.dp)
+            .fillMaxWidth()
+            .height(100.dp)
             .clickable {
                 navController.navigate("mountainDetail/${URLEncoder.encode(name, "UTF-8")}")
-            }
+            },
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors( // Add the 'colors' parameter
+            containerColor = Color(0xFFD9D9D9))
     ) {
         Row(
             modifier = Modifier
-                .background(Color(0xFFD9D9D9))
-                .padding(8.dp)
-                .height(100.dp)
+                .fillMaxSize()
+                .background(Color(0xFFD9D9D9)),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
                     .width(100.dp)
-                    .background(Color.Gray, RoundedCornerShape(10.dp)),
+                    .background(Color.Gray),
                 contentAlignment = Alignment.Center
             ) {
+                // TODO: Replace with actual Image composable if imageUrl is provided
+                // Example:
+                // if (imageUrl != null) {
+                //     Image(painter = rememberAsyncImagePainter(imageUrl), contentDescription = mountainName, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+                // } else {
+                //     Icon(Icons.Default.Landscape, contentDescription = "Placeholder", tint = Color.White) // Placeholder Icon
+                // }
                 Text("Image", color = Color.White)
             }
 
-            Spacer(modifier = Modifier.width(12.dp))
-
             Column(
-                verticalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxHeight()
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(12.dp)
+
             ) {
                 Text(name, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.Black,
                     fontFamily = Lato)

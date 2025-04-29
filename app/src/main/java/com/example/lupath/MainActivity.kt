@@ -10,6 +10,8 @@ import com.example.lupath.ui.theme.LuPathTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
         setContent {
             LuPathTheme {
                 val navController = rememberNavController()

@@ -22,8 +22,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
@@ -45,6 +47,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,6 +60,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.lupath.R
@@ -80,73 +84,95 @@ fun LuPathListScreen(
     navController: NavHostController,
     viewModel: HikePlanViewModel = viewModel()
 ) {
+    val screenScrollState = rememberScrollState()
+    val hikePlansList by viewModel.hikePlans.collectAsStateWithLifecycle()
+
+
     Scaffold(
         topBar = { LuPathTopBar(navController = navController) },
         containerColor = Color.White,
         bottomBar = { HomeBottomNav(navController) }
     ) { padding ->
-        Column(
+        LazyColumn(
             modifier = Modifier
-                .padding(padding)
+                .padding(padding) // Apply padding from Scaffold
                 .fillMaxSize(),
+            // Center titles if desired for the whole list content
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "My LuPath",
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Bold,
-                fontFamily = Lato,
-                modifier = Modifier.padding(10.dp)
-            )
-
-            Text(
-                text = "Calendar",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Medium,
-                fontFamily = Lato,
-                modifier = Modifier
-                    .align(Alignment.Start)
-                    .padding(top = 20.dp, start = 30.dp)
-            )
-
-//             Calendar to display planned hike dates
-            CustomCalendarM3Style(
-                hikePlans = viewModel.hikePlans,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-
-                onDateClick = { clickedDate ->
-                    println("Clicked on date: $clickedDate")
-                }
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            LazyColumn(modifier = Modifier
-                .weight(1f)
-                .padding(bottom = 10.dp)
-            ) {
-                items(
-                    items = viewModel.hikePlans,
-                    key = { plan -> plan.hashCode() }
-                ) { plan ->
-                    PlanCard(
-                        mountainName = plan.mountainName,
-                        difficulty = plan.difficulty,
-                        date = plan.date.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")),
-                        onEdit = {
-                            // TODO: Implement Edit Action
-                            println("Edit: ${plan.mountainName}")
-                        },
-                        onDelete = {
-                            // *** IMPLEMENT Delete Action ***
-                            viewModel.removeHikePlan(plan)
-                        }
-                    )
-                }
+            // --- Header Items ---
+            item { // Title 1
+                Text(
+                    text = "My LuPath",
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = Lato,
+                    modifier = Modifier.padding(10.dp)
+                )
             }
-        }
+
+            item { // Title 2
+                Text(
+                    text = "Calendar",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    fontFamily = Lato,
+                    modifier = Modifier
+                        // Align within the LazyColumn width
+                        .fillMaxWidth()
+                        .padding(top = 20.dp, start = 30.dp, end = 30.dp)
+                )
+            }
+
+            item { // Calendar Item
+                CustomCalendarM3Style(
+                    hikePlans = hikePlansList,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    onDateClick = { clickedDate ->
+                        println("Clicked on date: $clickedDate")
+                    }
+                )
+            }
+
+            item { // Spacer Item
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            item { // Title 3
+                Text(
+                    text = "Planned Hikes",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    fontFamily = Lato,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 30.dp, end = 30.dp, bottom = 8.dp)
+                )
+            }
+
+            // --- Plan Card Items ---
+            items(
+                items = hikePlansList,
+                key = { plan -> plan.hashCode() } // Use plan.id if available
+            ) { plan ->
+                PlanCard(
+                    mountainName = plan.mountainName,
+                    difficulty = plan.difficulty,
+                    date = plan.date.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")) ?: "No Date",
+                    onEdit = { /* ... */ },
+                    onDelete = { viewModel.removeHikePlan(plan) }
+                )
+                // Add spacing within the item lambda or use contentPadding on LazyColumn
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
+            item { // Spacer at the very end
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+        } // End of LazyColumn
     }
 }
 
@@ -232,16 +258,17 @@ fun PlanCard(
     onDelete: () -> Unit
 ) {
     Card(
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(10.dp),
         modifier = Modifier
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(horizontal = 15.dp, vertical = 8.dp)
             .fillMaxWidth()
             .height(100.dp),
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors( // Add the 'colors' parameter
             containerColor = Color(0xFFD9D9D9))
     ) {
-        Row(modifier = Modifier
+        Row(
+            modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFD9D9D9))
         ) {
@@ -293,14 +320,130 @@ fun PlanCard(
     }
 }
 
+//@Composable
+//fun CustomCalendarM3Style(
+//    hikePlans: List<HikePlan>,
+//    modifier: Modifier = Modifier,
+//    onDateClick: (LocalDate) -> Unit = {}
+//) {
+//    var currentMonth by rememberSaveable { mutableStateOf(YearMonth.now()) }
+//    val density = LocalDensity.current
+//
+//    val onPreviousMonth = { currentMonth = currentMonth.minusMonths(1) }
+//    val onNextMonth = { currentMonth = currentMonth.plusMonths(1) }
+//
+//    val daysInMonth = currentMonth.lengthOfMonth()
+//    val firstOfMonth = currentMonth.atDay(1)
+//    val startDayOfWeek = firstOfMonth.dayOfWeek.value % 7
+//    val paddingDays = startDayOfWeek
+//    val monthName = currentMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy"))
+//    val daysOfWeek = remember { getWeekDayAbbreviationList() } // Get S, M, T...
+//    val plannedDates = remember(hikePlans) {
+//        hikePlans.map { it.date }.toSet()
+//    }
+//// Swipe gesture tracking
+//    var swipeOffsetX by remember { mutableFloatStateOf(0f) }
+//    var gestureConsumed by remember { mutableStateOf(false) } // To prevent multiple month changes per swipe
+//
+//    Card(
+//        modifier = modifier,
+//        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+//        shape = MaterialTheme.shapes.medium,
+//        colors = CardDefaults.cardColors( // Add the 'colors' parameter
+//            containerColor = Color(0xFFD9D9D9))
+//
+//    ) {
+//        Column(modifier = Modifier.padding(16.dp)) {
+//            CalendarHeader(
+//                monthName = monthName,
+//                onPreviousMonth = onPreviousMonth,
+//                onNextMonth = onNextMonth
+//            )
+//
+//            Spacer(modifier = Modifier.height(16.dp))
+//
+//            Column(
+//                modifier = Modifier.pointerInput(currentMonth) { // Pass currentMonth as key to reset detector on month change
+//                    detectHorizontalDragGestures(
+//                        onDragStart = {
+//                            swipeOffsetX = 0f // Reset offset at the start of a drag
+//                            gestureConsumed = false // Reset consumed flag
+//                        },
+//                        onHorizontalDrag = { change, dragAmount ->
+//                            // Only consume if not already consumed in this gesture
+//                            if (!gestureConsumed) {
+//                                swipeOffsetX += dragAmount
+//                                // Optional: Consume the pointer event if handling drag
+//                                // change.consume()
+//                            }
+//                        },
+//                        onDragEnd = {
+//                            if (!gestureConsumed) {
+//                                val swipeThresholdPx = with(density) { 60.dp.toPx() } // Threshold in pixels
+//
+//                                if (swipeOffsetX > swipeThresholdPx) {
+//                                    // Swiped Right (finger moved right) -> Previous Month
+//                                    onPreviousMonth()
+//                                    gestureConsumed = true
+//                                } else if (swipeOffsetX < -swipeThresholdPx) {
+//                                    // Swiped Left (finger moved left) -> Next Month
+//                                    onNextMonth()
+//                                    gestureConsumed = true
+//                                }
+//                                // Reset offset after drag ends, regardless of threshold met
+//                                swipeOffsetX = 0f
+//                            }
+//                        }
+//                    )
+//                }
+//            ) {
+//                DaysOfWeekHeader(daysOfWeek)
+//
+//                Spacer(modifier = Modifier.height(8.dp))
+//
+//                LazyVerticalGrid(
+//                    columns = GridCells.Fixed(7),
+//                    // Let the grid determine its height based on content
+//                    // Apply minimum height if needed, but avoid fixed large height
+//                    modifier = Modifier.heightIn(min = 280.dp), // Ensure minimum touch area
+//                    userScrollEnabled = false // Disable grid's own scrolling to prevent conflicts
+//                ) {
+//                    // --- Padding Items ---
+//                    items(paddingDays) {
+//                        // Render empty boxes for padding days at the start of the month
+//                        Box(modifier = Modifier.size(40.dp)) // Same size as DayCell
+//                    }
+//
+//                    // --- Day Items ---
+//                    items(daysInMonth) { dayOfMonth ->
+//                        val day = dayOfMonth + 1
+//                        val date = currentMonth.atDay(day)
+//                        val isPlanned = plannedDates.contains(date)
+//                        val isToday = date == LocalDate.now()
+//
+//                        DayCell(
+//                            day = day,
+//                            date = date,
+//                            isPlanned = isPlanned,
+//                            isToday = isToday,
+//                            onClick = { onDateClick(date) }
+//                        )
+//                    }
+//                }
+//            } // End of swipeable Column
+//        } // End of Card's Column
+//    } // End of Card
+//}
+
 @Composable
 fun CustomCalendarM3Style(
     hikePlans: List<HikePlan>,
     modifier: Modifier = Modifier,
     onDateClick: (LocalDate) -> Unit = {}
 ) {
-    var currentMonth by remember { mutableStateOf(YearMonth.now()) }
-    val density = LocalDensity.current
+    var currentMonth by rememberSaveable { mutableStateOf(YearMonth.now()) }
+    // Keep density if needed for swipe threshold, but swipe might be less intuitive now
+    // val density = LocalDensity.current
 
     val onPreviousMonth = { currentMonth = currentMonth.minusMonths(1) }
     val onNextMonth = { currentMonth = currentMonth.plusMonths(1) }
@@ -310,21 +453,20 @@ fun CustomCalendarM3Style(
     val startDayOfWeek = firstOfMonth.dayOfWeek.value % 7
     val paddingDays = startDayOfWeek
     val monthName = currentMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy"))
-    val daysOfWeek = remember { getWeekDayAbbreviationList() } // Get S, M, T...
-    val plannedDates = remember(hikePlans) {
+    val daysOfWeek = remember { getWeekDayAbbreviationList() }
+    val plannedDates = remember(hikePlans, currentMonth) { // Recalculate if plans or month change
         hikePlans.map { it.date }.toSet()
     }
-// Swipe gesture tracking
-    var swipeOffsetX by remember { mutableFloatStateOf(0f) }
-    var gestureConsumed by remember { mutableStateOf(false) } // To prevent multiple month changes per swipe
+
+    // Remove swipe state if removing swipe modifier
+    // var swipeOffsetX by remember { mutableFloatStateOf(0f) }
+    // var gestureConsumed by remember { mutableStateOf(false) }
 
     Card(
         modifier = modifier,
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors( // Add the 'colors' parameter
-            containerColor = Color(0xFFD9D9D9))
-
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFD9D9D9))
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             CalendarHeader(
@@ -332,78 +474,53 @@ fun CustomCalendarM3Style(
                 onPreviousMonth = onPreviousMonth,
                 onNextMonth = onNextMonth
             )
-
             Spacer(modifier = Modifier.height(16.dp))
 
-            Column(
-                modifier = Modifier.pointerInput(currentMonth) { // Pass currentMonth as key to reset detector on month change
-                    detectHorizontalDragGestures(
-                        onDragStart = {
-                            swipeOffsetX = 0f // Reset offset at the start of a drag
-                            gestureConsumed = false // Reset consumed flag
-                        },
-                        onHorizontalDrag = { change, dragAmount ->
-                            // Only consume if not already consumed in this gesture
-                            if (!gestureConsumed) {
-                                swipeOffsetX += dragAmount
-                                // Optional: Consume the pointer event if handling drag
-                                // change.consume()
-                            }
-                        },
-                        onDragEnd = {
-                            if (!gestureConsumed) {
-                                val swipeThresholdPx = with(density) { 60.dp.toPx() } // Threshold in pixels
+            // Removed the Column with pointerInput modifier
 
-                                if (swipeOffsetX > swipeThresholdPx) {
-                                    // Swiped Right (finger moved right) -> Previous Month
-                                    onPreviousMonth()
-                                    gestureConsumed = true
-                                } else if (swipeOffsetX < -swipeThresholdPx) {
-                                    // Swiped Left (finger moved left) -> Next Month
-                                    onNextMonth()
-                                    gestureConsumed = true
-                                }
-                                // Reset offset after drag ends, regardless of threshold met
-                                swipeOffsetX = 0f
+            DaysOfWeekHeader(daysOfWeek)
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // --- Replace LazyVerticalGrid with basic Columns/Rows ---
+            // This will compose all day cells at once. Acceptable if calendar isn't huge.
+            Column { // Column to hold the rows of weeks
+                val totalCells = paddingDays + daysInMonth
+                val numRows = (totalCells + 6) / 7 // Calculate number of rows needed
+
+                var dayOfMonth = 1
+                repeat(numRows) { // Create each week row
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceAround // Distribute cells
+                    ) {
+                        repeat(7) { dayIndex -> // Create each day cell/placeholder
+                            val cellIndex = it * 7 + dayIndex
+                            if (cellIndex < paddingDays || dayOfMonth > daysInMonth) {
+                                // Empty box for padding or after last day
+                                Box(modifier = Modifier.size(40.dp))
+                            } else {
+                                // Actual DayCell
+                                val date = currentMonth.atDay(dayOfMonth)
+                                val isPlanned = plannedDates.contains(date)
+                                val isToday = date == LocalDate.now()
+                                DayCell(
+                                    day = dayOfMonth,
+                                    date = date,
+                                    isPlanned = isPlanned,
+                                    isToday = isToday,
+                                    onClick = { onDateClick(date) }
+                                )
+                                dayOfMonth++ // Increment day
                             }
                         }
-                    )
-                }
-            ) {
-                DaysOfWeekHeader(daysOfWeek)
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(7),
-                    // Let the grid determine its height based on content
-                    // Apply minimum height if needed, but avoid fixed large height
-                    modifier = Modifier.heightIn(min = 240.dp), // Ensure minimum touch area
-                    userScrollEnabled = false // Disable grid's own scrolling to prevent conflicts
-                ) {
-                    // --- Padding Items ---
-                    items(paddingDays) {
-                        // Render empty boxes for padding days at the start of the month
-                        Box(modifier = Modifier.size(40.dp)) // Same size as DayCell
                     }
-
-                    // --- Day Items ---
-                    items(daysInMonth) { dayOfMonth ->
-                        val day = dayOfMonth + 1
-                        val date = currentMonth.atDay(day)
-                        val isPlanned = plannedDates.contains(date)
-                        val isToday = date == LocalDate.now()
-
-                        DayCell(
-                            day = day,
-                            date = date,
-                            isPlanned = isPlanned,
-                            isToday = isToday,
-                            onClick = { onDateClick(date) }
-                        )
+                    if (it < numRows - 1) { // Add spacing between weeks if desired
+                        Spacer(modifier = Modifier.height(4.dp))
                     }
                 }
-            } // End of swipeable Column
+            }
+            // --- End of basic Columns/Rows calendar grid ---
+
         } // End of Card's Column
     } // End of Card
 }
