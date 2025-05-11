@@ -44,7 +44,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -60,7 +62,6 @@ object Routes {
     const val LUPATH_LIST = "lupath_list"
     const val HOME = "home"
     const val CHECK_LIST = "check_list"
-    // Add other routes...
 }
 
 @Composable
@@ -83,7 +84,6 @@ fun HomeBottomNav(navController: NavHostController,) {
 
     NavigationBar(
         containerColor = Color(0xFFC0D9C6)
-        // Consider using MaterialTheme.colorScheme.surfaceVariant or similar
     ) {
         // --- Lupath Item ---
         NavigationBarItem(
@@ -110,7 +110,6 @@ fun HomeBottomNav(navController: NavHostController,) {
                 )
             },
             label = { Text("Lupath", color = Color.Black, fontFamily = Lato) },
-            // Customize colors for selected/unselected states
             colors = NavigationBarItemDefaults.colors(
                 indicatorColor = Color.Gray // Example indicator color
                 // unselectedIconColor = Color.Black,
@@ -304,19 +303,30 @@ fun PopularMountainCard(name: String, location: String, navController: NavHostCo
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFD9D9D9)) // Optional: Keeps it bright even in dark mode
+                .background(Color(0xFFD9D9D9))
                 .padding(10.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Box(
+//            Box(
+//                modifier = Modifier
+//                    .size(100.dp)
+//                    .background(Color.DarkGray, RoundedCornerShape(8.dp)),
+//                contentAlignment = Alignment.Center
+//            ) {
+//                Text("Image", color = Color.White)
+//            }
+
+            Image(
+                painter = painterResource(id = R.drawable.mt_pulag_ex),
+                contentDescription = "mt pulag",
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(100.dp)
-                    .background(Color.DarkGray, RoundedCornerShape(8.dp)),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("Image", color = Color.White)
-            }
+                    .clip(RoundedCornerShape(8.dp))
+            )
+
             Spacer(Modifier.height(8.dp))
+
             Text(name, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color.Black,
                 fontFamily = Lato)
             Text(location, fontSize = 12.sp, color = Color.Black, fontFamily = Lato)
@@ -336,7 +346,7 @@ fun MountainListCard(name: String, difficulty: String, description: String, navC
                 navController.navigate("mountainDetail/${URLEncoder.encode(name, "UTF-8")}")
             },
         elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors( // Add the 'colors' parameter
+        colors = CardDefaults.cardColors(
             containerColor = Color(0xFFD9D9D9))
     ) {
         Row(
@@ -345,22 +355,31 @@ fun MountainListCard(name: String, difficulty: String, description: String, navC
                 .background(Color(0xFFD9D9D9)),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(
+//            Box(
+//                modifier = Modifier
+//                    .fillMaxHeight()
+//                    .width(100.dp)
+//                    .background(Color.Gray),
+//                contentAlignment = Alignment.Center
+//            ) {
+//                // TODO: Replace with actual Image composable if imageUrl is provided
+//                // Example:
+//                // if (imageUrl != null) {
+//                //     Image(painter = rememberAsyncImagePainter(imageUrl), contentDescription = mountainName, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+//                // } else {
+//                //     Icon(Icons.Default.Landscape, contentDescription = "Placeholder", tint = Color.White) // Placeholder Icon
+//                // }
+//                Text("Image", color = Color.White)
+//            }
+
+            Image(
+                painter = painterResource(id = R.drawable.mt_pulag_ex),
+                contentDescription = "mt pulag",
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxHeight()
                     .width(100.dp)
-                    .background(Color.Gray),
-                contentAlignment = Alignment.Center
-            ) {
-                // TODO: Replace with actual Image composable if imageUrl is provided
-                // Example:
-                // if (imageUrl != null) {
-                //     Image(painter = rememberAsyncImagePainter(imageUrl), contentDescription = mountainName, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
-                // } else {
-                //     Icon(Icons.Default.Landscape, contentDescription = "Placeholder", tint = Color.White) // Placeholder Icon
-                // }
-                Text("Image", color = Color.White)
-            }
+            )
 
             Column(
                 modifier = Modifier
@@ -377,6 +396,3 @@ fun MountainListCard(name: String, difficulty: String, description: String, navC
         }
     }
 }
-
-
-

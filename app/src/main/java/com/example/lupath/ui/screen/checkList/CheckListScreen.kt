@@ -1,4 +1,4 @@
-package com.example.lupath.ui.screen.toBringList
+package com.example.lupath.ui.screen.checkList
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -52,7 +51,6 @@ import com.example.lupath.data.model.ChecklistViewModel
 import com.example.lupath.ui.screen.home.HomeBottomNav
 import com.example.lupath.ui.theme.GreenDark
 import com.example.lupath.ui.theme.GreenLight
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -60,123 +58,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.sp
-
-
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun CheckListScreen(
-//    navController: NavHostController,
-//    viewModel: ChecklistViewModel = viewModel()
-//) {
-//    var showAddDialog by rememberSaveable { mutableStateOf(false) }
-//    val predefinedItemsList by viewModel.predefinedItems.collectAsStateWithLifecycle() // <<< Collect State
-//    val personalItemsList by viewModel.personalItems.collectAsStateWithLifecycle()   // <<< Collect State
-//
-//    Scaffold(
-//        topBar = { LuPathTopBar(navController = navController) },
-//        containerColor = Color.White,
-//        bottomBar = { HomeBottomNav(navController) }
-//    ) { paddingValues ->
-//
-//        LazyColumn(
-//            modifier = Modifier
-//                .padding(paddingValues) // Apply padding from Scaffold
-//                .fillMaxSize()
-//                .padding(horizontal = 16.dp), // Add horizontal padding once here
-//            horizontalAlignment = Alignment.CenterHorizontally
-//        ) {
-//            // --- Predefined Checklist Section ---
-//            item { // Header as an item
-//                Text(
-//                    text = "Check List",
-//                    style = MaterialTheme.typography.headlineSmall,
-//                    fontWeight = FontWeight.Bold,
-//                    modifier = Modifier
-//                        .fillMaxWidth() // Allow aligning start
-//                        .padding(top = 16.dp, bottom = 8.dp) // Add vertical padding
-//                    // .align(Alignment.Start) // This won't work directly on item's modifier
-//                    // Alignment is controlled by LazyColumn's horizontalAlignment or Text's textAlign
-//                )
-//            }
-//
-//            items(
-//                items = predefinedItemsList,
-//                key = { item: ChecklistItem -> item.id } // Explicit type for key lambda
-//            ) { item: ChecklistItem -> // <<< Explicitly type 'item' here
-//                ChecklistItemRow(
-//                    item = item,
-//                    onCheckedChange = { // isChecked parameter is implicitly Boolean
-//                        viewModel.togglePredefinedItemChecked(item)
-//                    }
-//                )
-//            }
-//
-//            item { // Spacer as an item
-//                Spacer(modifier = Modifier.height(24.dp))
-//            }
-//
-//            item { // Header as an item
-//                Text(
-//                    text = "My personal Check List",
-//                    style = MaterialTheme.typography.headlineSmall,
-//                    fontWeight = FontWeight.Bold,
-//                    modifier = Modifier
-//                        .fillMaxWidth() // Allow aligning start
-//                        .padding(bottom = 8.dp)
-//                    // .align(Alignment.Start) // Controlled by LazyColumn alignment
-//                )
-//            }
-//
-//            // --- Personal Checklist Section ---
-//            if (personalItemsList.isEmpty()) { // Use collected list
-//                item { // Placeholder text as an item
-//                    Text(
-//                        text = "No personal items added yet.",
-//                        style = MaterialTheme.typography.bodyMedium,
-//                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-//                        modifier = Modifier.padding(vertical = 16.dp) // More padding maybe
-//                    )
-//                }
-//            }
-//
-//            items(
-//                items = personalItemsList,
-//                key = { item: ChecklistItem -> item.id } // Explicit type for key lambda
-//            ) { item: ChecklistItem -> // <<< Explicitly type 'item' here
-//                ChecklistItemRow(
-//                    item = item,
-//                    onCheckedChange = { // isChecked parameter is implicitly Boolean
-//                        viewModel.togglePersonalItemChecked(item)
-//                    },
-//                    onDelete = { viewModel.removePersonalItem(item) }
-//                )
-//            }
-//
-//            // --- Add Entry Button as the last item ---
-//            item {
-//                AddEntryButton(
-//                    modifier = Modifier.padding(top = 24.dp, bottom = 16.dp), // Adjust padding
-//                    onClick = { showAddDialog = true }
-//                )
-//            }
-//        } // End of LazyColumn
-//    } // End of Scaffold
-//
-//    // --- Dialog ---
-//    if (showAddDialog) {
-//        AddChecklistItemDialog(
-//            onDismiss = { showAddDialog = false },
-//            onConfirm = { text ->
-//                viewModel.addPersonalItem(text)
-//                // Keep dialog open after adding? Or dismiss?
-//                // If dismiss:
-//                showAddDialog = false
-//                // If stay open:
-//                // showAddDialog = true // (it's already true, maybe clear text instead?)
-//            }
-//        )
-//    }
-//}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -187,41 +68,38 @@ fun CheckListScreen(
     var showAddDialog by rememberSaveable { mutableStateOf(false) }
     val predefinedItemsList by viewModel.predefinedItems.collectAsStateWithLifecycle()
     val personalItemsList by viewModel.personalItems.collectAsStateWithLifecycle()
-    // State for the main screen scroll
     val screenScrollState = rememberScrollState()
 
     Scaffold(
         topBar = { LuPathTopBar(navController = navController) },
-        containerColor = Color.White, // Or MaterialTheme.colorScheme.background
+        containerColor = Color.White,
         bottomBar = { HomeBottomNav(navController) }
     ) { paddingValues ->
 
         // --- Outer Column handles the overall screen scrolling ---
         Column(
             modifier = Modifier
-                .padding(paddingValues) // Apply padding from Scaffold
+                .padding(paddingValues)
                 .fillMaxSize()
-                .verticalScroll(screenScrollState) // <<< OUTER SCROLL ENABLED
-                .padding(bottom = 16.dp) // Padding at the very bottom of scrollable area
+                .verticalScroll(screenScrollState)
+                .padding(bottom = 16.dp)
         ) {
             // --- Card Container for the Checklist ---
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    // Add horizontal/vertical padding for the card itself
                     .padding(horizontal = 16.dp, vertical = 16.dp),
-                shape = RoundedCornerShape(10.dp), // Adjust shape as desired
+                shape = RoundedCornerShape(10.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                 colors = CardDefaults.cardColors(
-                    // Set desired card background color
-                    containerColor = Color(0xFFF0F0F0) // Example: Light Gray Card
+                    containerColor = Color(0xFFF0F0F0)
                 )
             ) {
                 // --- Column for content *inside* the Card ---
                 // --- This inner Column is NOT scrollable itself ---
                 Column(
                     modifier = Modifier
-                        .padding(horizontal = 16.dp, vertical = 16.dp), // Padding inside card
+                        .padding(horizontal = 16.dp, vertical = 16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     // --- Predefined Checklist Section ---
@@ -231,7 +109,7 @@ fun CheckListScreen(
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp,
                         modifier = Modifier
-                            .align(Alignment.CenterHorizontally) // Align title within the inner column
+                            .align(Alignment.CenterHorizontally)
                             .padding(bottom = 8.dp)
                     )
 
@@ -255,7 +133,7 @@ fun CheckListScreen(
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp,
                         modifier = Modifier
-                            .align(Alignment.CenterHorizontally) // Align title
+                            .align(Alignment.CenterHorizontally)
                             .padding(bottom = 8.dp)
                     )
 
@@ -283,7 +161,7 @@ fun CheckListScreen(
 
                     // --- Add Entry Button ---
                     AddEntryButton(
-                        modifier = Modifier.padding(top = 16.dp), // Padding above button inside card
+                        modifier = Modifier.padding(top = 16.dp),
                         onClick = { showAddDialog = true }
                     )
 
@@ -453,12 +331,12 @@ fun AddChecklistItemDialog(
                 },
                 enabled = text.isNotBlank() // Enable button only if text is entered
             ) {
-                Text("Add", color = GreenDark)
+                Text("Add", color = Color.Black)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel", color = GreenDark)
+                Text("Cancel", color = Color.Black)
             }
         }
     )

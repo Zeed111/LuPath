@@ -128,10 +128,10 @@ fun MountainDetailScreen(
 
             Column(
                 modifier = Modifier
-                    .fillMaxWidth() // Take remaining width
-                    .weight(1f) // Take remaining height
-                    .verticalScroll(scrollState) // <<< MAKE THIS PART SCROLLABLE
-                    .padding(bottom = 16.dp) // Padding at the very bottom of scrollable area
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .verticalScroll(scrollState)
+                    .padding(bottom = 16.dp)
             ) {
                 ImageCarouselSection()
 
@@ -209,12 +209,16 @@ fun MountainDetailScreen(
     }
 }
 
-
-
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun ImageCarouselSection() {
     val pagerState = rememberPagerState()
+
+    val images = listOf(
+        R.drawable.mt_pulag_ex,
+        R.drawable.mt_pulag_ex_2,
+        R.drawable.mt_pulag_ex_3
+    )
 
     Box(
         modifier = Modifier
@@ -239,27 +243,24 @@ fun ImageCarouselSection() {
 //                contentScale = ContentScale.Crop,
 //                modifier = Modifier.fillMaxSize()
 //            )
-            Box(
+
+            Image(
+                painter = painterResource(id = images[page]),
+                contentDescription = "mt pulag",
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(GreenDark),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "Image $page",
-                    color = Color.White,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = Lato
-                )
-            }
+            )
         }
 
         HorizontalPagerIndicator(
             pagerState = pagerState,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(12.dp)
+                .padding(12.dp),
+
+            activeColor = GreenDark,
+            inactiveColor = GreenDark.copy(alpha = 0.4f)
         )
     }
 }

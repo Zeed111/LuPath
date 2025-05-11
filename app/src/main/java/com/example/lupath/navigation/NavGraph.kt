@@ -13,7 +13,7 @@ import com.example.lupath.ui.screen.lupathList.LuPathListScreen
 import com.example.lupath.ui.screen.mountainDetails.MountainDetailScreen
 import com.example.lupath.ui.screen.settings.AboutScreen
 import com.example.lupath.ui.screen.settings.SettingsScreen
-import com.example.lupath.ui.screen.toBringList.CheckListScreen
+import com.example.lupath.ui.screen.checkList.CheckListScreen
 
 @Composable
 fun AppNavGraph(navController: NavHostController, exitApp: () -> Unit) {
@@ -71,5 +71,3 @@ fun AppNavGraph(navController: NavHostController, exitApp: () -> Unit) {
 
     }
 }
-
-

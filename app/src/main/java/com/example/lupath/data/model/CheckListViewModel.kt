@@ -52,7 +52,6 @@ class ChecklistViewModel : ViewModel() {
         // Persist change if necessary
     }
 
-
     fun addPersonalItem(text: String) {
         if (text.isNotBlank()) {
             val newItem = ChecklistItem(text = text.trim()) // Creates item with new UUID ID

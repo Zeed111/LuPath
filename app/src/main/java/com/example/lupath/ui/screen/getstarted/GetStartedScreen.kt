@@ -117,5 +117,3 @@ class FakeGetStartedViewModel : GetStartedViewModel() {
         // lalagyan palang
     }
 }
-
-

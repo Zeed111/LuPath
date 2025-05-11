@@ -34,11 +34,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.lupath.ui.theme.Lato
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    // Renamed parameters to indicate they are press handlers
     navController: NavHostController,
     onAboutPress: () -> Unit, // Callback for About item click
     onExitApp: () -> Unit
@@ -67,7 +65,7 @@ fun SettingsScreen(
                     Spacer(modifier = Modifier.width(48.dp)) // Match navigation icon width
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.White // Match background
+                    containerColor = Color.White
                 )
             )
         },
@@ -104,7 +102,6 @@ fun SettingsScreen(
     }
 }
 
-// --- SettingsItem Composable remains the same ---
 @Composable
 fun SettingsItem(
     icon: ImageVector,
