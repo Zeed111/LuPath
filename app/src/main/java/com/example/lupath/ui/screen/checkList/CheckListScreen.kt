@@ -58,12 +58,13 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CheckListScreen(
     navController: NavHostController,
-    viewModel: ChecklistViewModel = viewModel()
+    viewModel: ChecklistViewModel = hiltViewModel()
 ) {
     var showAddDialog by rememberSaveable { mutableStateOf(false) }
     val predefinedItemsList by viewModel.predefinedItems.collectAsStateWithLifecycle()
@@ -117,9 +118,8 @@ fun CheckListScreen(
                     predefinedItemsList.forEach { item ->
                         ChecklistItemRow(
                             item = item, // Pass the ChecklistItem object
-                            onCheckedChange = { isChecked -> // Receive boolean from Checkbox/Row click
-                                // Tell ViewModel to toggle based on the object
-                                viewModel.togglePredefinedItemChecked(item)
+                            onCheckedChange = {
+                                viewModel.toggleItemChecked(item) // ViewModel uses the item's current state
                             }
                             // No onDelete for predefined
                         )
@@ -150,9 +150,8 @@ fun CheckListScreen(
                         personalItemsList.forEach { item ->
                             ChecklistItemRow(
                                 item = item, // Pass the ChecklistItem object
-                                onCheckedChange = { isChecked -> // Receive boolean from Checkbox/Row click
-                                    // Tell ViewModel to toggle based on the object
-                                    viewModel.togglePersonalItemChecked(item)
+                                onCheckedChange = {
+                                    viewModel.toggleItemChecked(item)
                                 },
                                 onDelete = { viewModel.removePersonalItem(item) } // Pass the object
                             )

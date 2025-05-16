@@ -1,5 +1,6 @@
 package com.example.lupath.navigation
 
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -30,19 +31,31 @@ fun AppNavGraph(navController: NavHostController, exitApp: () -> Unit) {
         }
 
         composable(
-            route = "mountainDetail/{mountainName}",
-            arguments = listOf(navArgument("mountainName") { type = NavType.StringType })
+            route = "mountainDetail/{mountainId}",
+            arguments = listOf(navArgument("mountainId") { type = NavType.StringType })
         ) { backStackEntry ->
-            val mountainName =
-                backStackEntry.arguments?.getString("mountainName") ?: "Unknown Mountain"
-            MountainDetailScreen(
-                mountainName = mountainName,
-                navController = navController
-            )
+            val mountainIdFromRoute = backStackEntry.arguments?.getString("mountainId")
+            if (mountainIdFromRoute != null && mountainIdFromRoute.isNotBlank()) {
+                MountainDetailScreen(
+                    mountainIdFromNav = mountainIdFromRoute, // Pass the String ID
+                    navController = navController
+                )
+            } else {
+                Text("Error: Mountain ID is missing in navigation route.")
+            }
         }
 
-        composable("datepicker") {
-            DatePickerScreen(navController)
+        composable(
+            route = "datepicker/{mountainId}", // Add mountainId as argument
+            arguments = listOf(navArgument("mountainId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val mountainIdArg = backStackEntry.arguments?.getString("mountainId")
+            if (mountainIdArg != null) {
+                DatePickerScreen(navController = navController, mountainId = mountainIdArg)
+            } else {
+                // Handle error: mountainId not found, maybe navigate back or show error
+                Text("Error: Mountain ID missing.")
+            }
         }
 
         composable(route = "lupath_list") {

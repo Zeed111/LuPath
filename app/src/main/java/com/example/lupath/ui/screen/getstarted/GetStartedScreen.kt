@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import androidx.compose.foundation.Image
 import androidx.compose.ui.res.painterResource
+import com.example.lupath.data.model.GetStartedViewModel
 import com.example.lupath.ui.theme.GreenDark
 import com.example.lupath.ui.theme.Lato
 

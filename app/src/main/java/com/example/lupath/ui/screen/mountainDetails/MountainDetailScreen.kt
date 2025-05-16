@@ -1,71 +1,82 @@
 package com.example.lupath.ui.screen.mountainDetails
 
+import android.inputmethodservice.Keyboard.Row
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.example.lupath.R
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.ThumbUp
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.colorResource
-import androidx.navigation.NavController
+import com.example.lupath.data.database.entity.CampsiteEntity
+import com.example.lupath.data.database.entity.GuidelineEntity
+import com.example.lupath.data.model.MountainDetailViewModel
 import com.example.lupath.ui.screen.home.HomeBottomNav
-import com.example.lupath.ui.theme.GreenLight
-import com.google.accompanist.pager.*
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
-import androidx.compose.runtime.*
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.res.painterResource
 import com.example.lupath.ui.screen.lupathList.LuPathTopBar
 import com.example.lupath.ui.theme.GreenDark
 import com.example.lupath.ui.theme.Lato
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.HorizontalPagerIndicator
+import com.google.accompanist.pager.rememberPagerState
 
 @OptIn(ExperimentalPagerApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MountainDetailScreen(
-    mountainName: String,
+    mountainIdFromNav: String,
     navController: NavHostController
 ) {
-    val pagerState = rememberPagerState()
+
     val tabTitles = listOf("Details", "Camping Spot", "Guidelines")
     var selectedTab by remember { mutableStateOf(0) }
     val scrollState = rememberScrollState()
+    val application = LocalContext.current.applicationContext
+//    val mountainDao = (application as MyApplication).database.mountainDao()
+    val viewModel: MountainDetailViewModel = hiltViewModel()
+    val mountainDetailsState by viewModel.mountainWithDetails.collectAsStateWithLifecycle()
 
     val topAppBarColors = TopAppBarDefaults.topAppBarColors(
         containerColor = Color.Transparent, // Start transparent
@@ -95,7 +106,7 @@ fun MountainDetailScreen(
 
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { navController.navigate("datepicker") },
+                onClick = { navController.navigate("datepicker/$mountainIdFromNav") },
                 containerColor = Color.White,
                 shape = RoundedCornerShape(30),
                 modifier = Modifier
@@ -113,19 +124,6 @@ fun MountainDetailScreen(
             .padding(padding)
             .fillMaxSize()
         ) {
-
-            // Swipeable Image
-//            Box {
-////                ImageCarouselSection()
-//
-//                IconButton(
-//                    onClick = { navController.popBackStack() },
-//                    modifier = Modifier
-//                        .padding(5.dp)) {
-//                    Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-//                }
-//            }
-
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -133,80 +131,147 @@ fun MountainDetailScreen(
                     .verticalScroll(scrollState)
                     .padding(bottom = 16.dp)
             ) {
-                ImageCarouselSection()
+//                ImageCarouselSection()
 
                 Spacer(Modifier.height(12.dp))
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.Top
-                ) {
-                    Column {
-                        Text("Mountain Pulag", fontWeight = FontWeight.Bold, fontSize = 20.sp,
-                            fontFamily = Lato)
-                        Text("Lusod Kabayan, Benguet", fontSize = 14.sp, color = Color.Black,
-                            fontFamily = Lato)
+                val currentMountainData = mountainDetailsState
+
+                if (currentMountainData == null) {
+                    // --- Loading State or Error State ---
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 32.dp, start = 16.dp, end = 16.dp), // Give it some space
+                        contentAlignment = Alignment.Center
+                    ) {
+                        // You could check for an error state in your ViewModel
+                        // if (viewModel.hasError) { Text("Failed to load details.") } else {
+                        CircularProgressIndicator() // Show loading indicator
+                        // }
+                        Text("Loading details for $mountainIdFromNav...")
+                    }
+                } else {
+                    // --- Content When Data is Loaded ---
+                    val mountain = currentMountainData.mountain // The MountainEntity
+                    // val campsites = currentMountainData.campsites // List<CampsiteEntity>
+                    // val trails = currentMountainData.trails       // List<TrailEntity>
+                    // val guidelines = currentMountainData.guidelines // List<GuidelineEntity>
+
+                    // Image Carousel (Pass image references from 'mountain')
+                    ImageCarouselSection(
+                        // Example: Assuming 'mountain.pictureReference' is a list of image strings/IDs
+                        // imageReferences = mountain.pictureReferenceList ?: emptyList()
+                    )
+
+                    Spacer(Modifier.height(12.dp))
+
+                    // --- Mountain Title, Location, Difficulty Row ---
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.Top
+                    ) {
+                        Column(modifier = Modifier.weight(0.6f)) { // Give more weight to title/location
+                            Text(
+                                mountain.mountainName, // <<< FROM FETCHED DATA
+                                fontWeight = FontWeight.Bold, fontSize = 20.sp,
+                                fontFamily = Lato
+                            )
+                            Text(
+                                mountain.location, // <<< FROM FETCHED DATA
+                                fontSize = 14.sp, color = Color.Black,
+                                fontFamily = Lato
+                            )
+                        }
+
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.weight(0.4f) // Less weight for difficulty
+                        ) {
+                            Row { // Placeholder for rating icons
+                                repeat(3) {
+                                    Icon(
+                                        imageVector = Icons.Default.ThumbUp, // Error likely here
+                                        contentDescription = null,
+                                        modifier = Modifier.size(16.dp),
+                                        tint = Color.Black
+                                    )
+                                    Spacer(Modifier.width(6.dp))
+                                }
+                            }
+                            Spacer(Modifier.height(4.dp))
+                            Text(
+                                // Assuming difficultyText is the field in MountainEntity
+                                mountain.difficultyText, // <<< FROM FETCHED DATA
+                                fontSize = 12.sp, fontFamily = Lato,
+                                textAlign = TextAlign.Center
+                            )
+                        }
                     }
 
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Row {
-                            repeat(3) {
-                                Icon(
-                                    imageVector = Icons.Default.ThumbUp, // change pa sa need na icon, pansamantala lang
-                                    contentDescription = null,
-                                    modifier = Modifier.size(16.dp),
-                                    tint = Color.Black
-                                )
-                                Spacer(Modifier.width(6.dp))
+                    Spacer(Modifier.height(12.dp))
+
+                    // --- Tabs Row ---
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        tabTitles.forEachIndexed { index, title ->
+                            Button(
+                                onClick = { selectedTab = index },
+                                shape = RoundedCornerShape(10.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (selectedTab == index) GreenDark else Color.LightGray
+                                ),
+                                elevation = null,
+                                modifier = Modifier
+                                    .width(105.dp)
+                                    .height(40.dp),
+                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
+                            ) {
+                                Text(title, color = Color.Black, fontSize = 12.sp, maxLines = 1,
+                                    fontFamily = Lato)
                             }
                         }
-                        Spacer(Modifier.height(4.dp))
-                        Text("Difficulty: Beginner", fontSize = 12.sp, fontFamily = Lato)
                     }
-                }
 
-                Spacer(Modifier.height(12.dp))
+                    Spacer(Modifier.height(8.dp))
 
-                // Tabs
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    tabTitles.forEachIndexed { index, title ->
-                        Button(
-                            onClick = { selectedTab = index },
-                            shape = RoundedCornerShape(10.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = if (selectedTab == index) GreenDark else Color.LightGray
-                            ),
-                            elevation = null,
-                            modifier = Modifier
-                                .width(105.dp)
-                                .height(40.dp),
-                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
-                        ) {
-                            Text(title, color = Color.Black, fontSize = 12.sp, maxLines = 1,
-                                fontFamily = Lato)
+                    // --- Tab Content ---
+                    // Pass relevant data (e.g., mountain.introduction, campsites, trails, guidelines)
+                    // to your tab content composables.
+                    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                        when (selectedTab) {
+                            0 -> DetailsTabContent(
+                                introduction = mountain.introduction,
+                                typeVolcano = mountain.typeVolcano,
+                                masl = mountain.masl,
+                                trekDuration = mountain.trekDurationDetails ?: mountain.hoursToSummit,
+                                trailType = mountain.trailTypeDescription,
+                                scenery = mountain.sceneryDescription,
+                                views = mountain.viewsDescription,
+                                wildlife = mountain.wildlifeDescription,
+                                features = mountain.featuresDescription,
+                                hikingSeason = mountain.hikingSeasonDetails ?: mountain.bestMonthsToHike
+                                // Pass other details as needed
+                            )
+                            1 -> CampingSpotTabContent(
+                                campsites = currentMountainData.campsites // Pass the list of campsites
+                            )
+                            2 -> GuidelinesTabContent(
+                                guidelines = currentMountainData.guidelines // Pass the list of guidelines
+                            )
                         }
                     }
-                }
-
-                Spacer(Modifier.height(8.dp))
-
-                // Tab Content
-                when (selectedTab) {
-                    0 -> DetailsTabContent()
-                    1 -> CampingSpotTabContent()
-                    2 -> GuidelinesTabContent()
-                }
-            }
-        }
-    }
+                } // End of else (data loaded)
+            } // End Scrollable Inner Column
+        } // End Outer Column
+    } // End Scaffold
 }
 
 @OptIn(ExperimentalPagerApi::class)
@@ -266,43 +331,63 @@ fun ImageCarouselSection() {
 }
 
 @Composable
-fun DetailsTabContent() {
-    Column(modifier = Modifier
-        .padding(horizontal = 16.dp, vertical = 8.dp)) {
-        Text(
-            "Deatils of the Mountain Soon to be Added",
-            fontSize = 14.sp,
-            fontFamily = Lato
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-//        Text
+fun DetailsTabContent(
+    introduction: String?,
+    typeVolcano: String?,
+    masl: Int?,
+    trekDuration: String?,
+    trailType: String?,
+    scenery: String?,
+    views: String?,
+    wildlife: String?,
+    features: String?,
+    hikingSeason: String?
+    // ... other parameters
+) {
+    Column { // Make this scrollable if content can be very long
+        introduction?.let { Text("Introduction:\n$it", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(bottom=8.dp)) }
+        typeVolcano?.let { Text("Type: $it", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(bottom=4.dp)) }
+        masl?.let { Text("MASL: $it m", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(bottom=4.dp)) }
+        trekDuration?.let { Text("Trek Duration: $it", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(bottom=4.dp)) }
+        trailType?.let { Text("Trail Type: $it", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(bottom=4.dp)) }
+        scenery?.let { Text("Scenery:\n$it", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(bottom=4.dp)) }
+        views?.let { Text("Views:\n$it", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(bottom=4.dp)) }
+        wildlife?.let { Text("Wildlife:\n$it", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(bottom=4.dp)) }
+        features?.let { Text("Features:\n$it", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(bottom=4.dp)) }
+        hikingSeason?.let { Text("Best Season:\n$it", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(bottom=4.dp)) }
     }
 }
 
 @Composable
-fun CampingSpotTabContent() {
-    Column(modifier = Modifier
-        .padding(horizontal = 16.dp, vertical = 8.dp)) {
-        Text(
-            "Camping Spot of the Mountain Soon to be Added",
-            fontSize = 14.sp,
-            fontFamily = Lato
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-//        Text
+fun CampingSpotTabContent(campsites: List<CampsiteEntity>) { // Assuming CampsiteEntity has relevant fields
+    Column {
+        if (campsites.isEmpty()) {
+            Text("No specific campsite information available.")
+        } else {
+            campsites.forEach { campsite ->
+                Text(campsite.name, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleSmall)
+                campsite.description?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
+                // Add more campsite details as needed (trek time, water, etc.)
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
     }
 }
 
 @Composable
-fun GuidelinesTabContent() {
-    Column(modifier = Modifier
-        .padding(horizontal = 16.dp, vertical = 8.dp)) {
-        Text(
-            "Guidelines of the Mountain Soon to be Added",
-            fontSize = 14.sp,
-            fontFamily = Lato
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-//        Text
+fun GuidelinesTabContent(guidelines: List<GuidelineEntity>) { // Assuming GuidelineEntity has category & description
+    Column {
+        if (guidelines.isEmpty()) {
+            Text("No specific guidelines available.")
+        } else {
+            // Group guidelines by category for better display
+            guidelines.groupBy { it.category }.forEach { (category, guidelineList) ->
+                Text(category, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(top = 8.dp))
+                guidelineList.forEach { guideline ->
+                    Text("• ${guideline.description}", style = MaterialTheme.typography.bodyMedium)
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
     }
 }

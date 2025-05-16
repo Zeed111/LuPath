@@ -61,6 +61,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -82,7 +83,7 @@ import java.util.Locale
 @Composable
 fun LuPathListScreen(
     navController: NavHostController,
-    viewModel: HikePlanViewModel = viewModel()
+    viewModel: HikePlanViewModel = hiltViewModel()
 ) {
     val screenScrollState = rememberScrollState()
     val hikePlansList by viewModel.hikePlans.collectAsStateWithLifecycle()
@@ -151,25 +152,32 @@ fun LuPathListScreen(
             }
 
             // --- Plan Card Items ---
-            items(
-                items = hikePlansList,
-                key = { plan -> plan.hashCode() } // Use plan.id if available
-            ) { plan ->
-                PlanCard(
-                    mountainName = plan.mountainName,
-                    difficulty = plan.difficulty,
-                    date = plan.date.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")) ?: "No Date",
-                    onEdit = { /* ... */ },
-                    onDelete = { viewModel.removeHikePlan(plan) }
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
+            if (hikePlansList.isEmpty()) {
+                item {
+                    Text(
+                        text = "No hikes planned yet.",
+                        modifier = Modifier.padding(16.dp),
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            } else {
+                items(
+                    items = hikePlansList,
+                    key = { plan -> plan.id } // Use a stable unique ID for the key
+                ) { plan ->
+                    PlanCard(
+                        hikePlan = plan, // Pass the whole HikePlan UI model
+                        onEdit = { /* TODO: Implement edit functionality */ },
+                        onDelete = { viewModel.removeHikePlan(plan) }
+                    )
+                    Spacer(modifier = Modifier.height(8.dp)) // Spacing between cards
+                }
             }
 
-            item { // Spacer at the very end
-                Spacer(modifier = Modifier.height(16.dp))
+            item { // Spacer at the very end to ensure content isn't cut off by bottom bar
+                Spacer(modifier = Modifier.height(80.dp)) // Adjust as needed
             }
-
         }
     }
 }
@@ -215,9 +223,7 @@ fun LuPathTopBar(navController: NavHostController) {
 
 @Composable
 fun PlanCard(
-    mountainName: String,
-    difficulty: String,
-    date: String,
+    hikePlan: HikePlan,
     onEdit: () -> Unit,
     onDelete: () -> Unit
 ) {
@@ -250,9 +256,8 @@ fun PlanCard(
                     .weight(1f)
                     .padding(12.dp)
             ) {
-                Text(mountainName, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                Text(date, fontSize = 12.sp, color = Color.Black)
-                Text("Difficulty: $difficulty", fontSize = 12.sp)
+                Text(hikePlan.mountainName, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(hikePlan.date.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")), fontSize = 12.sp, color = Color.Black)
             }
 
             var expanded by remember { mutableStateOf(false) }

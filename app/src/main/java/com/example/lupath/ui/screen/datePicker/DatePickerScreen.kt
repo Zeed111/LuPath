@@ -55,11 +55,16 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.lupath.ui.theme.GreenDark
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DatePickerScreen(navController: NavHostController, viewModel: HikePlanViewModel = viewModel()) {
+fun DatePickerScreen(
+    navController: NavHostController,
+    viewModel: HikePlanViewModel = hiltViewModel(),
+    mountainId: String
+) {
     val datePickerState = rememberDatePickerState()
     val screenScrollState = rememberScrollState()
     val context = LocalContext.current
@@ -71,17 +76,17 @@ fun DatePickerScreen(navController: NavHostController, viewModel: HikePlanViewMo
                 onClick = {
                     val selectedMillis = datePickerState.selectedDateMillis
                     if (selectedMillis == null) {
-                        println("No date selected")
+                        android.widget.Toast.makeText(context, "Please select a date",
+                            android.widget.Toast.LENGTH_SHORT).show()
                     } else {
                         val date = Instant.ofEpochMilli(selectedMillis)
                             .atZone(ZoneId.systemDefault())
                             .toLocalDate()
-                        val newHikePlan = HikePlan(
-                            mountainName = "Mt. Pulag", // Example, make dynamic if needed
-                            date = date,
-                            difficulty = "Beginner"
+
+                        viewModel.addHikePlanFromPicker(
+                            mountainIdFromPicker = mountainId, // This 'mountainId' is a parameter of DatePickerScreen
+                            selectedDate = date
                         )
-                        viewModel.addHikePlan(newHikePlan)
 
                         val selectedDateText = try {
                             date.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")).let {
@@ -91,7 +96,10 @@ fun DatePickerScreen(navController: NavHostController, viewModel: HikePlanViewMo
                             "Invalid Date"
                         }
 
-                        navController.navigate("lupath_list")
+                        navController.navigate("lupath_list") {
+                            launchSingleTop = true
+                            // Consider popUpTo to clear backstack if needed
+                        }
                     }
                 },
                 shape = RoundedCornerShape(30),
