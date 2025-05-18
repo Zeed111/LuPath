@@ -1,6 +1,7 @@
 package com.example.lupath.data.database
 
 import android.content.Context
+import android.util.Log
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -23,7 +24,7 @@ import java.util.UUID
         HikePlanEntity::class // Remove if not used elsewhere
         // HikePlanChecklistLinkEntity::class // Remove if not used elsewhere
     ],
-    version = 1 /* Your current version, increment if schema changed */,
+    version = 3 /* Your current version, increment if schema changed */,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -49,6 +50,7 @@ abstract class AppDatabase : RoomDatabase() {
                     "lupath_app_database"
                 )
                     .addCallback(AppDatabaseCallback(context)) // Add callback for pre-population
+                    .fallbackToDestructiveMigration() // If you increment version and don't want to write migrations during dev
                     .build()
                 INSTANCE = instance
                 instance
@@ -59,6 +61,16 @@ abstract class AppDatabase : RoomDatabase() {
     private class AppDatabaseCallback(private val context: Context) : RoomDatabase.Callback() {
         override fun onCreate(db: SupportSQLiteDatabase) {
             super.onCreate(db)
+            INSTANCE?.let { database ->
+                CoroutineScope(Dispatchers.IO).launch {
+                    populateInitialData(database)
+                }
+            }
+        }
+
+        override fun onDestructiveMigration(db: SupportSQLiteDatabase) {
+            super.onDestructiveMigration(db)
+            Log.d("AppDatabaseCallback", "onDestructiveMigration called. Re-populating data.")
             INSTANCE?.let { database ->
                 CoroutineScope(Dispatchers.IO).launch {
                     populateInitialData(database)
@@ -82,6 +94,7 @@ abstract class AppDatabase : RoomDatabase() {
                     pictureReference = "mt_batulao_main",
                     location = "Nasugbu, Batangas (bordering Cavite)",
                     masl = 811,
+                    difficultySummary = "Easy to moderate",
                     difficultyText = "Easy to moderate (4/9)",
                     hoursToSummit = "4–6 hours round trip",
                     bestMonthsToHike = "November to February",
@@ -93,7 +106,11 @@ abstract class AppDatabase : RoomDatabase() {
                     wildlifeDescription = "Grassland birds, butterflies, native grasses, some flowering shrubs and small mammals",
                     featuresDescription = "Iconic gorilla-shaped ridgeline, multiple minor peaks, and a picturesque summit ridge",
                     hikingSeasonDetails = "Best during November to February (dry and cool); avoid summer midday heat and rainy season for safety",
-                    introduction = "Mount Batulao is an inactive stratovolcano located in Nasugbu, Batangas... referencing how sunlight hits its ridges at dawn and dusk." // Shortened
+                    introduction = "Mount Batulao is an inactive stratovolcano located in Nasugbu, Batangas... referencing how sunlight hits its ridges at dawn and dusk.", // Shortened
+                    tagline = "Let's Hike to Mt. Batulao",
+                    mountainImageRef1 = "mt_batulao_1",
+                    mountainImageRef2 = "mt_batulao_2",
+                    mountainImageRef3 = "mt_batulao_3"
                 )
             ))
             campsiteDao.insertAllCampsites(listOf(
@@ -125,7 +142,8 @@ abstract class AppDatabase : RoomDatabase() {
                     pictureReference = "mt_maculot_main",
                     location = "Cuenca, Batangas",
                     masl = 930,
-                    difficultyText = "Moderate (3/9 to the Rockies; 4/9 for full traverse)",
+                    difficultySummary = "Moderate",
+                    difficultyText = "Moderate (4/9)",
                     hoursToSummit = "1-2 hours to the Rockies; 2–4 hours to the summit", // Trek Duration from research
                     bestMonthsToHike = "November to February",
                     typeVolcano = "Volcanic mountain",
@@ -136,7 +154,11 @@ abstract class AppDatabase : RoomDatabase() {
                     wildlifeDescription = "Typical lowland forest species; occasional sightings of birds and small mammals",
                     featuresDescription = "The \"Rockies\" viewpoint, summit, and a grotto frequented by pilgrims",
                     hikingSeasonDetails = "November to February for cooler temperatures and clearer views",
-                    introduction = "Mount Maculot is a prominent peak located in Cuenca, Batangas...breathtaking scenery it offers." // Shortened
+                    introduction = "Mount Maculot is a prominent peak located in Cuenca, Batangas...breathtaking scenery it offers.", // Shortened
+                    tagline = "Let's Hike to Mt. Maculot",
+                    mountainImageRef1 = "mt_maculot_1",
+                    mountainImageRef2 = "mt_maculot_2",
+                    mountainImageRef3 = "mt_maculot_3"
                 )
             ))
             campsiteDao.insertAllCampsites(listOf(
@@ -170,6 +192,8 @@ abstract class AppDatabase : RoomDatabase() {
                 ChecklistItemEntity(itemId = "predef_010", name = "Trash Bag (Leave No Trace)", isPreMade = true)
                 // Add more common items
             ))
+
+            Log.d("AppDatabaseCallback", "populateInitialData: FINISHED")
         }
     }
 }

@@ -489,8 +489,10 @@ fun MountainListCard(mountain: Mountain, navController: NavHostController) {
 //            }
 
             Image(
-                painter = painterResource(id = R.drawable.mt_pulag_ex),
-                contentDescription = "mt pulag",
+                painter = painterResource(
+                    id = mountain.imageResId ?: R.drawable.mt_pulag_ex // Use the pre-resolved imageResId
+                ),
+                contentDescription = "Image of ${mountain.name}",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxHeight()
@@ -507,7 +509,7 @@ fun MountainListCard(mountain: Mountain, navController: NavHostController) {
                     fontFamily = Lato)
                 Text(mountain.difficulty.toString(), fontSize = 14.sp, color = Color.Black, fontFamily = Lato)
                 Text(
-                    mountain.tagline.toString(), fontSize = 12.sp, maxLines = 2, overflow = TextOverflow.Ellipsis,
+                    text = mountain.tagline ?: "No tagline available", fontSize = 12.sp, maxLines = 2, overflow = TextOverflow.Ellipsis,
                     color = Color.Black, fontFamily = Lato)
             }
         }

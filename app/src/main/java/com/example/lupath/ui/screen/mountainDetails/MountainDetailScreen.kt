@@ -1,7 +1,10 @@
 package com.example.lupath.ui.screen.mountainDetails
 
+import android.content.Context
 import android.inputmethodservice.Keyboard.Row
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -53,6 +56,7 @@ import androidx.navigation.NavHostController
 import com.example.lupath.R
 import com.example.lupath.data.database.entity.CampsiteEntity
 import com.example.lupath.data.database.entity.GuidelineEntity
+import com.example.lupath.data.database.entity.MountainEntity
 import com.example.lupath.data.model.MountainDetailViewModel
 import com.example.lupath.ui.screen.home.HomeBottomNav
 import com.example.lupath.ui.screen.lupathList.LuPathTopBar
@@ -73,8 +77,7 @@ fun MountainDetailScreen(
     val tabTitles = listOf("Details", "Camping Spot", "Guidelines")
     var selectedTab by remember { mutableStateOf(0) }
     val scrollState = rememberScrollState()
-    val application = LocalContext.current.applicationContext
-//    val mountainDao = (application as MyApplication).database.mountainDao()
+    val context = LocalContext.current
     val viewModel: MountainDetailViewModel = hiltViewModel()
     val mountainDetailsState by viewModel.mountainWithDetails.collectAsStateWithLifecycle()
 
@@ -131,7 +134,6 @@ fun MountainDetailScreen(
                     .verticalScroll(scrollState)
                     .padding(bottom = 16.dp)
             ) {
-//                ImageCarouselSection()
 
                 Spacer(Modifier.height(12.dp))
 
@@ -152,17 +154,45 @@ fun MountainDetailScreen(
                         Text("Loading details for $mountainIdFromNav...")
                     }
                 } else {
-                    // --- Content When Data is Loaded ---
-                    val mountain = currentMountainData.mountain // The MountainEntity
-                    // val campsites = currentMountainData.campsites // List<CampsiteEntity>
-                    // val trails = currentMountainData.trails       // List<TrailEntity>
-                    // val guidelines = currentMountainData.guidelines // List<GuidelineEntity>
+                    val mountain: MountainEntity = currentMountainData.mountain
 
-                    // Image Carousel (Pass image references from 'mountain')
-                    ImageCarouselSection(
-                        // Example: Assuming 'mountain.pictureReference' is a list of image strings/IDs
-                        // imageReferences = mountain.pictureReferenceList ?: emptyList()
-                    )
+                    // Prepare images for the carousel from MountainEntity
+                    val imageResourceIds = mutableListOf<Int>()
+
+                    // Get carousel image 1 (can be the same as main pictureReference)
+                    getDrawableResIdFromString(context, mountain.mountainImageRef1 ?: mountain.pictureReference)?.let {
+                        imageResourceIds.add(it)
+                    }
+                    // Get carousel image 2
+                    getDrawableResIdFromString(context, mountain.mountainImageRef2)?.let {
+                        imageResourceIds.add(it)
+                    }
+                    // Get carousel image 3
+                    getDrawableResIdFromString(context, mountain.mountainImageRef3)?.let {
+                        imageResourceIds.add(it)
+                    }
+
+                    // If after trying to load specific images, the list is still empty,
+                    // or you want to ensure a minimum number of images, add placeholders.
+                    // For this example, if no specific images are found, we'll use one placeholder.
+                    // If some specific images are found, we won't add more placeholders unless you want to guarantee 3.
+                    if (imageResourceIds.isEmpty()) {
+                        imageResourceIds.add(R.drawable.mt_pulag_ex) // Default placeholder
+                    }
+                    // To ensure always 3 images, you could fill up with placeholders:
+                    // val placeholders = listOf(R.drawable.mt_pulag_ex_2, R.drawable.mt_pulag_ex_3)
+                    // var currentPlaceholderIndex = 0
+                    // while (imageResourceIds.size < 3 && currentPlaceholderIndex < placeholders.size) {
+                    //    if (!imageResourceIds.contains(placeholders[currentPlaceholderIndex])) { // Avoid duplicate placeholders
+                    //        imageResourceIds.add(placeholders[currentPlaceholderIndex])
+                    //    }
+                    //    currentPlaceholderIndex++
+                    // }
+
+
+                    ImageCarouselSection(imageResIds = imageResourceIds.distinct())
+
+
 
                     Spacer(Modifier.height(12.dp))
 
@@ -274,16 +304,30 @@ fun MountainDetailScreen(
     } // End Scaffold
 }
 
+@DrawableRes
+fun getDrawableResIdFromString(context: Context, drawableName: String?): Int? {
+    if (drawableName.isNullOrBlank()) return null
+    val resId = context.resources.getIdentifier(drawableName, "drawable", context.packageName)
+    return if (resId != 0) resId else null
+}
+
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun ImageCarouselSection() {
+fun ImageCarouselSection(imageResIds: List<Int>) {
     val pagerState = rememberPagerState()
 
-    val images = listOf(
-        R.drawable.mt_pulag_ex,
-        R.drawable.mt_pulag_ex_2,
-        R.drawable.mt_pulag_ex_3
-    )
+    if (imageResIds.isEmpty()) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(280.dp)
+                .background(Color.LightGray),
+            contentAlignment = Alignment.Center
+        ) {
+            Text("No images available") // Or a placeholder Icon
+        }
+        return
+    }
 
     Box(
         modifier = Modifier
@@ -291,42 +335,34 @@ fun ImageCarouselSection() {
             .height(280.dp)
             .clip(
                 RoundedCornerShape(
-                    bottomStart = 20.dp, // bottom-left corner
-                    bottomEnd = 20.dp    // bottom-right corner
+                    bottomStart = 20.dp,
+                    bottomEnd = 20.dp
                 )
             )
     ) {
         HorizontalPager(
-            count = 3,
+            count = imageResIds.size,
             state = pagerState,
-            modifier = Modifier
-                .fillMaxSize()
+            modifier = Modifier.fillMaxSize()
         ) { page ->
-//            Image(
-//                painter = painterResource(id = R.drawable.lupath),
-//                contentDescription = "Mountain Image",
-//                contentScale = ContentScale.Crop,
-//                modifier = Modifier.fillMaxSize()
-//            )
-
             Image(
-                painter = painterResource(id = images[page]),
-                contentDescription = "mt pulag",
+                painter = painterResource(id = imageResIds[page]),
+                contentDescription = "Mountain Image ${page + 1}",
                 contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxSize()
+                modifier = Modifier.fillMaxSize()
             )
         }
 
-        HorizontalPagerIndicator(
-            pagerState = pagerState,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(12.dp),
-
-            activeColor = GreenDark,
-            inactiveColor = GreenDark.copy(alpha = 0.4f)
-        )
+        if (imageResIds.size > 1) {
+            HorizontalPagerIndicator(
+                pagerState = pagerState,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(12.dp),
+                activeColor = GreenDark,
+                inactiveColor = GreenDark.copy(alpha = 0.4f)
+            )
+        }
     }
 }
 

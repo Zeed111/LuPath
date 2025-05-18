@@ -8,6 +8,7 @@ data class Mountain(
     val name: String,
     val location: String,
     val masl: Int? = null, // Meters Above Sea Level (nullable if can be unknown)
+    val difficultySummary: String?,
     val difficulty: String? = null, // e.g., "Easy to moderate (4/9)"
     val tagline: String? = null, // A short descriptive tagline
     val hoursToSummit: String? = null, // e.g., "4-6 hours round trip" (nullable)
@@ -25,6 +26,6 @@ data class Mountain(
     val introduction: String? = null,
 
     // For images
-    @DrawableRes val imageResId: Int? = null, // For local drawables (e.g., R.drawable.some_image)
-    val imageUrl: String? = null // For internet URLs
+    @DrawableRes val imageResId: Int? = null,
+    val pictureReference: String?// For local drawables (e.g., R.drawable.some_image)
 )
