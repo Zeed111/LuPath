@@ -2,6 +2,7 @@ package com.example.lupath.ui.screen.mountainDetails
 
 import android.content.Context
 import android.inputmethodservice.Keyboard.Row
+import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -43,11 +44,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -57,6 +63,7 @@ import com.example.lupath.R
 import com.example.lupath.data.database.entity.CampsiteEntity
 import com.example.lupath.data.database.entity.GuidelineEntity
 import com.example.lupath.data.database.entity.MountainEntity
+import com.example.lupath.data.database.entity.TrailEntity
 import com.example.lupath.data.model.MountainDetailViewModel
 import com.example.lupath.ui.screen.home.HomeBottomNav
 import com.example.lupath.ui.screen.lupathList.LuPathTopBar
@@ -66,6 +73,26 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
+
+
+private data class CharacteristicDisplayInfo(
+    val customDrawableName: String,
+    val label: String,
+)
+
+/**
+ * Helper function to convert a drawable name string (without extension)
+ * to its corresponding Resource ID.
+ * Returns null if the resource is not found or the name is blank.
+ */
+@DrawableRes
+fun getDrawableResIdFromString(context: Context, drawableName: String?): Int? {
+    if (drawableName.isNullOrBlank()) return null
+    // The name passed to getIdentifier should not include the file extension.
+    val nameWithoutExtension = drawableName.substringBeforeLast('.')
+    val resId = context.resources.getIdentifier(nameWithoutExtension, "drawable", context.packageName)
+    return if (resId != 0) resId else null // Return null if not found (resId will be 0)
+}
 
 @OptIn(ExperimentalPagerApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -93,18 +120,6 @@ fun MountainDetailScreen(
         containerColor = Color.White,
         topBar = {
             LuPathTopBar(navController = navController)
-//            TopAppBar(
-//                title = { },
-//                navigationIcon = {
-//                    IconButton(onClick = { navController.popBackStack() }) {
-//                        Icon(
-//                            Icons.AutoMirrored.Filled.ArrowBack,
-//                            contentDescription = "Back"
-//                        )
-//                    }
-//                },
-//                colors = topAppBarColors
-//            )
         },
 
         floatingActionButton = {
@@ -189,10 +204,7 @@ fun MountainDetailScreen(
                     //    currentPlaceholderIndex++
                     // }
 
-
                     ImageCarouselSection(imageResIds = imageResourceIds.distinct())
-
-
 
                     Spacer(Modifier.height(12.dp))
 
@@ -221,25 +233,121 @@ fun MountainDetailScreen(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier.weight(0.4f) // Less weight for difficulty
                         ) {
-                            Row { // Placeholder for rating icons
-                                repeat(3) {
-                                    Icon(
-                                        imageVector = Icons.Default.ThumbUp, // Error likely here
-                                        contentDescription = null,
-                                        modifier = Modifier.size(16.dp),
-                                        tint = Color.Black
-                                    )
-                                    Spacer(Modifier.width(6.dp))
-                                }
+                            val characteristics = mutableListOf<CharacteristicDisplayInfo>()
+
+                            if (mountain.isEstablishedTrail == true) {
+                                // Replace "your_trail_icon_name" with the actual filename of your custom trail icon
+                                characteristics.add(CharacteristicDisplayInfo("trail_icon", "Trail"))
                             }
-                            Spacer(Modifier.height(4.dp))
+                            if (mountain.isRocky == true) {
+                                // Replace "your_rocky_icon_name" with the actual filename
+                                characteristics.add(CharacteristicDisplayInfo("rocky_icon", "Rocky"))
+                            }
+                            if (mountain.isSlippery == true) {
+                                // Replace "your_slippery_icon_name" with the actual filename
+                                characteristics.add(CharacteristicDisplayInfo("slippery_icon", "Slippery"))
+                            }
+                            if (mountain.hasSteepSections == true) {
+                                // Replace "your_steep_icon_name" with the actual filename
+                                characteristics.add(CharacteristicDisplayInfo("steep_icon", "Steep"))
+                            }
+                            if (!mountain.notableWildlife.isNullOrBlank()) {
+                                // Replace "your_generic_wildlife_icon_name" with the actual filename
+                                characteristics.add(CharacteristicDisplayInfo("wildlife_icon", "Wildlife"))
+                            }
+
+                            // --- Display Characteristic Icons in a compact Row ---
+                            if (characteristics.isNotEmpty()) {
+                                Row(
+                                    // This Row will wrap its content, and the parent Column's
+                                    // horizontalAlignment will center it.
+                                    horizontalArrangement = Arrangement.spacedBy(6.dp), // Adds 8.dp space between each icon
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.padding(bottom = 4.dp) // Space between icon row and difficulty text
+                                ) {
+                                    characteristics.forEach { characteristicInfo ->
+                                        CharacteristicIcon( // Your composable for displaying custom drawables
+                                            drawableName = characteristicInfo.customDrawableName,
+                                            label = characteristicInfo.label
+                                            // The CustomCharacteristicIcon can decide whether to show the label or not
+                                            // For a compact view like rating icons, you might omit the text label within CustomCharacteristicIcon
+                                        )
+                                    }
+                                }
+                            } else {
+                                // Optional: Add a small spacer if no icons are present,
+                                // so the difficulty text alignment remains consistent.
+                                Spacer(Modifier.height(28.dp)) // Approximate height of an icon row
+                            }
+
+                            // --- Difficulty Text ---
                             Text(
-                                // Assuming difficultyText is the field in MountainEntity
-                                mountain.difficultyText, // <<< FROM FETCHED DATA
-                                fontSize = 12.sp, fontFamily = Lato,
-                                textAlign = TextAlign.Center
+                                text = mountain.difficultyText ?: "N/A", // Using the detailed difficulty
+                                fontSize = 12.sp,
+                                fontFamily = Lato, // Ensure Lato is set up
+                                textAlign = TextAlign.Center, // Ensures the text itself is centered if it wraps
+                                color = MaterialTheme.colorScheme.onSurfaceVariant // Use theme colors
                             )
                         }
+//                            Row { // Placeholder for rating icons
+////                                repeat(3) {
+////                                    Icon(
+////                                        imageVector = Icons.Default.ThumbUp, // Error likely here
+////                                        contentDescription = null,
+////                                        modifier = Modifier.size(16.dp),
+////                                        tint = Color.Black
+////                                    )
+////                                    Spacer(Modifier.width(6.dp))
+////                                }
+////                            }
+//
+//                                val characteristics = mutableListOf<CharacteristicDisplayInfo>()
+//
+//                                if (mountain.isEstablishedTrail == true) {
+//                                    // Replace "your_trail_icon_name" with the actual filename of your custom trail icon in res/drawable
+//                                    characteristics.add(CharacteristicDisplayInfo("trail_icon", "Trail"))
+//                                }
+//                                if (mountain.isRocky == true) {
+//                                    // Replace "your_rocky_icon_name" with the actual filename
+//                                    characteristics.add(CharacteristicDisplayInfo("rocky_icon", "Rocky"))
+//                                }
+//                                if (mountain.isSlippery == true) {
+//                                    // Replace "your_slippery_icon_name" with the actual filename
+//                                    characteristics.add(CharacteristicDisplayInfo("slippery_icon", "Slippery"))
+//                                }
+//                                if (mountain.hasSteepSections == true) {
+//                                    // Replace "your_steep_icon_name" with the actual filename
+//                                    characteristics.add(CharacteristicDisplayInfo("steep_icon", "Steep"))
+//                                }
+//                                if (!mountain.notableWildlife.isNullOrBlank()) {
+//                                    // Replace "your_generic_wildlife_icon_name" with the actual filename
+//                                    characteristics.add(CharacteristicDisplayInfo("wildlife_icon", "Wildlife"))
+//                                }
+//
+//                                if (characteristics.isNotEmpty()) {
+//                                    Row(
+//                                        modifier = Modifier
+//                                            .fillMaxWidth()
+//                                            .padding(horizontal = 16.dp, vertical = 8.dp),
+//                                        horizontalArrangement = Arrangement.SpaceAround // Distributes icons evenly
+//                                    ) {
+//                                        characteristics.forEach { characteristicInfo ->
+//                                            CharacteristicIcon(
+//                                                drawableName = characteristicInfo.customDrawableName,
+//                                                label = characteristicInfo.label
+//                                            )
+//                                        }
+//                                    }
+//                                }
+//
+//                            Spacer(Modifier.height(4.dp))
+//                            Text(
+//                                // Assuming difficultyText is the field in MountainEntity
+//                                mountain.difficultyText, // <<< FROM FETCHED DATA
+//                                fontSize = 12.sp, fontFamily = Lato,
+//                                textAlign = TextAlign.Center
+//                            )
+//                        }
                     }
 
                     Spacer(Modifier.height(12.dp))
@@ -291,7 +399,7 @@ fun MountainDetailScreen(
                                 // Pass other details as needed
                             )
                             1 -> CampingSpotTabContent(
-                                campsites = currentMountainData.campsites // Pass the list of campsites
+                                campsites = currentMountainData.campsites, trails = currentMountainData.trails // Pass the list of campsites
                             )
                             2 -> GuidelinesTabContent(
                                 guidelines = currentMountainData.guidelines // Pass the list of guidelines
@@ -304,12 +412,42 @@ fun MountainDetailScreen(
     } // End Scaffold
 }
 
-@DrawableRes
-fun getDrawableResIdFromString(context: Context, drawableName: String?): Int? {
-    if (drawableName.isNullOrBlank()) return null
-    val resId = context.resources.getIdentifier(drawableName, "drawable", context.packageName)
-    return if (resId != 0) resId else null
-}
+    @Composable
+    fun CharacteristicIcon(drawableName: String, label: String, modifier: Modifier = Modifier) {
+        val context = LocalContext.current
+        // Use remember to avoid re-calculating on every recomposition if drawableName doesn't change
+        val imageResId = remember(drawableName) {
+            getDrawableResIdFromString(context, drawableName)
+        }
+
+        if (imageResId != null && imageResId != 0) { // Check if resource ID is valid
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = modifier.width(20.dp) // Give each icon a fixed width for better spacing
+            ) {
+                Image( // Use Image composable for drawables
+                    painter = painterResource(id = imageResId),
+                    contentDescription = label, // Important for accessibility
+                    modifier = Modifier.size(20.dp), // Adjust size as needed
+                    contentScale = ContentScale.Fit // Or Crop, depending on your icons
+                )
+//                Spacer(modifier = Modifier.height(4.dp))
+//                Text(
+//                    text = label,
+//                    fontSize = 11.sp,
+//                    fontFamily = Lato, // Assuming Lato is set up
+//                    textAlign = TextAlign.Center,
+//                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+//                    maxLines = 1,
+//                    overflow = TextOverflow.Ellipsis
+//                )
+            }
+        } else {
+            // Optionally, log an error or display a fallback if an icon name is provided but not found
+             Log.w("CustomCharacteristicIcon", "Drawable resource not found for name: $drawableName")
+        }
+    }
+
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
@@ -367,6 +505,29 @@ fun ImageCarouselSection(imageResIds: List<Int>) {
 }
 
 @Composable
+fun DetailItem(label: String, value: String?) {
+    // Only display the item if the value is not null or blank
+    if (!value.isNullOrBlank()) {
+        // Use buildAnnotatedString to combine styled text
+        Text(
+            text = buildAnnotatedString {
+                // Append the label part with bold style
+                withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold, fontFamily = Lato)) {
+                    append("$label: ") // Add colon and space after label
+                }
+                // Append the value part with regular style
+                withStyle(style = SpanStyle(fontWeight = FontWeight.Normal, fontFamily = Lato)) {
+                    append(value)
+                }
+            },
+            style = MaterialTheme.typography.bodyMedium, // Base style for the whole text
+            modifier = Modifier.padding(bottom = 6.dp), // Consistent padding
+            color = MaterialTheme.colorScheme.onSurface // Use theme color
+        )
+    }
+}
+
+@Composable
 fun DetailsTabContent(
     introduction: String?,
     typeVolcano: String?,
@@ -378,33 +539,166 @@ fun DetailsTabContent(
     wildlife: String?,
     features: String?,
     hikingSeason: String?
-    // ... other parameters
 ) {
-    Column { // Make this scrollable if content can be very long
-        introduction?.let { Text("Introduction:\n$it", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(bottom=8.dp)) }
-        typeVolcano?.let { Text("Type: $it", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(bottom=4.dp)) }
-        masl?.let { Text("MASL: $it m", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(bottom=4.dp)) }
-        trekDuration?.let { Text("Trek Duration: $it", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(bottom=4.dp)) }
-        trailType?.let { Text("Trail Type: $it", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(bottom=4.dp)) }
-        scenery?.let { Text("Scenery:\n$it", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(bottom=4.dp)) }
-        views?.let { Text("Views:\n$it", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(bottom=4.dp)) }
-        wildlife?.let { Text("Wildlife:\n$it", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(bottom=4.dp)) }
-        features?.let { Text("Features:\n$it", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(bottom=4.dp)) }
-        hikingSeason?.let { Text("Best Season:\n$it", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(bottom=4.dp)) }
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) { // Add some spacing between items
+
+        // Special handling for Introduction as it might not have a "Label: Value" format
+        introduction?.let {
+            if (it.isNotBlank()) {
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold, fontFamily = Lato)) {
+                            append("Introduction:\n") // Label part
+                        }
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.Normal, fontFamily = Lato)) {
+                            append(it) // Value part
+                        }
+                    },
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(bottom = 12.dp), // More padding after intro
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        }
+
+        DetailItem(label = "Type", value = typeVolcano)
+        DetailItem(label = "MASL", value = masl?.let { "$it m" }) // Convert Int to String with unit
+        DetailItem(label = "Trek Duration", value = trekDuration)
+        DetailItem(label = "Trail Type", value = trailType)
+
+        // For multi-line values like scenery, views, etc., the label will be bold and value normal
+        scenery?.let {
+            if (it.isNotBlank()) {
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold, fontFamily = Lato)) {
+                            append("Scenery:\n")
+                        }
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.Normal, fontFamily = Lato)) {
+                            append(it)
+                        }
+                    },
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(bottom = 6.dp),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        }
+        views?.let {
+            if (it.isNotBlank()) {
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold, fontFamily = Lato)) {
+                            append("Views:\n")
+                        }
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.Normal, fontFamily = Lato)) {
+                            append(it)
+                        }
+                    },
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(bottom = 6.dp),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        }
+        wildlife?.let {
+            if (it.isNotBlank()) {
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold, fontFamily = Lato)) {
+                            append("Wildlife:\n")
+                        }
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.Normal, fontFamily = Lato)) {
+                            append(it)
+                        }
+                    },
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(bottom = 6.dp),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        }
+        features?.let {
+            if (it.isNotBlank()) {
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold, fontFamily = Lato)) {
+                            append("Features:\n")
+                        }
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.Normal, fontFamily = Lato)) {
+                            append(it)
+                        }
+                    },
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(bottom = 6.dp),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        }
+        DetailItem(label = "Best Season", value = hikingSeason)
     }
 }
 
 @Composable
-fun CampingSpotTabContent(campsites: List<CampsiteEntity>) { // Assuming CampsiteEntity has relevant fields
+fun CampingSpotTabContent(
+    campsites: List<CampsiteEntity>,
+    trails: List<TrailEntity>
+) { // Assuming CampsiteEntity has relevant fields
     Column {
         if (campsites.isEmpty()) {
             Text("No specific campsite information available.")
         } else {
-            campsites.forEach { campsite ->
-                Text(campsite.name, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleSmall)
-                campsite.description?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
-                // Add more campsite details as needed (trek time, water, etc.)
-                Spacer(modifier = Modifier.height(8.dp))
+            campsites.forEachIndexed { index, campsite ->
+                Column {
+                    Text(
+                        // Provide a more descriptive fallback for null names
+                        text = campsite.name ?: " ",
+                        fontWeight = FontWeight.SemiBold,
+                        style = MaterialTheme.typography.titleSmall, // Consider titleMedium if it's a primary heading for the item
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    // Handle nullable description
+                    campsite.description?.let { desc ->
+                        if (desc.isNotBlank()) { // Only show if description is not blank
+                            Text(
+                                text = desc,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                    if (index < campsites.size - 1) {
+                        Spacer(modifier = Modifier.height(12.dp)) // << YOUR DESIRED SPACE BETWEEN CAMPSITE ITEMS
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(15.dp))
+
+        if (trails.isEmpty()) {
+            Text("No specific trails information available.")
+        } else {
+            trails.forEachIndexed { index, trail ->
+                Column {
+                    Text(
+                        // Provide a more descriptive fallback for null names
+                        text = trail.name ?: " ",
+                        fontWeight = FontWeight.SemiBold,
+                        style = MaterialTheme.typography.titleSmall, // Consider titleMedium if it's a primary heading for the item
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    // Handle nullable description
+                    trail.description?.let { desc ->
+                        if (desc.isNotBlank()) { // Only show if description is not blank
+                            Text(
+                                text = desc,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
             }
         }
     }

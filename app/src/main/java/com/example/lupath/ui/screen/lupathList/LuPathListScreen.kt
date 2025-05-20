@@ -1,5 +1,6 @@
 package com.example.lupath.ui.screen.lupathList
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -47,6 +48,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -55,6 +57,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -72,6 +75,7 @@ import com.example.lupath.ui.screen.home.HomeBottomNav
 import com.example.lupath.ui.theme.GreenDark
 import com.example.lupath.ui.theme.GreenLight
 import com.example.lupath.ui.theme.Lato
+import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -166,10 +170,23 @@ fun LuPathListScreen(
                     items = hikePlansList,
                     key = { plan -> plan.id } // Use a stable unique ID for the key
                 ) { plan ->
+                    val context = LocalContext.current
+                    val scope = rememberCoroutineScope() // For launching coroutines from Composable
+
                     PlanCard(
                         hikePlan = plan, // Pass the whole HikePlan UI model
-                        onEdit = { /* TODO: Implement edit functionality */ },
-                        onDelete = { viewModel.removeHikePlan(plan) }
+                        onEdit = {
+                            val initialDateEpochDay = plan.date.toEpochDay()
+                            navController.navigate(
+                                "datepicker/${plan.mountainId}?hikePlanId=${plan.id}&initialSelectedDateEpochDay=${initialDateEpochDay}"
+                            )},
+                        onDelete = {
+                            scope.launch { // Launch a coroutine to call the suspend function
+                                viewModel.removeHikePlan(plan) // Call the suspend function
+                                // Show Toast after the plan is removed
+                                Toast.makeText(context, "Hike plan deleted", Toast.LENGTH_SHORT).show()
+                            }
+                        }
                     )
                     Spacer(modifier = Modifier.height(8.dp)) // Spacing between cards
                 }

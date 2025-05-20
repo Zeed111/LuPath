@@ -1,5 +1,6 @@
 package com.example.lupath.data.model
 
+import android.widget.Toast
 import androidx.compose.runtime.R
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
@@ -87,6 +88,25 @@ class HikePlanViewModel @Inject constructor(
                 date = hikePlanUiModel.date
             )
             hikePlanDao.deleteHikePlan(entityToDelete)
+        }
+    }
+
+    fun updateHikePlanDate(hikePlanId: String, mountainId: String, newDate: LocalDate) {
+        viewModelScope.launch(Dispatchers.IO) {
+            // To update, you typically need the full entity or at least its ID.
+            // If you only want to update the date, you could fetch the existing entity first,
+            // modify its date, and then pass it to the update DAO method.
+            // Or, if your DAO's @Update method can handle partial updates based on ID (less common for simple @Update),
+            // or if you create a specific DAO method for updating just the date.
+            // For simplicity with a standard @Update, we'll assume we need to provide the entity.
+            // We need mountainOwnerId for the entity constructor.
+            val updatedHikePlanEntity = HikePlanEntity(
+                hikePlanId = hikePlanId, // Keep the original ID
+                mountainOwnerId = mountainId, // Keep the original mountainId
+                date = newDate // Set the new date
+            )
+            hikePlanDao.updateHikePlan(updatedHikePlanEntity)
+            // The 'hikePlans' StateFlow will automatically update due to database observation.
         }
     }
 

@@ -17,8 +17,8 @@ import com.example.lupath.ui.screen.settings.SettingsScreen
 import com.example.lupath.ui.screen.checkList.CheckListScreen
 
 @Composable
-fun AppNavGraph(navController: NavHostController, exitApp: () -> Unit) {
-    NavHost(navController = navController, startDestination = "get_started") {
+fun AppNavGraph(navController: NavHostController, startDestination: String, exitApp: () -> Unit) {
+    NavHost(navController = navController, startDestination = startDestination) {
         composable("get_started") {
             GetStartedScreen(onNavigateToHome = {
                 navController.navigate("home") {
@@ -45,16 +45,48 @@ fun AppNavGraph(navController: NavHostController, exitApp: () -> Unit) {
             }
         }
 
+//        composable(
+//            route = "datepicker/{mountainId}", // Add mountainId as argument
+//            arguments = listOf(navArgument("mountainId") { type = NavType.StringType })
+//        ) { backStackEntry ->
+//            val mountainIdArg = backStackEntry.arguments?.getString("mountainId")
+//            if (mountainIdArg != null) {
+//                DatePickerScreen(navController = navController, mountainId = mountainIdArg)
+//            } else {
+//                // Handle error: mountainId not found, maybe navigate back or show error
+//                Text("Error: Mountain ID missing.")
+//            }
+//        }
+
         composable(
-            route = "datepicker/{mountainId}", // Add mountainId as argument
-            arguments = listOf(navArgument("mountainId") { type = NavType.StringType })
+            // Route for DatePickerScreen, now with optional parameters for editing
+            route = "datepicker/{mountainId}?hikePlanId={hikePlanId}&initialSelectedDateEpochDay={initialSelectedDateEpochDay}",
+            arguments = listOf(
+                navArgument("mountainId") { type = NavType.StringType },
+                navArgument("hikePlanId") {
+                    type = NavType.StringType
+                    nullable = true // This ID is optional, only present when editing
+                    defaultValue = null
+                },
+                navArgument("initialSelectedDateEpochDay") {
+                    type = NavType.LongType
+                    defaultValue = -1L // Use -1L or another sentinel to indicate no date passed
+                }
+            )
         ) { backStackEntry ->
             val mountainIdArg = backStackEntry.arguments?.getString("mountainId")
+            val hikePlanIdArg = backStackEntry.arguments?.getString("hikePlanId") // Can be null
+            val initialDateEpochDayArg = backStackEntry.arguments?.getLong("initialSelectedDateEpochDay")
+
             if (mountainIdArg != null) {
-                DatePickerScreen(navController = navController, mountainId = mountainIdArg)
+                DatePickerScreen(
+                    navController = navController,
+                    mountainId = mountainIdArg,
+                    hikePlanIdForEdit = hikePlanIdArg, // Pass to DatePickerScreen
+                    initialSelectedDateEpochDay = initialDateEpochDayArg ?: -1L // Pass to DatePickerScreen
+                )
             } else {
-                // Handle error: mountainId not found, maybe navigate back or show error
-                Text("Error: Mountain ID missing.")
+                Text("Error: Mountain ID missing for DatePicker.")
             }
         }
 

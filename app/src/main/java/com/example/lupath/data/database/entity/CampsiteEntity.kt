@@ -18,8 +18,8 @@ import androidx.room.PrimaryKey
 data class CampsiteEntity(
     @PrimaryKey val campsiteId: String,
     val mountainOwnerId: String, // Foreign Key
-    val name: String,
-    val description: String? // e.g., "Sheltered and flat", "Near Rockies and summit areas"
+    val name: String? = null,
+    val description: String? = null // e.g., "Sheltered and flat", "Near Rockies and summit areas"
     // Add other campsite specific fields from your detailed research if needed
     // val trekTimeToCampsite: String?,
     // val waterSourceAvailable: String?,

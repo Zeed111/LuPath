@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import androidx.compose.foundation.Image
 import androidx.compose.ui.res.painterResource
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.lupath.data.model.GetStartedViewModel
 import com.example.lupath.ui.theme.GreenDark
 import com.example.lupath.ui.theme.Lato
@@ -31,7 +32,7 @@ import com.example.lupath.ui.theme.Lato
 
 @Composable
 fun GetStartedScreen(
-    viewModel: GetStartedViewModel = viewModel(),
+    viewModel: GetStartedViewModel = hiltViewModel(),
     onNavigateToHome: () -> Unit
 ) {
     val message by viewModel.welcomeMessage.collectAsState()
@@ -52,6 +53,17 @@ fun GetStartedScreen(
                     .padding(top = 0.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Image(
+                    painter = painterResource(id = R.drawable.lupath),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .width(150.dp)
+                        .height(150.dp)
+                        .align(Alignment.CenterHorizontally)
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
                 Text(
                     text = "Welcome",
                     fontSize = 40.sp,
@@ -96,25 +108,5 @@ fun GetStartedScreen(
                 Text("Get Started", fontSize = 30.sp, fontFamily = Lato)
             }
         }
-    }
-}
-
-@Preview(showBackground = true, name = "Get Started Screen Preview")
-@Composable
-fun GetStartedScreenPreview() {
-    LuPathTheme {
-        GetStartedScreen(
-            viewModel = FakeGetStartedViewModel(),
-            onNavigateToHome = {}
-        )
-    }
-}
-
-class FakeGetStartedViewModel : GetStartedViewModel() {
-    private val _message = MutableStateFlow("Focus, relax and find your next adventure here in Lupath")
-    override val welcomeMessage: StateFlow<String> = _message
-
-    override fun onGetStartedClicked() {
-        // lalagyan palang
     }
 }

@@ -1,5 +1,6 @@
 package com.example.lupath.ui.screen.datePicker
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -54,20 +55,49 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import androidx.compose.material3.DatePickerDefaults
+import androidx.compose.material3.SelectableDates
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.lupath.ui.theme.GreenDark
+import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerScreen(
     navController: NavHostController,
     viewModel: HikePlanViewModel = hiltViewModel(),
-    mountainId: String
+    mountainId: String,
+    hikePlanIdForEdit: String?,
+    initialSelectedDateEpochDay: Long
 ) {
-    val datePickerState = rememberDatePickerState()
     val screenScrollState = rememberScrollState()
     val context = LocalContext.current
+    val isEditMode = hikePlanIdForEdit != null
+
+    // Initialize DatePickerState
+    // If editing and a valid initial date is passed, use it. Otherwise, no initial selection.
+    val initialSelectedMillis = if (isEditMode && initialSelectedDateEpochDay != -1L) {
+        LocalDate.ofEpochDay(initialSelectedDateEpochDay).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+    } else {
+        null // No pre-selected date for new plans or if initial date isn't passed for edit
+    }
+
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = initialSelectedMillis,
+        // Optionally, you can set a validator here to disable past dates directly in the picker
+        yearRange = (LocalDate.now().year)..(LocalDate.now().year + 100), // Example year range
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                val selectedLocalDate = Instant.ofEpochMilli(utcTimeMillis)
+                    .atZone(ZoneId.systemDefault()) // Or ZoneId.of("UTC") if picker uses UTC
+                    .toLocalDate()
+                return !selectedLocalDate.isBefore(LocalDate.now()) // Allow today and future dates
+            }
+            override fun isSelectableYear(year: Int): Boolean {
+                return year >= LocalDate.now().year
+            }
+        }
+    )
 
     Scaffold(
         containerColor = Color.White,
@@ -76,29 +106,35 @@ fun DatePickerScreen(
                 onClick = {
                     val selectedMillis = datePickerState.selectedDateMillis
                     if (selectedMillis == null) {
-                        android.widget.Toast.makeText(context, "Please select a date",
-                            android.widget.Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Please select a date",
+                            Toast.LENGTH_SHORT).show()
                     } else {
                         val date = Instant.ofEpochMilli(selectedMillis)
                             .atZone(ZoneId.systemDefault())
                             .toLocalDate()
 
-                        viewModel.addHikePlanFromPicker(
-                            mountainIdFromPicker = mountainId, // This 'mountainId' is a parameter of DatePickerScreen
-                            selectedDate = date
-                        )
-
-                        val selectedDateText = try {
-                            date.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")).let {
-                                URLEncoder.encode(it, StandardCharsets.UTF_8.toString())
+                        if (date.isBefore(LocalDate.now())) {
+                            Toast.makeText(context, "Please select today or a future date.", Toast.LENGTH_LONG).show()
+                        } else {
+                            // Date is valid (today or future), proceed with action
+                            if (isEditMode) {
+                                viewModel.updateHikePlanDate(
+                                    hikePlanId = hikePlanIdForEdit,
+                                    mountainId = mountainId,
+                                    newDate = date
+                                )
+                                Toast.makeText(context, "Hike plan date updated!", Toast.LENGTH_SHORT).show()
+                            } else {
+                                viewModel.addHikePlanFromPicker(
+                                    mountainIdFromPicker = mountainId,
+                                    selectedDate = date
+                                )
+                                Toast.makeText(context, "Hike plan added!", Toast.LENGTH_SHORT).show()
                             }
-                        } catch (e: Exception) {
-                            "Invalid Date"
-                        }
-
-                        navController.navigate("lupath_list") {
-                            launchSingleTop = true
-                            // Consider popUpTo to clear backstack if needed
+                            navController.navigate("lupath_list") {
+                                popUpTo("lupath_list") { inclusive = true }
+                                launchSingleTop = true
+                            }
                         }
                     }
                 },

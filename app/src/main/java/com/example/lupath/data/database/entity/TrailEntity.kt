@@ -18,7 +18,7 @@ import androidx.room.PrimaryKey
 data class TrailEntity(
     @PrimaryKey val trailId: String,
     val mountainOwnerId: String, // Foreign Key
-    val name: String, // e.g., "Old Trail", "New Trail", "Rockies Trail"
+    val name: String? = null, // e.g., "Old Trail", "New Trail", "Rockies Trail"
     val distanceDescription: String? = null, // e.g., "Wider paths", "Direct ascent"
     val hoursToSummitSpecificTrail: String? = null,
     val difficultySpecificTrail: String? = null,

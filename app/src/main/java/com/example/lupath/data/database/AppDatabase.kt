@@ -24,7 +24,7 @@ import java.util.UUID
         HikePlanEntity::class // Remove if not used elsewhere
         // HikePlanChecklistLinkEntity::class // Remove if not used elsewhere
     ],
-    version = 3 /* Your current version, increment if schema changed */,
+    version = 8 /* Your current version, increment if schema changed */,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -106,17 +106,34 @@ abstract class AppDatabase : RoomDatabase() {
                     wildlifeDescription = "Grassland birds, butterflies, native grasses, some flowering shrubs and small mammals",
                     featuresDescription = "Iconic gorilla-shaped ridgeline, multiple minor peaks, and a picturesque summit ridge",
                     hikingSeasonDetails = "Best during November to February (dry and cool); avoid summer midday heat and rainy season for safety",
-                    introduction = "Mount Batulao is an inactive stratovolcano located in Nasugbu, Batangas... referencing how sunlight hits its ridges at dawn and dusk.", // Shortened
+                    introduction = "Mount Batulao is an inactive stratovolcano located in Nasugbu, " +
+                            "Batangas, on the northwestern edge of the Taal Caldera. It’s one of the " +
+                            "most frequented hiking destinations in Southern Luzon due to its " +
+                            "accessibility, scenic grassy ridges, and its suitability for beginner " +
+                            "to intermediate hikers. The name \"Batulao\" comes from the Tagalog " +
+                            "phrase bato sa ilaw, meaning \"rock in the light,\" referencing how " +
+                            "sunlight hits its ridges at dawn and dusk.",
                     tagline = "Let's Hike to Mt. Batulao",
                     mountainImageRef1 = "mt_batulao_1",
                     mountainImageRef2 = "mt_batulao_2",
-                    mountainImageRef3 = "mt_batulao_3"
+                    mountainImageRef3 = "mt_batulao_3",
+
+                    hasSteepSections = true,                // Example: Batulao has assaults
+                    notableWildlife = "Birds, Butterflies", // Example: Shows generic wildlife icon
+                    isRocky = true,                         // Example: Batulao has rocky parts
+                    isSlippery = true,                      // Example: Can be slippery, especially New Trail when wet
+                    isEstablishedTrail = true               // Example: Trails are generally clear
                 )
             ))
             campsiteDao.insertAllCampsites(listOf(
+                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtBatulaoId, description = "Mount Batulao features several established campsites, " +
+                        "particularly on the Old Trail (e.g., Station 7 and 10), with flatter and more shaded areas compared to the New Trail. These are commonly used for overnight stays " +
+                        "and sunrise viewing. The New Trail has scenic, wind-exposed ridges great for short rest stops or photo breaks."),
                 CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtBatulaoId, name = "Station 7 (Old Trail)", description = "Sheltered and flat"),
                 CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtBatulaoId, name = "Station 10 (Old Trail)", description = "Near summit, ideal for early ascents"),
-                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtBatulaoId, name = "New Trail ridge points", description = "Good for day hikes and short rests")
+                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtBatulaoId, name = "New Trail ridge points", description = "Good for day hikes and short rests"),
+                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtBatulaoId, name = "Trek Time to Campsite", description = "1.5–3 hours depending on pace and starting point"),
+                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtBatulaoId, name = "Water Source", description = "Available on Old Trail, but not always reliable—bring at least 2–3 liters")
             ))
             trailDao.insertAllTrails(listOf(
                 TrailEntity(trailId = UUID.randomUUID().toString(), mountainOwnerId = mtBatulaoId, name = "Old Trail", description = "Gradual inclines, more trees and shade, wider paths"),
@@ -158,7 +175,13 @@ abstract class AppDatabase : RoomDatabase() {
                     tagline = "Let's Hike to Mt. Maculot",
                     mountainImageRef1 = "mt_maculot_1",
                     mountainImageRef2 = "mt_maculot_2",
-                    mountainImageRef3 = "mt_maculot_3"
+                    mountainImageRef3 = "mt_maculot_3",
+
+                    hasSteepSections = true,                // Example: Batulao has assaults
+                    notableWildlife = "Birds, Butterflies", // Example: Shows generic wildlife icon
+                    isRocky = true,                         // Example: Batulao has rocky parts
+                    isSlippery = true,                      // Example: Can be slippery, especially New Trail when wet
+                    isEstablishedTrail = false // Example: Trails are generally clear
                 )
             ))
             campsiteDao.insertAllCampsites(listOf(
@@ -187,9 +210,9 @@ abstract class AppDatabase : RoomDatabase() {
                 ChecklistItemEntity(itemId = "predef_005", name = "Backpack with Rain Cover", isPreMade = true),
                 ChecklistItemEntity(itemId = "predef_006", name = "Proper Hiking Shoes", isPreMade = true),
                 ChecklistItemEntity(itemId = "predef_007", name = "Sun Protection (Sunscreen, Hat, Sunglasses)", isPreMade = true),
-                ChecklistItemEntity(itemId = "predef_008", name = "Rain Gear (Poncho/Rain Jacket)", isPreMade = true),
+                ChecklistItemEntity(itemId = "predef_008", name = "Rain Gear", isPreMade = true),
                 ChecklistItemEntity(itemId = "predef_009", name = "Trail Food/Snacks", isPreMade = true),
-                ChecklistItemEntity(itemId = "predef_010", name = "Trash Bag (Leave No Trace)", isPreMade = true)
+                ChecklistItemEntity(itemId = "predef_010", name = "Trash Bag ", isPreMade = true)
                 // Add more common items
             ))
 

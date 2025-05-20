@@ -1,15 +1,38 @@
 package com.example.lupath.data.model
 
+import android.app.Application
+import android.content.Context
+import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-open class GetStartedViewModel : ViewModel() {
+@HiltViewModel
+class GetStartedViewModel @Inject constructor(
+    private val application: Application
+) : ViewModel() {
     private val _welcomeMessage =
         MutableStateFlow("Focus, relax and find your next adventure here in Lupath")
-    open val welcomeMessage: StateFlow<String> = _welcomeMessage
+    val welcomeMessage: StateFlow<String> = _welcomeMessage
 
-    open fun onGetStartedClicked() {
+    private val prefs: SharedPreferences =
+        application.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+
+    companion object {
+        const val KEY_GET_STARTED_COMPLETED = "get_started_completed"
+    }
+
+    fun onGetStartedClicked() {
         // Later: Save onboarding flag or fetch data
+        with(prefs.edit()) {
+            putBoolean(KEY_GET_STARTED_COMPLETED, true)
+            apply()
+        }
+    }
+
+    fun hasCompletedGetStarted(): Boolean {
+        return prefs.getBoolean(KEY_GET_STARTED_COMPLETED, false)
     }
 }

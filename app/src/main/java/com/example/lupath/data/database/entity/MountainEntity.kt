@@ -31,5 +31,12 @@ data class MountainEntity(
 
     val mountainImageRef1: String?, // Drawable name for first carousel image (can be same as pictureReference)
     val mountainImageRef2: String?, // Drawable name for second carousel image
-    val mountainImageRef3: String?  // Drawable name for third carousel image
+    val mountainImageRef3: String?,  // Drawable name for third carousel image
+
+    val hasSteepSections: Boolean?,     // True if there are significant steep inclines/declines
+    val notableWildlife: String?,      // If not blank, can trigger a generic wildlife icon.
+    // You can also store keywords here if you want more specific wildlife icons later.
+    val isRocky: Boolean?,             // True if the trail has significant rocky sections
+    val isSlippery: Boolean?,          // True if the trail is known to be slippery (e.g., when wet, loose soil)
+    val isEstablishedTrail: Boolean?  // True if the trail is generally clear and well-defined (for the "Hiker" icon)
 )
