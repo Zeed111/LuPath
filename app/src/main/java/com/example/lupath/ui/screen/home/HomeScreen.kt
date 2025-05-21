@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -67,6 +68,7 @@ import com.example.lupath.ui.theme.Lato
 import java.net.URLEncoder
 import com.example.lupath.data.model.Mountain
 import androidx.compose.foundation.lazy.items
+import com.example.lupath.ui.theme.GreenLight
 
 object Routes {
     const val LUPATH_LIST = "lupath_list"
@@ -254,6 +256,7 @@ fun HomeTopBar(navController: NavHostController) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .statusBarsPadding()
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -407,7 +410,8 @@ fun PopularMountainCard(mountain: Mountain,  onClick: () -> Unit) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFD9D9D9))
+//                .background(Color(0xFFD9D9D9))
+                .background(GreenLight)
                 .padding(10.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -463,12 +467,13 @@ fun MountainListCard(mountain: Mountain, navController: NavHostController) {
             },
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFD9D9D9))
+//            containerColor = Color(0xFFD9D9D9))
+                containerColor = GreenLight)
     ) {
         Row(
             modifier = Modifier
-                .fillMaxSize()
-                .background(Color(0xFFD9D9D9)),
+                .fillMaxSize(),
+//                .background(Color(0xFFD9D9D9)),
             verticalAlignment = Alignment.CenterVertically
         ) {
 //            Box(

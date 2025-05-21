@@ -8,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import androidx.core.content.edit
 
 @HiltViewModel
 class GetStartedViewModel @Inject constructor(
@@ -26,13 +27,8 @@ class GetStartedViewModel @Inject constructor(
 
     fun onGetStartedClicked() {
         // Later: Save onboarding flag or fetch data
-        with(prefs.edit()) {
+        prefs.edit {
             putBoolean(KEY_GET_STARTED_COMPLETED, true)
-            apply()
         }
-    }
-
-    fun hasCompletedGetStarted(): Boolean {
-        return prefs.getBoolean(KEY_GET_STARTED_COMPLETED, false)
     }
 }
