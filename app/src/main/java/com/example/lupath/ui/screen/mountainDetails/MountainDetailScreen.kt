@@ -19,21 +19,26 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -73,7 +78,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
-
+import androidx.compose.foundation.lazy.items
 
 private data class CharacteristicDisplayInfo(
     val customDrawableName: String,
@@ -94,6 +99,29 @@ fun getDrawableResIdFromString(context: Context, drawableName: String?): Int? {
     return if (resId != 0) resId else null // Return null if not found (resId will be 0)
 }
 
+data class LegendItemData(
+    val customDrawableName: String,
+    val label: String,
+    val detailedDescription: String
+)
+
+fun getAllLegendItems(): List<LegendItemData> {
+    return listOf(
+        LegendItemData("trail_icon", "Established Trail", "Indicates a well-defined and established " +
+                "path, generally easy to follow."),
+        LegendItemData("rocky_icon", "Rocky", "Trail has many rocks, uneven surfaces, or " +
+                "scree. Sturdy footwear with ankle support is recommended."),
+        LegendItemData("slippery_icon", "Slippery", "Trail may be slick due to mud, wet " +
+                "rocks, or loose gravel, especially after rain. Exercise caution and consider trekking poles."),
+        LegendItemData("steep_icon", "Steep", "Contains significant uphill or downhill " +
+                "sections. May require good stamina and careful footing."),
+        LegendItemData("wildlife_icon", "Wildlife", "Possibility of encountering " +
+                "local fauna. Observe from a distance and do not feed animals.")
+        // Add entries for ALL other characteristic icons you use, with their detailed descriptions.
+        // Ensure the customDrawableName matches the filenames in res/drawable.
+    )
+}
+
 @OptIn(ExperimentalPagerApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MountainDetailScreen(
@@ -107,6 +135,7 @@ fun MountainDetailScreen(
     val context = LocalContext.current
     val viewModel: MountainDetailViewModel = hiltViewModel()
     val mountainDetailsState by viewModel.mountainWithDetails.collectAsStateWithLifecycle()
+    var showLegendDialog by remember { mutableStateOf(false) }
 
     val topAppBarColors = TopAppBarDefaults.topAppBarColors(
         containerColor = Color.Transparent, // Start transparent
@@ -233,51 +262,83 @@ fun MountainDetailScreen(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier.weight(0.4f) // Less weight for difficulty
                         ) {
-                            val characteristics = mutableListOf<CharacteristicDisplayInfo>()
+//                            val characteristics = mutableListOf<CharacteristicDisplayInfo>()
+//
+//                            if (mountain.isEstablishedTrail == true) {
+//                                // Replace "your_trail_icon_name" with the actual filename of your custom trail icon
+//                                characteristics.add(CharacteristicDisplayInfo("trail_icon", "Established Trail"))
+//                            }
+//                            if (mountain.isRocky == true) {
+//                                // Replace "your_rocky_icon_name" with the actual filename
+//                                characteristics.add(CharacteristicDisplayInfo("rocky_icon", "Rocky"))
+//                            }
+//                            if (mountain.isSlippery == true) {
+//                                // Replace "your_slippery_icon_name" with the actual filename
+//                                characteristics.add(CharacteristicDisplayInfo("slippery_icon", "Slippery"))
+//                            }
+//                            if (mountain.hasSteepSections == true) {
+//                                // Replace "your_steep_icon_name" with the actual filename
+//                                characteristics.add(CharacteristicDisplayInfo("steep_icon", "Steep"))
+//                            }
+//                            if (!mountain.notableWildlife.isNullOrBlank()) {
+//                                // Replace "your_generic_wildlife_icon_name" with the actual filename
+//                                characteristics.add(CharacteristicDisplayInfo("wildlife_icon", "Wildlife"))
+//                            }
 
-                            if (mountain.isEstablishedTrail == true) {
-                                // Replace "your_trail_icon_name" with the actual filename of your custom trail icon
-                                characteristics.add(CharacteristicDisplayInfo("trail_icon", "Trail"))
-                            }
-                            if (mountain.isRocky == true) {
-                                // Replace "your_rocky_icon_name" with the actual filename
-                                characteristics.add(CharacteristicDisplayInfo("rocky_icon", "Rocky"))
-                            }
-                            if (mountain.isSlippery == true) {
-                                // Replace "your_slippery_icon_name" with the actual filename
-                                characteristics.add(CharacteristicDisplayInfo("slippery_icon", "Slippery"))
-                            }
-                            if (mountain.hasSteepSections == true) {
-                                // Replace "your_steep_icon_name" with the actual filename
-                                characteristics.add(CharacteristicDisplayInfo("steep_icon", "Steep"))
-                            }
-                            if (!mountain.notableWildlife.isNullOrBlank()) {
-                                // Replace "your_generic_wildlife_icon_name" with the actual filename
-                                characteristics.add(CharacteristicDisplayInfo("wildlife_icon", "Wildlife"))
+                            val characteristics = remember(mountain) { // Recompute if mountain changes
+                                listOfNotNull(
+                                    if (mountain.isEstablishedTrail == true) CharacteristicDisplayInfo("trail_icon", "Established Trail") else null,
+                                    if (mountain.isRocky == true) CharacteristicDisplayInfo("rocky_icon", "Rocky") else null,
+                                    if (mountain.isSlippery == true) CharacteristicDisplayInfo("your_slippery_icon_name", "Slippery") else null,
+                                    if (mountain.hasSteepSections == true) CharacteristicDisplayInfo("steep_icon", "Steep") else null,
+                                    if (!mountain.notableWildlife.isNullOrBlank()) CharacteristicDisplayInfo("wildlife_icon", "Wildlife") else null
+                                )
                             }
 
-                            // --- Display Characteristic Icons in a compact Row ---
-                            if (characteristics.isNotEmpty()) {
-                                Row(
-                                    // This Row will wrap its content, and the parent Column's
-                                    // horizontalAlignment will center it.
-                                    horizontalArrangement = Arrangement.spacedBy(6.dp), // Adds 8.dp space between each icon
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.padding(bottom = 4.dp) // Space between icon row and difficulty text
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                // Center the group of (InfoButton + Icons) if the Row takes full width
+                                // If you want InfoButton strictly left and icons next to it, use Arrangement.Start
+                                horizontalArrangement = Arrangement.Start // Align InfoButton to the start
+                            ) {
+                                // Info Button on the left
+                                IconButton(
+                                    onClick = { showLegendDialog = true },
+                                    modifier = Modifier.size(22.dp) // Adjust size for touchability
                                 ) {
-                                    characteristics.forEach { characteristicInfo ->
-                                        CharacteristicIcon( // Your composable for displaying custom drawables
-                                            drawableName = characteristicInfo.customDrawableName,
-                                            label = characteristicInfo.label
+                                    Icon(
+                                        imageVector = Icons.Filled.Info,
+                                        contentDescription = "View trail condition legend",
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.width(12.dp)) // Space between info button and the first icon
+
+                                // Row for the actual characteristic icons
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp), // Space between each characteristic icon
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.padding(bottom = 4.dp)
+                                ) {
+                                    if (characteristics.isNotEmpty()) {
+                                        characteristics.forEach { characteristicInfo ->
+                                            CharacteristicIcon( // Your composable for displaying custom drawables
+                                                drawableName = characteristicInfo.customDrawableName,
+                                                label = characteristicInfo.label
                                             // The CustomCharacteristicIcon can decide whether to show the label or not
                                             // For a compact view like rating icons, you might omit the text label within CustomCharacteristicIcon
-                                        )
+                                            )
+                                        }
+                                    } else {
+                                        // Optional: Add a small spacer if no icons are present,
+                                        // so the difficulty text alignment remains consistent.
+                                        Spacer(Modifier.height(20.dp)) // Approximate height of an icon row
                                     }
                                 }
-                            } else {
-                                // Optional: Add a small spacer if no icons are present,
-                                // so the difficulty text alignment remains consistent.
-                                Spacer(Modifier.height(28.dp)) // Approximate height of an icon row
                             }
 
                             // --- Difficulty Text ---
@@ -289,65 +350,6 @@ fun MountainDetailScreen(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant // Use theme colors
                             )
                         }
-//                            Row { // Placeholder for rating icons
-////                                repeat(3) {
-////                                    Icon(
-////                                        imageVector = Icons.Default.ThumbUp, // Error likely here
-////                                        contentDescription = null,
-////                                        modifier = Modifier.size(16.dp),
-////                                        tint = Color.Black
-////                                    )
-////                                    Spacer(Modifier.width(6.dp))
-////                                }
-////                            }
-//
-//                                val characteristics = mutableListOf<CharacteristicDisplayInfo>()
-//
-//                                if (mountain.isEstablishedTrail == true) {
-//                                    // Replace "your_trail_icon_name" with the actual filename of your custom trail icon in res/drawable
-//                                    characteristics.add(CharacteristicDisplayInfo("trail_icon", "Trail"))
-//                                }
-//                                if (mountain.isRocky == true) {
-//                                    // Replace "your_rocky_icon_name" with the actual filename
-//                                    characteristics.add(CharacteristicDisplayInfo("rocky_icon", "Rocky"))
-//                                }
-//                                if (mountain.isSlippery == true) {
-//                                    // Replace "your_slippery_icon_name" with the actual filename
-//                                    characteristics.add(CharacteristicDisplayInfo("slippery_icon", "Slippery"))
-//                                }
-//                                if (mountain.hasSteepSections == true) {
-//                                    // Replace "your_steep_icon_name" with the actual filename
-//                                    characteristics.add(CharacteristicDisplayInfo("steep_icon", "Steep"))
-//                                }
-//                                if (!mountain.notableWildlife.isNullOrBlank()) {
-//                                    // Replace "your_generic_wildlife_icon_name" with the actual filename
-//                                    characteristics.add(CharacteristicDisplayInfo("wildlife_icon", "Wildlife"))
-//                                }
-//
-//                                if (characteristics.isNotEmpty()) {
-//                                    Row(
-//                                        modifier = Modifier
-//                                            .fillMaxWidth()
-//                                            .padding(horizontal = 16.dp, vertical = 8.dp),
-//                                        horizontalArrangement = Arrangement.SpaceAround // Distributes icons evenly
-//                                    ) {
-//                                        characteristics.forEach { characteristicInfo ->
-//                                            CharacteristicIcon(
-//                                                drawableName = characteristicInfo.customDrawableName,
-//                                                label = characteristicInfo.label
-//                                            )
-//                                        }
-//                                    }
-//                                }
-//
-//                            Spacer(Modifier.height(4.dp))
-//                            Text(
-//                                // Assuming difficultyText is the field in MountainEntity
-//                                mountain.difficultyText, // <<< FROM FETCHED DATA
-//                                fontSize = 12.sp, fontFamily = Lato,
-//                                textAlign = TextAlign.Center
-//                            )
-//                        }
                     }
 
                     Spacer(Modifier.height(12.dp))
@@ -409,45 +411,120 @@ fun MountainDetailScreen(
                 } // End of else (data loaded)
             } // End Scrollable Inner Column
         } // End Outer Column
+        if (showLegendDialog) {
+            CharacteristicLegendDialog(
+                onDismissRequest = { showLegendDialog = false },
+                legendItems = getAllLegendItems()
+            )
+        }
     } // End Scaffold
 }
 
-    @Composable
-    fun CharacteristicIcon(drawableName: String, label: String, modifier: Modifier = Modifier) {
-        val context = LocalContext.current
-        // Use remember to avoid re-calculating on every recomposition if drawableName doesn't change
-        val imageResId = remember(drawableName) {
-            getDrawableResIdFromString(context, drawableName)
-        }
-
-        if (imageResId != null && imageResId != 0) { // Check if resource ID is valid
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = modifier.width(20.dp) // Give each icon a fixed width for better spacing
-            ) {
-                Image( // Use Image composable for drawables
-                    painter = painterResource(id = imageResId),
-                    contentDescription = label, // Important for accessibility
-                    modifier = Modifier.size(20.dp), // Adjust size as needed
-                    contentScale = ContentScale.Fit // Or Crop, depending on your icons
-                )
-//                Spacer(modifier = Modifier.height(4.dp))
-//                Text(
-//                    text = label,
-//                    fontSize = 11.sp,
-//                    fontFamily = Lato, // Assuming Lato is set up
-//                    textAlign = TextAlign.Center,
-//                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-//                    maxLines = 1,
-//                    overflow = TextOverflow.Ellipsis
-//                )
-            }
-        } else {
-            // Optionally, log an error or display a fallback if an icon name is provided but not found
-             Log.w("CustomCharacteristicIcon", "Drawable resource not found for name: $drawableName")
-        }
+@Composable
+fun CharacteristicIcon(
+    drawableName: String,
+    label: String,
+    modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    // Use remember to avoid re-calculating on every recomposition if drawableName doesn't change
+    val imageResId = remember(drawableName) {
+        getDrawableResIdFromString(context, drawableName)
     }
+    if (imageResId != null && imageResId != 0) { // Check if resource ID is valid
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = modifier.width(20.dp) // Give each icon a fixed width for better spacing
+        ) {
+            Image( // Use Image composable for drawables
+                painter = painterResource(id = imageResId),
+                contentDescription = label, // Important for accessibility
+                modifier = Modifier.size(20.dp), // Adjust size as needed
+                contentScale = ContentScale.Fit // Or Crop, depending on your icons
+            )
+        }
+    } else {
+        // Optionally, log an error or display a fallback if an icon name is provided but not found
+        Log.w("CustomCharacteristicIcon", "Drawable resource not found for name: $drawableName")
+    }
+}
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CharacteristicLegendDialog(
+    onDismissRequest: () -> Unit,
+    legendItems: List<LegendItemData>
+) {
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        title = { Text("Trail Condition Legend", style = MaterialTheme.typography.titleLarge) },
+        text = {
+            if (legendItems.isEmpty()) {
+                Text("No legend items to display.")
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    // Use items extension with explicit key and item type
+                    items(
+                        items = legendItems,
+                        key = { item -> item.customDrawableName + item.label } // Provide a stable and unique key
+                    ) { item: LegendItemData -> // Explicitly type 'item'
+                        Row(
+                            verticalAlignment = Alignment.Top,
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        ) {
+                            val context = LocalContext.current
+                            val imageResId = remember(item.customDrawableName) {
+                                getDrawableResIdFromString(context, item.customDrawableName)
+                            }
+
+                            if (imageResId != null && imageResId != 0) {
+                                Image(
+                                    painter = painterResource(id = imageResId),
+                                    contentDescription = item.label,
+                                    modifier = Modifier
+                                        .size(32.dp)
+                                        .align(Alignment.CenterVertically)
+                                )
+                            } else {
+                                Spacer(modifier = Modifier.size(32.dp)) // Placeholder
+                            }
+
+                            Spacer(modifier = Modifier.width(16.dp))
+
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = item.label,
+                                    fontWeight = FontWeight.Bold,
+                                    style = MaterialTheme.typography.titleSmall
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = item.detailedDescription,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+                        }
+                        // Optional: Add a Divider if it's not the last item.
+                        // It's often cleaner to add spacing via Arrangement or padding in LazyColumn/Row.
+                        if (legendItems.indexOf(item) < legendItems.size - 1) {
+                            // Divider(modifier = Modifier.padding(top = 8.dp))
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismissRequest) {
+                Text("CLOSE")
+            }
+        },
+        containerColor = Color.White,
+        titleContentColor = MaterialTheme.colorScheme.onSurface,
+        textContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+    )
+}
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
