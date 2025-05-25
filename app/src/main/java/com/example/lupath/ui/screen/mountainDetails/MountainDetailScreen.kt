@@ -725,7 +725,7 @@ fun CampingSpotTabContent(
 ) { // Assuming CampsiteEntity has relevant fields
     Column {
         if (campsites.isEmpty()) {
-            Text("No specific campsite information available.")
+
         } else {
             campsites.forEachIndexed { index, campsite ->
                 Column {
@@ -756,7 +756,7 @@ fun CampingSpotTabContent(
         Spacer(modifier = Modifier.height(15.dp))
 
         if (trails.isEmpty()) {
-            Text("No specific trails information available.")
+
         } else {
             trails.forEachIndexed { index, trail ->
                 Column {

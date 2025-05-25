@@ -83,7 +83,7 @@ fun DatePickerScreen(
     // Initialize DatePickerState
     // If editing and a valid initial date is passed, use it. Otherwise, no initial selection.
     val initialSelectedMillis = if (isEditMode && initialSelectedDateEpochDay != -1L) {
-        LocalDate.ofEpochDay(initialSelectedDateEpochDay).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        LocalDate.ofEpochDay(initialSelectedDateEpochDay).atStartOfDay(ZoneId.of("UTC")).toInstant().toEpochMilli()
     } else {
         null // No pre-selected date for new plans or if initial date isn't passed for edit
     }
@@ -102,7 +102,7 @@ fun DatePickerScreen(
             override fun isSelectableYear(year: Int): Boolean {
                 return year >= LocalDate.now().year
             }
-        }
+        },
     )
 
     var notesText by rememberSaveable { mutableStateOf(initialNotes.orEmpty()) }
@@ -282,7 +282,7 @@ fun DatePickerScreen(
                     newDate = nonNullTempSelectedDate,
                     newNotes = tempNotesText // Ensure tempNotesText is in scope
                 )
-//                Toast.makeText(context, "Hike plan updated!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Hike plan updated!", Toast.LENGTH_SHORT).show()
                 showEditConfirmationDialog = false
                 navController.navigate("lupath_list") { // Navigate after confirmation
                     popUpTo("lupath_list") { inclusive = true }

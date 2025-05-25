@@ -399,11 +399,14 @@ fun MountainListSection(
 
 @Composable
 fun PopularMountainCard(mountain: Mountain,  onClick: () -> Unit) {
+    val cardHeight = 200.dp // Define a fixed height for all cards
+    val imageHeight = 100.dp // Define a portion of the height for the image
     Card(
         shape = RoundedCornerShape(10.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         modifier = Modifier
             .width(150.dp)
+            .height(cardHeight)
             .padding(end = 16.dp)
             .clickable (onClick = onClick)
     ) {
@@ -422,15 +425,14 @@ fun PopularMountainCard(mountain: Mountain,  onClick: () -> Unit) {
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .aspectRatio(1f) // Make image square-ish
-                        // Clip only top corners if text is below
+                        .height(imageHeight)
                         .clip(RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp))
                 )
             } else { // Fallback placeholder
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .aspectRatio(1f)
+                        .height(imageHeight)
                         .background(Color.DarkGray),
                     contentAlignment = Alignment.Center
                 ) {
@@ -440,9 +442,23 @@ fun PopularMountainCard(mountain: Mountain,  onClick: () -> Unit) {
 
             Spacer(Modifier.height(8.dp))
 
-            Text(mountain.name, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color.Black,
-                fontFamily = Lato)
-            Text(mountain.location, fontSize = 12.sp, color = Color.Black, fontFamily = Lato)
+            Text(mountain.name,
+                fontWeight = FontWeight.Bold,
+                fontSize = 14.sp,
+                color = Color.Black,
+                fontFamily = Lato,
+                maxLines = 2, // Allow location to take up to 2 lines
+                overflow = TextOverflow.Ellipsis,
+                minLines = 1
+            )
+            Text(mountain.location,
+                fontSize = 12.sp,
+                color = Color.Black,
+                fontFamily = Lato,
+                maxLines = 2, // Allow location to take up to 2 lines
+                overflow = TextOverflow.Ellipsis,
+                minLines = 1
+            )
         }
     }
 }
