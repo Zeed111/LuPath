@@ -118,11 +118,11 @@ abstract class AppDatabase : RoomDatabase() {
                     mountainImageRef2 = "mt_batulao_2",
                     mountainImageRef3 = "mt_batulao_3",
 
-                    hasSteepSections = true,                // Example: Batulao has assaults
-                    notableWildlife = "Birds, Butterflies", // Example: Shows generic wildlife icon
-                    isRocky = true,                         // Example: Batulao has rocky parts
-                    isSlippery = true,                      // Example: Can be slippery, especially New Trail when wet
-                    isEstablishedTrail = true               // Example: Trails are generally clear
+                    hasSteepSections = true,
+                    notableWildlife = "Birds, Butterflies",
+                    isRocky = true,
+                    isSlippery = true,
+                    isEstablishedTrail = true
                 )
             ))
             campsiteDao.insertAllCampsites(listOf(
@@ -161,7 +161,7 @@ abstract class AppDatabase : RoomDatabase() {
                     masl = 930,
                     difficultySummary = "Moderate",
                     difficultyText = "Moderate (4/9)",
-                    hoursToSummit = "1-2 hours to the Rockies; 2–4 hours to the summit", // Trek Duration from research
+                    hoursToSummit = "2–4 hours to the summit",
                     bestMonthsToHike = "November to February",
                     typeVolcano = "Volcanic mountain",
                     trekDurationDetails = "1-2 hours to the Rockies; 2–4 hours to the summit",
@@ -171,17 +171,21 @@ abstract class AppDatabase : RoomDatabase() {
                     wildlifeDescription = "Typical lowland forest species; occasional sightings of birds and small mammals",
                     featuresDescription = "The \"Rockies\" viewpoint, summit, and a grotto frequented by pilgrims",
                     hikingSeasonDetails = "November to February for cooler temperatures and clearer views",
-                    introduction = "Mount Maculot is a prominent peak located in Cuenca, Batangas...breathtaking scenery it offers.", // Shortened
+                    introduction = "Mount Maculot is a prominent peak located in Cuenca, Batangas, " +
+                            "standing at approximately 930 meters above sea level (MASL). It's renowned " +
+                            "for its \"Rockies\"—a cliffside viewpoint offering panoramic vistas of " +
+                            "Taal Lake and Taal Volcano. The mountain is a favorite among hikers for " +
+                            "its accessibility and the breathtaking scenery it offers.\n",
                     tagline = "Let's Hike to Mt. Maculot",
                     mountainImageRef1 = "mt_maculot_1",
                     mountainImageRef2 = "mt_maculot_2",
                     mountainImageRef3 = "mt_maculot_3",
 
-                    hasSteepSections = true,                // Example: Batulao has assaults
-                    notableWildlife = "Birds, Butterflies", // Example: Shows generic wildlife icon
-                    isRocky = true,                         // Example: Batulao has rocky parts
-                    isSlippery = true,                      // Example: Can be slippery, especially New Trail when wet
-                    isEstablishedTrail = false // Example: Trails are generally clear
+                    hasSteepSections = true,
+                    notableWildlife = "Birds, Small Mammals",
+                    isRocky = true,
+                    isSlippery = true,
+                    isEstablishedTrail = true
                 )
             ))
             campsiteDao.insertAllCampsites(listOf(
@@ -213,7 +217,7 @@ abstract class AppDatabase : RoomDatabase() {
                     difficultyText = "Easy to moderate (3/9)",
                     hoursToSummit = "1.5–2.5 hours to the summit",
                     bestMonthsToHike = "November to February",
-                    typeVolcano = " ",
+                    typeVolcano = "Grassland mountain",
                     trekDurationDetails = " ",
                     trailTypeDescription = "Open trails with minimal tree cover; some steep sections\n",
                     sceneryDescription = "Panoramic views of Batangas landscapes and nearby mountains",
@@ -229,11 +233,11 @@ abstract class AppDatabase : RoomDatabase() {
                     mountainImageRef2 = "mt_talamitam_2",
                     mountainImageRef3 = "mt_talamitam_3",
 
-                    hasSteepSections = false,                // Example: Batulao has assaults
-                    notableWildlife = "fauna", // Example: Shows generic wildlife icon
-                    isRocky = false,                         // Example: Batulao has rocky parts
-                    isSlippery = false,                      // Example: Can be slippery, especially New Trail when wet
-                    isEstablishedTrail = true               // Example: Trails are generally clear
+                    hasSteepSections = true,
+                    notableWildlife = "fauna",
+                    isRocky = false,
+                    isSlippery = true,
+                    isEstablishedTrail = true
                 )
             ))
             campsiteDao.insertAllCampsites(listOf(
@@ -262,364 +266,413 @@ abstract class AppDatabase : RoomDatabase() {
                     mountainId = mtManabuId,
                     mountainName = "Mt. Manabu",
                     pictureReference = "mt_manabu_main",
-                    location = "Sto. Tomas, Batangas", // [cite: 34]
-                    masl = 760, // [cite: 34]
+                    location = "Sto. Tomas, Batangas",
+                    masl = 760,
                     difficultySummary = "Easy",
-                    difficultyText = "Easy (2/9)", // [cite: 36]
-                    hoursToSummit = "2–3 hours to the summit", // [cite: 36]
-                    bestMonthsToHike = "November to February", // [cite: 43]
-                    typeVolcano = "Forested mountain", // [cite: 36]
-                    trekDurationDetails = "2–3 hours to the summit", // [cite: 36]
-                    trailTypeDescription = "Forested paths with occasional open areas; loop trail", // [cite: 37]
-                    sceneryDescription = "Lush greenery and views of nearby peaks", // [cite: 37]
-                    viewsDescription = "Views of nearby peaks", // Derived from sceneryDescription [cite: 37]
-                    wildlifeDescription = "Rich biodiversity, including various bird species and endemic plants", // [cite: 38]
-                    featuresDescription = "Forest trails, a prominent white cross at the summit, and a grotto", // [cite: 38]
-                    hikingSeasonDetails = "November to February for cooler temperatures and clearer trails", // [cite: 43]
-                    introduction = "Mount Manabu, part of the Malipunyo Range, is located in Sto. Tomas, Batangas, and rises to about 760 MASL. [cite: 34] The name \"Manabu\" is derived from \"Mataas na Bundok,\" meaning \"High Mountain.\" [cite: 35] It's a favored destination for beginners due to its manageable trails and serene environment. [cite: 35]",
+                    difficultyText = "Easy (2/9)",
+                    hoursToSummit = "2–3 hours to the summit",
+                    bestMonthsToHike = "November to February",
+                    typeVolcano = "Forested mountain",
+                    trekDurationDetails = "2–3 hours to the summit",
+                    trailTypeDescription = "Forested paths with occasional open areas; loop trail",
+                    sceneryDescription = "Lush greenery and views of nearby peaks",
+                    viewsDescription = "Views of nearby peaks",
+                    wildlifeDescription = "Rich biodiversity, including various bird species and endemic plants",
+                    featuresDescription = "Forest trails, a prominent white cross at the summit, and a grotto",
+                    hikingSeasonDetails = "November to February for cooler temperatures and clearer trails",
+                    introduction = "Mount Manabu, part of the Malipunyo Range, is located in Sto. Tomas, " +
+                            "Batangas, and rises to about 760 MASL. The name \"Manabu\" is " +
+                            "derived from \"Mataas na Bundok,\" meaning \"High Mountain.\" It's a " +
+                            "favored destination for beginners due to its manageable trails and " +
+                            "serene environment.",
                     tagline = "Let's Hike to Mt. Manabu",
                     mountainImageRef1 = "mt_manabu_1",
                     mountainImageRef2 = "mt_manabu_2",
                     mountainImageRef3 = "mt_manabu_3",
 
-                    hasSteepSections = false, // Not explicitly mentioned as having significant steep sections
-                    notableWildlife = "Birds, Endemic Plants", // [cite: 38]
-                    isRocky = false, // Not explicitly mentioned as rocky
-                    isSlippery = true, // Implied by "muddy trails during the rainy season" [cite: 43]
-                    isEstablishedTrail = true // Implied by "manageable trails" and "loop trail" [cite: 35, 37]
+                    hasSteepSections = false,
+                    notableWildlife = "Birds, Endemic Plants",
+                    isRocky = false,
+                    isSlippery = true,
+                    isEstablishedTrail = true
                 )
             ))
             campsiteDao.insertAllCampsites(listOf(
-                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtManabuId, description = "Several clearings along the trail serve as campsites, offering a peaceful setting amidst nature. [cite: 38] The trail is well-shaded, making it comfortable for hikers even during warmer days. [cite: 39]"),
-                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtManabuId, name = "Campsite Locations", description = "Along the trail and near the summit area"), // [cite: 40]
-                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtManabuId, name = "Water Source", description = "Available; a spring is located near one of the campsites"), // [cite: 40]
-                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtManabuId, name = "Best For", description = "Beginner hikers, overnight camping, and nature appreciation") // [cite: 40]
+                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtManabuId, description = "Several clearings along the trail serve as campsites, offering a peaceful " +
+                        "setting amidst nature. [cite: 38] The trail is well-shaded, making it comfortable for hikers even during warmer days."),
+                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtManabuId, name = "Campsite Locations", description = "Along the trail and near the summit area"),
+                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtManabuId, name = "Water Source", description = "Available; a spring is located near one of the campsites"),
+                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtManabuId, name = "Best For", description = "Beginner hikers, overnight camping, and nature appreciation")
             ))
             trailDao.insertAllTrails(listOf(
-                TrailEntity(trailId = UUID.randomUUID().toString(), mountainOwnerId = mtManabuId, name = "Main Trail", description = "Loop trail leading to the summit") // [cite: 40]
+                TrailEntity(trailId = UUID.randomUUID().toString(), mountainOwnerId = mtManabuId, name = "Main Trail", description = "Loop trail leading to the summit")
             ))
             guidelineDao.insertAllGuidelines(listOf(
                 GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtManabuId, category = "Registration Fee", description = "Approximately ₱20–₱30"), // [cite: 41]
                 GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtManabuId, category = "Guide Fee", description = "Optional; local guides are familiar with the trail and can enhance the hiking experience"), // [cite: 41]
                 GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtManabuId, category = "Camping Fee", description = "May apply; check with local authorities"), // [cite: 42]
-                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtManabuId, category = "Safety Tip", description = "Be prepared for muddy trails during the rainy season; bring insect repellent") // [cite: 43]
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtManabuId, category = "Safety Tip", description = "Be prepared for muddy trails during the rainy season; bring insect repellent"),
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtManabuId, category = "Best Season", description = "November to February for cooler temperatures and clearer trails")
             ))
 
-// --- Mt. Gulugod Baboy Data ---
+            // --- Mt. Gulugod Baboy Data ---
             val mtGulugodBaboyId = "mtglgdbby001"
             mountainDao.insertAllMountains(listOf(
                 MountainEntity(
                     mountainId = mtGulugodBaboyId,
                     mountainName = "Mt. Gulugod Baboy",
                     pictureReference = "mt_gulugod_baboy_main",
-                    location = "Mabini, Batangas", // [cite: 46]
-                    masl = 525, // [cite: 44, 46]
+                    location = "Mabini, Batangas",
+                    masl = 525,
                     difficultySummary = "Easy",
-                    difficultyText = "Easy (2/9)", // [cite: 46]
-                    hoursToSummit = "1.5–2 hours to the summit", // [cite: 46]
-                    bestMonthsToHike = "November to March", // [cite: 52]
-                    typeVolcano = "Coastal hill / rolling ridge", // [cite: 46]
-                    trekDurationDetails = "1.5–2 hours to the summit", // [cite: 46]
-                    trailTypeDescription = "Open grassy slopes with gradual inclines; established paths", // [cite: 47]
-                    sceneryDescription = "Overlooks Balayan Bay, Batangas Bay, and several islands including Sombrero and Maricaban", // [cite: 47]
-                    viewsDescription = "360-degree views of sea, coastline, and Batangas countryside", // [cite: 47]
-                    wildlifeDescription = "Grassland birds, grazing livestock, butterflies, and native shrubs", // [cite: 47]
-                    featuresDescription = "Gentle ridges, sea views, and proximity to diving resorts for post-hike swims", // [cite: 47]
-                    hikingSeasonDetails = "November to March (cooler, drier months)", // [cite: 52]
-                    introduction = "Mount Gulugod Baboy, located in Anilao, Mabini, Batangas, is a coastal mountain standing at around 525 MASL. [cite: 44] The name translates to \"pig's spine,\" referencing the mountain's rolling, ridge-like terrain. [cite: 45] It's known for its short, friendly trails and stunning views of the ocean and nearby islands, making it a favorite for casual hikers and campers. [cite: 45]",
+                    difficultyText = "Easy (2/9)",
+                    hoursToSummit = "1.5–2 hours to the summit",
+                    bestMonthsToHike = "November to March",
+                    typeVolcano = "Coastal hill / rolling ridge",
+                    trekDurationDetails = "1.5–2 hours to the summit",
+                    trailTypeDescription = "Open grassy slopes with gradual inclines; established paths",
+                    sceneryDescription = "Overlooks Balayan Bay, Batangas Bay, and several islands including Sombrero and Maricaban",
+                    viewsDescription = "360-degree views of sea, coastline, and Batangas countryside",
+                    wildlifeDescription = "Grassland birds, grazing livestock, butterflies, and native shrubs",
+                    featuresDescription = "Gentle ridges, sea views, and proximity to diving resorts for post-hike swims",
+                    hikingSeasonDetails = "November to March (cooler, drier months)",
+                    introduction = "Mount Gulugod Baboy, located in Anilao, Mabini, Batangas, is a " +
+                            "coastal mountain standing at around 525 MASL. The name translates to " +
+                            "\"pig's spine,\" referencing the mountain's rolling, ridge-like terrain. " +
+                            "It's known for its short, friendly trails and stunning views of the ocean " +
+                            "and nearby islands, making it a favorite for casual hikers and campers.",
                     tagline = "Let's Hike to Mt. Gulugod Baboy",
                     mountainImageRef1 = "mt_gulugod_baboy_1",
                     mountainImageRef2 = "mt_gulugod_baboy_2",
                     mountainImageRef3 = "mt_gulugod_baboy_3",
 
-                    hasSteepSections = false, // Described as "gradual inclines" [cite: 47]
-                    notableWildlife = "Birds, Butterflies, Livestock", // [cite: 47]
-                    isRocky = false, // Not explicitly mentioned as rocky
-                    isSlippery = false, // Not explicitly mentioned but possible when wet on grassy slopes
-                    isEstablishedTrail = true // [cite: 47]
+                    hasSteepSections = false,
+                    notableWildlife = "Birds, Butterflies, Livestock",
+                    isRocky = false,
+                    isSlippery = false,
+                    isEstablishedTrail = true
                 )
             ))
             campsiteDao.insertAllCampsites(listOf(
-                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtGulugodBaboyId, description = "The mountain features open grassland suitable for pitching tents, especially near the summit. [cite: 48] Overnight campers are rewarded with colorful sunsets and cool breezes from the nearby sea. [cite: 49] The trail is mostly open, so early hikes are recommended to avoid direct sun exposure. [cite: 49]"),
-                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtGulugodBaboyId, name = "Summit ridge", description = "Wide and grassy with panoramic views"), // [cite: 50]
-                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtGulugodBaboyId, name = "Water Sources", description = "None on the trail; bring at least 2–3 liters per person"), // [cite: 51]
-                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtGulugodBaboyId, name = "Best For", description = "Day hikes, first-time hikers, overnight campers, and sea+mountain combos") // [cite: 51]
+                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtGulugodBaboyId, description = "The mountain features open grassland suitable for pitching tents, especially near the summit. " +
+                        "Overnight campers are rewarded with colorful sunsets and cool breezes from the nearby sea. The trail is mostly open, so early hikes are recommended to avoid direct sun exposure."),
+                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtGulugodBaboyId, name = "Campsite Locations", description = "Summit ridge: Wide and grassy with panoramic views"),
+                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtGulugodBaboyId, name = "Water Sources", description = "None on the trail; bring at least 2–3 liters per person"),
+                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtGulugodBaboyId, name = "Best For", description = "Day hikes, first-time hikers, overnight campers, and sea+mountain combos")
             ))
             trailDao.insertAllTrails(listOf(
-                TrailEntity(trailId = UUID.randomUUID().toString(), mountainOwnerId = mtGulugodBaboyId, name = "Main Trail from Philpan Dive Resort", description = "Most popular route"), // [cite: 50]
-                TrailEntity(trailId = UUID.randomUUID().toString(), mountainOwnerId = mtGulugodBaboyId, name = "Alternate trail from Barangay San Teodoro", description = "Less crowded") // [cite: 50]
+                TrailEntity(trailId = UUID.randomUUID().toString(), mountainOwnerId = mtGulugodBaboyId, name = "Main Trail from Philpan Dive Resort", description = "Most popular route"),
+                TrailEntity(trailId = UUID.randomUUID().toString(), mountainOwnerId = mtGulugodBaboyId, name = "Alternate trail from Barangay San Teodoro", description = "Less crowded")
             ))
             guidelineDao.insertAllGuidelines(listOf(
-                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtGulugodBaboyId, category = "Registration Fee", description = "₱40–₱50 (depending on the trailhead)"), // [cite: 52]
-                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtGulugodBaboyId, category = "Guide Fee", description = "Optional (₱300–₱500 per group), trail is straightforward"), // [cite: 52]
-                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtGulugodBaboyId, category = "Camping Fee", description = "₱30–₱50, payable at the jump-off"), // [cite: 52]
-                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtGulugodBaboyId, category = "Safety Tip", description = "Trail is very exposed—wear sun protection"), // [cite: 52]
-                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtGulugodBaboyId, category = "Safety Tip", description = "Monitor the weather to avoid sudden changes in wind/rain"), // [cite: 52]
-                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtGulugodBaboyId, category = "Leave No Trace", description = "Bring your trash down, respect nearby residential areas") // [cite: 52]
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtGulugodBaboyId, category = "Registration Fee", description = "₱40–₱50 (depending on the trailhead)"),
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtGulugodBaboyId, category = "Guide Fee", description = "Optional (₱300–₱500 per group), trail is straightforward"),
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtGulugodBaboyId, category = "Camping Fee", description = "₱30–₱50, payable at the jump-off"),
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtGulugodBaboyId, category = "Safety Tip", description = "Trail is very exposed—wear sun protection"),
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtGulugodBaboyId, category = "Safety Tip", description = "Monitor the weather to avoid sudden changes in wind/rain"),
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtGulugodBaboyId, category = "Leave No Trace", description = "Bring your trash down, respect nearby residential areas"),
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtGulugodBaboyId, category = "Best Season", description = "November to March (cooler, drier months)")
             ))
 
-// --- Mt. Pico de Loro (Mt. Palay-Palay) Data ---
+            // --- Mt. Pico de Loro (Mt. Palay-Palay) Data ---
             val mtPicoDeLoroId = "mtpdl001"
             mountainDao.insertAllMountains(listOf(
                 MountainEntity(
                     mountainId = mtPicoDeLoroId,
                     mountainName = "Mt. Pico de Loro (Mt. Palay-Palay)",
                     pictureReference = "mt_pico_de_loro_main",
-                    location = "Ternate, Cavite / Nasugbu, Batangas", // [cite: 56]
-                    masl = 688, // [cite: 54, 56]
+                    location = "Ternate, Cavite / Nasugbu, Batangas",
+                    masl = 688,
                     difficultySummary = "Moderate to Challenging",
-                    difficultyText = "Moderate to Challenging (4/9 to summit; 5/9 to monolith)", // [cite: 57]
-                    hoursToSummit = "3–4 hours to the summit; 5-6 hours total for out-and-back", // [cite: 57]
-                    bestMonthsToHike = "November to March", // [cite: 60]
-                    typeVolcano = "Dormant volcanic cone", // [cite: 56]
-                    trekDurationDetails = "3–4 hours to the summit; 5–6 hours total for out-and-back", // [cite: 57]
-                    trailTypeDescription = "Forested trail with rocky sections, ridge walk, and optional monolith climb", // [cite: 57]
-                    sceneryDescription = "Forest canopy, coastal views, and the famous monolith", // [cite: 57]
-                    viewsDescription = "Panoramic sights of Batangas coastline, South China Sea, and nearby ranges", // [cite: 58]
-                    wildlifeDescription = "Forest birds, monkeys, butterflies, and lush flora", // [cite: 58]
-                    featuresDescription = "The summit rock (monolith), summit ridge, and reforested areas", // [cite: 58]
-                    hikingSeasonDetails = "November to March (dry and cool weather)", // [cite: 60]
-                    introduction = "Mount Pico de Loro, also known as Mount Palay-Palay, is one of the most iconic hiking destinations in Southern Luzon. [cite: 53] It straddles the provinces of Cavite and Batangas and stands at 688 meters above sea level (MASL). [cite: 54] Named \"Parrot's Beak\" for its distinct summit rock formation, Pico de Loro offers a scenic hike through forest trails, culminating in panoramic views from its monolithic peak. [cite: 55]",
+                    difficultyText = "Moderate to Challenging (4/9 to summit; 5/9 to monolith)",
+                    hoursToSummit = "3–4 hours to the summit; 5-6 hours total for out-and-back",
+                    bestMonthsToHike = "November to March",
+                    typeVolcano = "Dormant volcanic cone",
+                    trekDurationDetails = "3–4 hours to the summit; 5–6 hours total for out-and-back",
+                    trailTypeDescription = "Forested trail with rocky sections, ridge walk, and optional monolith climb",
+                    sceneryDescription = "Forest canopy, coastal views, and the famous monolith",
+                    viewsDescription = "Panoramic sights of Batangas coastline, South China Sea, and nearby ranges",
+                    wildlifeDescription = "Forest birds, monkeys, butterflies, and lush flora",
+                    featuresDescription = "The summit rock (monolith), summit ridge, and reforested areas",
+                    hikingSeasonDetails = "November to March (dry and cool weather)",
+                    introduction = "Mount Pico de Loro, also known as Mount Palay-Palay, is one of the " +
+                            "most iconic hiking destinations in Southern Luzon. It straddles the " +
+                            "provinces of Cavite and Batangas and stands at 688 meters above sea " +
+                            "level (MASL). Named \"Parrot's Beak\" for its distinct summit rock " +
+                            "formation, Pico de Loro offers a scenic hike through forest trails, " +
+                            "culminating in panoramic views from its monolithic peak.",
                     tagline = "Let's Hike to Mt. Pico de Loro",
                     mountainImageRef1 = "mt_pico_de_loro_1",
                     mountainImageRef2 = "mt_pico_de_loro_2",
                     mountainImageRef3 = "mt_pico_de_loro_3",
 
-                    hasSteepSections = true, // Implied by "rocky sections" and "monolith climb" [cite: 57]
-                    notableWildlife = "Birds, Monkeys, Butterflies", // [cite: 58]
-                    isRocky = true, // [cite: 57]
-                    isSlippery = true, // "Prepare for slippery trails during wet season" [cite: 60]
-                    isEstablishedTrail = true // Implied by regulated trails [cite: 58]
+                    hasSteepSections = true,
+                    notableWildlife = "Birds, Monkeys, Butterflies",
+                    isRocky = true,
+                    isSlippery = true,
+                    isEstablishedTrail = true
                 )
             ))
             campsiteDao.insertAllCampsites(listOf(
-                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtPicoDeLoroId, description = "There is an official campsite below the summit, providing ample space and excellent scenery. Camping is regulated to protect the surrounding forest. [cite: 58]"),
-                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtPicoDeLoroId, name = "Summit base campsite", description = "Spacious and cleared with views of the monolith"), // [cite: 58]
-                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtPicoDeLoroId, name = "Water Sources", description = "Limited; a water source may exist midway through the trail (subject to availability)"), // [cite: 59]
-                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtPicoDeLoroId, name = "Best For", description = "Adventurous hikers, photography enthusiasts, overnight climbs") // [cite: 59]
+                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtPicoDeLoroId, description = "There is an official campsite below the summit, providing ample " +
+                        "space and excellent scenery. Camping is regulated to protect the surrounding forest."),
+                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtPicoDeLoroId, name = "Summit base campsite", description = "Spacious and cleared with views of the monolith"),
+                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtPicoDeLoroId, name = "Water Sources", description = "Limited; a water source may exist midway through the trail (subject to availability)"),
+                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtPicoDeLoroId, name = "Best For", description = "Adventurous hikers, photography enthusiasts, overnight climbs")
             ))
             trailDao.insertAllTrails(listOf(
-                TrailEntity(trailId = UUID.randomUUID().toString(), mountainOwnerId = mtPicoDeLoroId, name = "New Trail (DENR route)", description = "Main regulated trail via DENR station in Ternate"), // [cite: 58]
-                TrailEntity(trailId = UUID.randomUUID().toString(), mountainOwnerId = mtPicoDeLoroId, name = "Old Trail (Nasugbu side)", description = "Previously used, now mostly off-limits or discouraged") // [cite: 58]
+                TrailEntity(trailId = UUID.randomUUID().toString(), mountainOwnerId = mtPicoDeLoroId, name = "New Trail (DENR route)", description = "Main regulated trail via DENR station in Ternate"),
+                TrailEntity(trailId = UUID.randomUUID().toString(), mountainOwnerId = mtPicoDeLoroId, name = "Old Trail (Nasugbu side)", description = "Previously used, now mostly off-limits or discouraged")
             ))
             guidelineDao.insertAllGuidelines(listOf(
-                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtPicoDeLoroId, category = "Registration Fee", description = "₱25–₱50 at the DENR station"), // [cite: 59]
-                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtPicoDeLoroId, category = "Guide Fee", description = "Required (₱500–₱1,000 depending on group size)"), // [cite: 59]
-                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtPicoDeLoroId, category = "Camping Fee", description = "₱30–₱50 per person"), // [cite: 59]
-                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtPicoDeLoroId, category = "Restriction", description = "Monolith climb may be off-limits due to erosion and safety risks"), // [cite: 59]
-                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtPicoDeLoroId, category = "Leave No Trace", description = "Strict \"Leave No Trace\" policy enforced"), // [cite: 59]
-                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtPicoDeLoroId, category = "Safety Tip", description = "Bring gloves and wear proper shoes, especially if ridge or monolith climb is open"), // [cite: 59]
-                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtPicoDeLoroId, category = "Safety Tip", description = "Prepare for slippery trails during wet season") // [cite: 60]
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtPicoDeLoroId, category = "Registration Fee", description = "₱25–₱50 at the DENR station"),
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtPicoDeLoroId, category = "Guide Fee", description = "Required (₱500–₱1,000 depending on group size)"),
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtPicoDeLoroId, category = "Camping Fee", description = "₱30–₱50 per person"),
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtPicoDeLoroId, category = "Restriction", description = "Monolith climb may be off-limits due to erosion and safety risks"),
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtPicoDeLoroId, category = "Leave No Trace", description = "Strict \"Leave No Trace\" policy enforced"),
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtPicoDeLoroId, category = "Safety Tip", description = "Bring gloves and wear proper shoes, especially if ridge or monolith climb is open"),
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtPicoDeLoroId, category = "Safety Tip", description = "Prepare for slippery trails during wet season"),
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtPicoDeLoroId, category = "Best Season", description = "November to March (dry and cool weather)\n")
             ))
 
-// --- Mt. Balagbag Data ---
+            // --- Mt. Balagbag Data ---
             val mtBalagbagId = "mtblgbg001"
             mountainDao.insertAllMountains(listOf(
                 MountainEntity(
                     mountainId = mtBalagbagId,
                     mountainName = "Mt. Balagbag",
                     pictureReference = "mt_balagbag_main",
-                    location = "Rodriguez, Rizal / San Jose del Monte, Bulacan", // [cite: 63]
-                    masl = 777, // [cite: 61, 63]
+                    location = "Rodriguez, Rizal / San Jose del Monte, Bulacan",
+                    masl = 777,
                     difficultySummary = "Easy to moderate",
-                    difficultyText = "Easy to moderate (2/9 to 3/9)", // [cite: 64]
-                    hoursToSummit = "1.5–3 hours to the summit depending on trail and pace", // [cite: 64]
-                    bestMonthsToHike = "November to February", // [cite: 69]
-                    typeVolcano = "Part of the Sierra Madre foothills (upland grassland ridge)", // [cite: 63]
-                    trekDurationDetails = "1.5–3 hours to the summit depending on trail and pace", // [cite: 64]
-                    trailTypeDescription = "Dirt road, open ridges, and gradual ascents; bike-friendly", // [cite: 64]
-                    sceneryDescription = "Expansive ridges, grasslands, views of nearby dams, cityscape, and mountains", // [cite: 64]
-                    viewsDescription = "Metro Manila skyline, La Mesa Dam, Sierra Madre range", // [cite: 64]
-                    wildlifeDescription = "Grassland birds, butterflies, and seasonal wildflowers", // [cite: 64]
-                    featuresDescription = "Wide ridges, perfect for stargazing, off-road biking, and group camping", // [cite: 64]
-                    hikingSeasonDetails = "November to February; good stargazing conditions in dry season", // [cite: 69]
-                    introduction = "Mount Balagbag is a popular hiking and biking destination located at the boundary of Rodriguez (Montalban), Rizal, and San Jose del Monte, Bulacan. [cite: 61] It rises to about 777 meters above sea level (MASL). [cite: 61, 62] Known for its rolling grassland trails and accessibility from Metro Manila, the mountain offers wide, open ridges with scenic views of the Sierra Madre, La Mesa Dam, and parts of the Metro skyline. [cite: 62]",
+                    difficultyText = "Easy to moderate (2/9 to 3/9)",
+                    hoursToSummit = "1.5–3 hours to the summit depending on trail and pace",
+                    bestMonthsToHike = "November to February",
+                    typeVolcano = "Part of the Sierra Madre foothills (upland grassland ridge)",
+                    trekDurationDetails = "1.5–3 hours to the summit depending on trail and pace",
+                    trailTypeDescription = "Dirt road, open ridges, and gradual ascents; bike-friendly",
+                    sceneryDescription = "Expansive ridges, grasslands, views of nearby dams, cityscape, and mountains",
+                    viewsDescription = "Metro Manila skyline, La Mesa Dam, Sierra Madre range",
+                    wildlifeDescription = "Grassland birds, butterflies, and seasonal wildflowers",
+                    featuresDescription = "Wide ridges, perfect for stargazing, off-road biking, and group camping",
+                    hikingSeasonDetails = "November to February; good stargazing conditions in dry season",
+                    introduction = "Mount Balagbag is a popular hiking and biking destination located " +
+                            "at the boundary of Rodriguez (Montalban), Rizal, and San Jose del Monte, " +
+                            "Bulacan. It rises to about 777 meters above sea level (MASL). Known for " +
+                            "its rolling grassland trails and accessibility from Metro Manila, the " +
+                            "mountain offers wide, open ridges with scenic views of the Sierra Madre, " +
+                            "La Mesa Dam, and parts of the Metro skyline.",
                     tagline = "Let's Hike to Mt. Balagbag",
                     mountainImageRef1 = "mt_balagbag_1",
                     mountainImageRef2 = "mt_balagbag_2",
                     mountainImageRef3 = "mt_balagbag_3",
 
-                    hasSteepSections = false, // Described as "gradual ascents" [cite: 64]
-                    notableWildlife = "Birds, Butterflies, Wildflowers", // [cite: 64]
-                    isRocky = false, // Primarily dirt road and grassland [cite: 64]
-                    isSlippery = false, // Not explicitly mentioned, but dirt roads can be slippery when wet
-                    isEstablishedTrail = true // Implied by common trails and bike-friendliness [cite: 64, 66]
+                    hasSteepSections = false,
+                    notableWildlife = "Birds, Butterflies, Wildflowers",
+                    isRocky = false,
+                    isSlippery = false,
+                    isEstablishedTrail = true
                 )
             ))
             campsiteDao.insertAllCampsites(listOf(
-                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtBalagbagId, description = "Mount Balagbag is well-known for its broad ridges that double as excellent camping areas. [cite: 65] It's ideal for beginners, family hikers, and large groups. There are multiple areas to pitch tents along the route and near the summit. [cite: 65, 66]"),
-                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtBalagbagId, name = "Summit ridge", description = "Open grassland with space for many tents"), // [cite: 66]
-                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtBalagbagId, name = "Along the trail", description = "Several rest stops and cleared areas suitable for camping"), // [cite: 66]
-                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtBalagbagId, name = "Water Sources", description = "Few; better to bring enough water (2-3L recommended)"), // [cite: 67]
-                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtBalagbagId, name = "Best For", description = "Beginners, mountain bikers, overnighters, and quick day hikes") // [cite: 67]
+                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtBalagbagId, description = "Mount Balagbag is well-known for its broad ridges that double as excellent camping areas. " +
+                        "It's ideal for beginners, family hikers, and large groups. There are multiple areas to pitch tents along the route and near the summit."),
+                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtBalagbagId, name = "Summit ridge", description = "Open grassland with space for many tents"),
+                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtBalagbagId, name = "Along the trail", description = "Several rest stops and cleared areas suitable for camping"),
+                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtBalagbagId, name = "Water Sources", description = "Few; better to bring enough water (2-3L recommended)"),
+                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtBalagbagId, name = "Best For", description = "Beginners, mountain bikers, overnighters, and quick day hikes")
             ))
             trailDao.insertAllTrails(listOf(
-                TrailEntity(trailId = UUID.randomUUID().toString(), mountainOwnerId = mtBalagbagId, name = "Licao-Licao Trail", description = "Most common trail from Barangay Licao-Licao"), // [cite: 66]
-                TrailEntity(trailId = UUID.randomUUID().toString(), mountainOwnerId = mtBalagbagId, name = "Karahume Trail", description = "Longer but more scenic route") // [cite: 66]
+                TrailEntity(trailId = UUID.randomUUID().toString(), mountainOwnerId = mtBalagbagId, name = "Licao-Licao Trail", description = "Most common trail from Barangay Licao-Licao"),
+                TrailEntity(trailId = UUID.randomUUID().toString(), mountainOwnerId = mtBalagbagId, name = "Karahume Trail", description = "Longer but more scenic route")
             ))
             guidelineDao.insertAllGuidelines(listOf(
-                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtBalagbagId, category = "Registration Fee", description = "₱20–₱50, depending on the barangay or route"), // [cite: 68]
-                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtBalagbagId, category = "Guide Fee", description = "Optional; not required but local guides are available"), // [cite: 68]
-                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtBalagbagId, category = "Camping Fee", description = "₱20–₱50 per person"), // [cite: 69]
-                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtBalagbagId, category = "Accessibility", description = "Can be reached by jeep/trike from Tungko or Fairview, then hike or ride"), // [cite: 69]
-                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtBalagbagId, category = "Safety Tip", description = "Very exposed trail—bring sun protection and plenty of water"), // [cite: 69]
-                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtBalagbagId, category = "Safety Tip", description = "Avoid hiking during thunderstorms due to wide, open terrain") // [cite: 69]
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtBalagbagId, category = "Registration Fee", description = "₱20–₱50, depending on the barangay or route"),
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtBalagbagId, category = "Guide Fee", description = "Optional; not required but local guides are available"),
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtBalagbagId, category = "Camping Fee", description = "₱20–₱50 per person"),
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtBalagbagId, category = "Accessibility", description = "Can be reached by jeep/trike from Tungko or Fairview, then hike or ride"),
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtBalagbagId, category = "Safety Tip", description = "Very exposed trail—bring sun protection and plenty of water"),
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtBalagbagId, category = "Safety Tip", description = "Avoid hiking during thunderstorms due to wide, open terrain"),
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtBalagbagId, category = "Best Season", description = "November to February; good stargazing conditions in dry season")
+
             ))
 
-// --- Mt. Binacayan Data ---
+            // --- Mt. Binacayan Data ---
             val mtBinacayanId = "mtbncyn001"
             mountainDao.insertAllMountains(listOf(
                 MountainEntity(
                     mountainId = mtBinacayanId,
                     mountainName = "Mt. Binacayan",
                     pictureReference = "mt_binacayan_main",
-                    location = "Rodriguez (Montalban), Rizal", // [cite: 72]
-                    masl = 424, // [cite: 70, 72]
+                    location = "Rodriguez (Montalban), Rizal",
+                    masl = 424,
                     difficultySummary = "Moderate",
-                    difficultyText = "Moderate (3/9)", // [cite: 72]
-                    hoursToSummit = "2–3 hours to the summit", // [cite: 72]
-                    bestMonthsToHike = "November to February", // [cite: 77]
-                    typeVolcano = "Rocky hill, part of the Sierra Madre range", // [cite: 72]
-                    trekDurationDetails = "2–3 hours to the summit", // [cite: 72]
-                    trailTypeDescription = "Rocky, somewhat steep with ridges", // [cite: 72]
-                    sceneryDescription = "Gorgeous river views, mountains, and a scenic ridge walk", // [cite: 72]
-                    viewsDescription = "Panoramic views of Wawa River, neighboring mountains, and the valleys below", // [cite: 73]
-                    wildlifeDescription = "Birds, small mammals, and plant life in the surrounding forest", // [cite: 73]
-                    featuresDescription = "Steep ridges, a rocky summit, and panoramic views of Wawa River", // [cite: 73]
-                    hikingSeasonDetails = "November to February (dry and cooler months)", // [cite: 77]
-                    introduction = "Mount Binacayan is a relatively short but scenic hike located in Rodriguez (Montalban), Rizal, with an elevation of around 424 meters above sea level (MASL). [cite: 70] It is one of the lesser-known mountains in the area but offers stunning views of the nearby Wawa River and Sierra Madre Mountains. [cite: 71] The mountain is popular for its rocky terrain and interesting ridges, making it a great spot for day hikes and rock climbing enthusiasts. [cite: 71]",
+                    difficultyText = "Moderate (3/9)",
+                    hoursToSummit = "2–3 hours to the summit",
+                    bestMonthsToHike = "November to February",
+                    typeVolcano = "Rocky hill, part of the Sierra Madre range",
+                    trekDurationDetails = "2–3 hours to the summit",
+                    trailTypeDescription = "Rocky, somewhat steep with ridges",
+                    sceneryDescription = "Gorgeous river views, mountains, and a scenic ridge walk",
+                    viewsDescription = "Panoramic views of Wawa River, neighboring mountains, and the valleys below",
+                    wildlifeDescription = "Birds, small mammals, and plant life in the surrounding forest",
+                    featuresDescription = "Steep ridges, a rocky summit, and panoramic views of Wawa River",
+                    hikingSeasonDetails = "November to February (dry and cooler months)",
+                    introduction = "Mount Binacayan is a relatively short but scenic hike located in " +
+                            "Rodriguez (Montalban), Rizal, with an elevation of around 424 meters above sea level (MASL). " +
+                            "It is one of the lesser-known mountains in the area but offers stunning " +
+                            "views of the nearby Wawa River and Sierra Madre Mountains. The mountain " +
+                            "is popular for its rocky terrain and interesting ridges, making it a " +
+                            "great spot for day hikes and rock climbing enthusiasts.",
                     tagline = "Let's Hike to Mt. Binacayan",
                     mountainImageRef1 = "mt_binacayan_1",
                     mountainImageRef2 = "mt_binacayan_2",
                     mountainImageRef3 = "mt_binacayan_3",
 
-                    hasSteepSections = true, // "somewhat steep with ridges" [cite: 72]
-                    notableWildlife = "Birds, Small Mammals", // [cite: 73]
-                    isRocky = true, // [cite: 71, 72]
-                    isSlippery = true, // "Trail is rocky and can be slippery during the rainy season" [cite: 77]
-                    isEstablishedTrail = true // Implied by "Main Trail" [cite: 75]
+                    hasSteepSections = true,
+                    notableWildlife = "Birds, Small Mammals",
+                    isRocky = true,
+                    isSlippery = true,
+                    isEstablishedTrail = true
                 )
             ))
             campsiteDao.insertAllCampsites(listOf(
-                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtBinacayanId, description = "Camping on Mount Binacayan is possible but limited due to its rocky terrain. [cite: 73] It's better for those looking for a day hike or short overnight trip with a quick return. [cite: 74] The area near the summit provides some flat spaces for camping. [cite: 74]"),
-                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtBinacayanId, name = "Near the summit", description = "Small open areas for tents, with views of the surrounding peaks"), // [cite: 75]
-                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtBinacayanId, name = "Water Sources", description = "Limited; hikers are advised to bring sufficient water"), // [cite: 76]
-                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtBinacayanId, name = "Best For", description = "Day hikers, adventurous beginners, rock climbing enthusiasts") // [cite: 77]
+                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtBinacayanId, description = "Camping on Mount Binacayan is possible but limited due to its rocky terrain. " +
+                        "It's better for those looking for a day hike or short overnight trip with a quick return. The area near the summit provides some flat spaces for camping."),
+                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtBinacayanId, name = "Near the summit", description = "Small open areas for tents, with views of the surrounding peaks"),
+                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtBinacayanId, name = "Water Sources", description = "Limited; hikers are advised to bring sufficient water"),
+                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtBinacayanId, name = "Best For", description = "Day hikers, adventurous beginners, rock climbing enthusiasts")
             ))
             trailDao.insertAllTrails(listOf(
-                TrailEntity(trailId = UUID.randomUUID().toString(), mountainOwnerId = mtBinacayanId, name = "Binacayan Trail", description = "The main trail leading to the summit from the jump-off point"), // [cite: 75]
-                TrailEntity(trailId = UUID.randomUUID().toString(), mountainOwnerId = mtBinacayanId, name = "Side Ridges", description = "Some hikers choose to hike along the side ridges for a more challenging experience") // [cite: 75]
+                TrailEntity(trailId = UUID.randomUUID().toString(), mountainOwnerId = mtBinacayanId, name = "Binacayan Trail", description = "The main trail leading to the summit from the jump-off point"),
+                TrailEntity(trailId = UUID.randomUUID().toString(), mountainOwnerId = mtBinacayanId, name = "Side Ridges", description = "Some hikers choose to hike along the side ridges for a more challenging experience")
             ))
             guidelineDao.insertAllGuidelines(listOf(
-                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtBinacayanId, category = "Registration Fee", description = "₱20–₱50, payable at the barangay hall"), // [cite: 77]
-                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtBinacayanId, category = "Guide Fee", description = "Optional, recommended for first-time hikers (₱300–₱500 per group)"), // [cite: 77]
-                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtBinacayanId, category = "Camping Fee", description = "₱20–₱50, depending on the area"), // [cite: 77]
-                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtBinacayanId, category = "Safety Tip", description = "Trail is rocky and can be slippery during the rainy season"), // [cite: 77]
-                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtBinacayanId, category = "Safety Tip", description = "Be cautious of loose rocks and sharp inclines") // [cite: 77]
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtBinacayanId, category = "Registration Fee", description = "₱20–₱50, payable at the barangay hall"),
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtBinacayanId, category = "Guide Fee", description = "Optional, recommended for first-time hikers (₱300–₱500 per group)"),
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtBinacayanId, category = "Camping Fee", description = "₱20–₱50, depending on the area"),
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtBinacayanId, category = "Safety Tip", description = "Trail is rocky and can be slippery during the rainy season"),
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtBinacayanId, category = "Safety Tip", description = "Be cautious of loose rocks and sharp inclines") ,
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtBinacayanId, category = "Best Season", description = "November to February (dry and cooler months)")
             ))
 
-// --- Mt. Pamitinan Data ---
+            // --- Mt. Pamitinan Data ---
             val mtPamitinanId = "mtpmtnn001"
             mountainDao.insertAllMountains(listOf(
                 MountainEntity(
                     mountainId = mtPamitinanId,
                     mountainName = "Mt. Pamitinan",
                     pictureReference = "mt_pamitinan_main",
-                    location = "Rodriguez (Montalban), Rizal", // [cite: 80]
-                    masl = 426, // [cite: 78, 80]
+                    location = "Rodriguez (Montalban), Rizal",
+                    masl = 426,
                     difficultySummary = "Moderate",
-                    difficultyText = "Moderate (3/9)", // [cite: 80]
-                    hoursToSummit = "2–3 hours to the summit", // [cite: 80]
-                    bestMonthsToHike = "November to February", // [cite: 85]
-                    typeVolcano = "Limestone mountain with rocky terrain", // [cite: 80]
-                    trekDurationDetails = "2–3 hours to the summit", // [cite: 80]
-                    trailTypeDescription = "Rocky, steep, and sometimes exposed", // [cite: 80]
-                    sceneryDescription = "Scenic views of the river, valleys, and the nearby mountains", // [cite: 80]
-                    viewsDescription = "Panoramic views of the Wawa River, Sierra Madre, and the neighboring mountains", // [cite: 81]
-                    wildlifeDescription = "Various bird species, insects, and occasional wild animals in the forested areas", // [cite: 81]
-                    featuresDescription = "Limestone cliffs, rock formations, and an expansive view from the summit", // [cite: 81]
-                    hikingSeasonDetails = "November to February (best weather conditions, dry season)", // [cite: 85]
-                    introduction = "Mount Pamitinan is a relatively short but exciting hike located in Rodriguez (Montalban), Rizal, standing at 426 meters above sea level (MASL). [cite: 78] Known for its limestone formations, it offers hikers a unique experience, with rugged rock faces and panoramic views of the surrounding Sierra Madre mountains and Wawa River. [cite: 79] It's a great spot for both beginner and intermediate hikers seeking a short but rewarding trek. [cite: 79]",
+                    difficultyText = "Moderate (3/9)",
+                    hoursToSummit = "2–3 hours to the summit",
+                    bestMonthsToHike = "November to February",
+                    typeVolcano = "Limestone mountain with rocky terrain",
+                    trekDurationDetails = "2–3 hours to the summit",
+                    trailTypeDescription = "Rocky, steep, and sometimes exposed",
+                    sceneryDescription = "Scenic views of the river, valleys, and the nearby mountains",
+                    viewsDescription = "Panoramic views of the Wawa River, Sierra Madre, and the neighboring mountains",
+                    wildlifeDescription = "Various bird species, insects, and occasional wild animals in the forested areas",
+                    featuresDescription = "Limestone cliffs, rock formations, and an expansive view from the summit",
+                    hikingSeasonDetails = "November to February (best weather conditions, dry season)",
+                    introduction = "Mount Pamitinan is a relatively short but exciting hike located " +
+                            "in Rodriguez (Montalban), Rizal, standing at 426 meters above sea level " +
+                            "(MASL). Known for its limestone formations, it offers hikers a unique " +
+                            "experience, with rugged rock faces and panoramic views of the surrounding " +
+                            "Sierra Madre mountains and Wawa River. It's a great spot for both " +
+                            "beginner and intermediate hikers seeking a short but rewarding trek.",
                     tagline = "Let's Hike to Mt. Pamitinan",
                     mountainImageRef1 = "mt_pamitinan_1",
                     mountainImageRef2 = "mt_pamitinan_2",
                     mountainImageRef3 = "mt_pamitinan_3",
 
-                    hasSteepSections = true, // [cite: 80]
-                    notableWildlife = "Birds, Insects, Wild Animals", // [cite: 81]
-                    isRocky = true, // [cite: 79, 80]
-                    isSlippery = true, // Implied by "Take extra care on the rocky sections, especially when wet" [cite: 84]
-                    isEstablishedTrail = true // Implied by "Main route" [cite: 83]
+                    hasSteepSections = true,
+                    notableWildlife = "Birds, Insects, Wild Animals",
+                    isRocky = true,
+                    isSlippery = true,
+                    isEstablishedTrail = true
                 )
             ))
             campsiteDao.insertAllCampsites(listOf(
-                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtPamitinanId, description = "Mount Pamitinan is typically a day hike destination, but camping is possible in some areas near the base or on the trail. [cite: 81] Due to the rocky and steep terrain, camping near the summit isn't recommended. [cite: 82] However, there are some flat areas near the jump-off point or along the trail for an overnight experience. [cite: 82]"),
-                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtPamitinanId, name = "Near the base", description = "Open spaces suitable for tents"), // [cite: 84]
-                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtPamitinanId, name = "Water Sources", description = "Wawa River (accessed early in the hike), but carry enough water (at least 2 liters)"), // [cite: 84]
-                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtPamitinanId, name = "Best For", description = "Day hikers, rock climbing enthusiasts, first-time hikers looking for a bit of a challenge") // [cite: 84]
+                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtPamitinanId, description = "Mount Pamitinan is typically a day hike destination, but camping is possible in some areas near the base or " +
+                        "on the trail. [cite: 81] Due to the rocky and steep terrain, camping near the summit isn't recommended. However, there are some flat areas near the jump-off point or along the trail for an overnight experience."),
+                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtPamitinanId, name = "Near the base", description = "Open spaces suitable for tents"),
+                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtPamitinanId, name = "Water Sources", description = "Wawa River (accessed early in the hike), but carry enough water (at least 2 liters)"),
+                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtPamitinanId, name = "Best For", description = "Day hikers, rock climbing enthusiasts, first-time hikers looking for a bit of a challenge")
             ))
             trailDao.insertAllTrails(listOf(
-                TrailEntity(trailId = UUID.randomUUID().toString(), mountainOwnerId = mtPamitinanId, name = "Pamitinan Trail", description = "Main route to the summit from the jump-off in Wawa") // [cite: 83]
+                TrailEntity(trailId = UUID.randomUUID().toString(), mountainOwnerId = mtPamitinanId, name = "Pamitinan Trail", description = "Main route to the summit from the jump-off in Wawa")
             ))
             guidelineDao.insertAllGuidelines(listOf(
-                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtPamitinanId, category = "Registration Fee", description = "₱20–₱30 at the barangay hall in Wawa"), // [cite: 84]
-                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtPamitinanId, category = "Guide Fee", description = "Recommended (₱300–₱500 per group), as the trail can be tricky for first-timers"), // [cite: 84]
-                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtPamitinanId, category = "Camping Fee", description = "₱20–₱50, payable at the jump-off or campsite"), // [cite: 84]
-                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtPamitinanId, category = "Safety Tip", description = "Take extra care on the rocky sections, especially when wet"), // [cite: 84]
-                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtPamitinanId, category = "Safety Tip", description = "Bring a flashlight or headlamp if planning for an overnight hike") // [cite: 84]
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtPamitinanId, category = "Registration Fee", description = "₱20–₱30 at the barangay hall in Wawa"),
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtPamitinanId, category = "Guide Fee", description = "Recommended (₱300–₱500 per group), as the trail can be tricky for first-timers"),
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtPamitinanId, category = "Camping Fee", description = "₱20–₱50, payable at the jump-off or campsite"),
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtPamitinanId, category = "Safety Tip", description = "Take extra care on the rocky sections, especially when wet"),
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtPamitinanId, category = "Safety Tip", description = "Bring a flashlight or headlamp if planning for an overnight hike"),
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtPamitinanId, category = "Best Season", description = "November to February (best weather conditions, dry season)")
             ))
 
-// --- Mt. Hapunang Banoi Data ---
+            // --- Mt. Hapunang Banoi Data ---
             val mtHapunangBanoiId = "mthpngbni001"
             mountainDao.insertAllMountains(listOf(
                 MountainEntity(
                     mountainId = mtHapunangBanoiId,
                     mountainName = "Mt. Hapunang Banoi",
                     pictureReference = "mt_hapunang_banoi_main",
-                    location = "Rodriguez (Montalban), Rizal", // [cite: 89]
-                    masl = 723, // [cite: 86, 89] (Document has conflicting info, 517 MASL on page 11, 723 on page 12. Using 723 from details.)
+                    location = "Rodriguez (Montalban), Rizal",
+                    masl = 723,
                     difficultySummary = "Moderate to Challenging",
-                    difficultyText = "Moderate to Challenging (4/9)", // [cite: 89]
-                    hoursToSummit = "3–4 hours to the summit", // [cite: 89]
-                    bestMonthsToHike = "November to February", // [cite: 92]
-                    typeVolcano = "Limestone mountain with steep ascents and rocky paths", // [cite: 89]
-                    trekDurationDetails = "3–4 hours to the summit", // [cite: 89]
-                    trailTypeDescription = "Steep, rocky paths, with scrambling sections", // [cite: 89]
-                    sceneryDescription = "Dense forests, exposed ridges, and views of nearby peaks and valleys", // [cite: 89]
-                    viewsDescription = "Views of the Sierra Madre, Montalban valley, and nearby mountains", // [cite: 90]
-                    wildlifeDescription = "Birds, insects, and occasional wildlife in the forested areas", // [cite: 90]
-                    featuresDescription = "Limestone formations, exposed rock faces, and ridges", // [cite: 90]
-                    hikingSeasonDetails = "November to February (best for dry weather and clear views)", // [cite: 92]
-                    introduction = "Mount Hapunang Banoi is a prominent peak located in Rodriguez (Montalban), Rizal, with an elevation of 723 meters above sea level (MASL). [cite: 86, 89] It is known for its rugged terrain, steep trails, and striking limestone rock formations. [cite: 87] The mountain is often combined with nearby peaks such as Mount Pamitinan and Mount Binacayan for a more challenging hike, but it can also be tackled on its own. [cite: 87, 88] It offers a great blend of forest, rock climbing, and expansive views. [cite: 88]",
+                    difficultyText = "Moderate to Challenging (4/9)",
+                    hoursToSummit = "3–4 hours to the summit",
+                    bestMonthsToHike = "November to February",
+                    typeVolcano = "Limestone mountain with steep ascents and rocky paths",
+                    trekDurationDetails = "3–4 hours to the summit",
+                    trailTypeDescription = "Steep, rocky paths, with scrambling sections",
+                    sceneryDescription = "Dense forests, exposed ridges, and views of nearby peaks and valleys",
+                    viewsDescription = "Views of the Sierra Madre, Montalban valley, and nearby mountains",
+                    wildlifeDescription = "Birds, insects, and occasional wildlife in the forested areas",
+                    featuresDescription = "Limestone formations, exposed rock faces, and ridges",
+                    hikingSeasonDetails = "November to February (best for dry weather and clear views)",
+                    introduction = "Mount Hapunang Banoi is a prominent peak located in Rodriguez " +
+                            "(Montalban), Rizal, with an elevation of 723 meters above sea level " +
+                            "(MASL). It is known for its rugged terrain, steep trails, and striking " +
+                            "limestone rock formations. The mountain is often combined with nearby " +
+                            "peaks such as Mount Pamitinan and Mount Binacayan for a more challenging " +
+                            "hike, but it can also be tackled on its own. It offers a great blend of " +
+                            "forest, rock climbing, and expansive views.",
                     tagline = "Let's Hike to Mt. Hapunang Banoi",
                     mountainImageRef1 = "mt_hapunang_banoi_1",
                     mountainImageRef2 = "mt_hapunang_banoi_2",
                     mountainImageRef3 = "mt_hapunang_banoi_3",
 
-                    hasSteepSections = true, // [cite: 87, 89]
-                    notableWildlife = "Birds, Insects, Wildlife", // [cite: 90]
-                    isRocky = true, // [cite: 87, 89]
-                    isSlippery = true, // Implied by "Be cautious around the limestone rock formations to avoid slipping" [cite: 92]
-                    isEstablishedTrail = true // Implied by "standard route" [cite: 91]
+                    hasSteepSections = true,
+                    notableWildlife = "Birds, Insects, Wildlife",
+                    isRocky = true,
+                    isSlippery = true,
+                    isEstablishedTrail = true
                 )
             ))
             campsiteDao.insertAllCampsites(listOf(
-                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtHapunangBanoiId, description = "Camping on Mount Hapunang Banoi is limited, given the steep nature of the terrain. [cite: 90] It's better suited for day hikes, but there are campsites near the trailhead and lower sections of the trail where hikers can stop for rest and short stays. [cite: 90]"),
-                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtHapunangBanoiId, name = "Near the base and initial parts of the trail", description = "for rest"), // [cite: 91]
-                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtHapunangBanoiId, name = "Limited flat ground near the trailhead", description = ""), // [cite: 91]
-                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtHapunangBanoiId, name = "Water Sources", description = "Wawa River is the main water source for the first section of the hike"), // [cite: 92]
-                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtHapunangBanoiId, name = "Best For", description = "Day hikers, experienced hikers combining multiple mountains, rock climbing enthusiasts") // [cite: 92]
+                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtHapunangBanoiId, description = "Camping on Mount Hapunang Banoi is limited, given the steep nature of the terrain. It's " +
+                        "better suited for day hikes, but there are campsites near the trailhead and lower sections of the trail where hikers can stop for rest and short stays."),
+                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtHapunangBanoiId, name = "Campsite Location", description = "Near the base and initial parts of the trail for rest"),
+                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtHapunangBanoiId, name = "Campsite Location", description = "Limited flat ground near the trailhead"),
+                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtHapunangBanoiId, name = "Water Sources", description = "Wawa River is the main water source for the first section of the hike"),
+                CampsiteEntity(campsiteId = UUID.randomUUID().toString(), mountainOwnerId = mtHapunangBanoiId, name = "Best For", description = "Day hikers, experienced hikers combining multiple mountains, rock climbing enthusiasts")
             ))
             trailDao.insertAllTrails(listOf(
-                TrailEntity(trailId = UUID.randomUUID().toString(), mountainOwnerId = mtHapunangBanoiId, name = "Main Trail", description = "The standard route starting from the Wawa River"), // [cite: 91]
-                TrailEntity(trailId = UUID.randomUUID().toString(), mountainOwnerId = mtHapunangBanoiId, name = "Combo Trail", description = "A longer route that connects with Mount Pamitinan and Mount Binacayan") // [cite: 91]
+                TrailEntity(trailId = UUID.randomUUID().toString(), mountainOwnerId = mtHapunangBanoiId, name = "Main Trail", description = "The standard route starting from the Wawa River"),
+                TrailEntity(trailId = UUID.randomUUID().toString(), mountainOwnerId = mtHapunangBanoiId, name = "Combo Trail", description = "A longer route that connects with Mount Pamitinan and Mount Binacayan")
             ))
             guidelineDao.insertAllGuidelines(listOf(
-                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtHapunangBanoiId, category = "Registration Fee", description = "₱20–₱30 at the barangay hall or jump-off point"), // [cite: 92]
-                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtHapunangBanoiId, category = "Guide Fee", description = "Highly recommended (₱300–₱500 per group) for navigation and safety"), // [cite: 92]
-                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtHapunangBanoiId, category = "Camping Fee", description = "₱20–₱50, depending on the location"), // [cite: 92]
-                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtHapunangBanoiId, category = "Safety Tip", description = "The trail is steep and rocky—wear proper hiking shoes"), // [cite: 92]
-                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtHapunangBanoiId, category = "Safety Tip", description = "Be cautious around the limestone rock formations to avoid slipping") // [cite: 92]
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtHapunangBanoiId, category = "Registration Fee", description = "₱20–₱30 at the barangay hall or jump-off point"),
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtHapunangBanoiId, category = "Guide Fee", description = "Highly recommended (₱300–₱500 per group) for navigation and safety"),
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtHapunangBanoiId, category = "Camping Fee", description = "₱20–₱50, depending on the location"),
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtHapunangBanoiId, category = "Safety Tip", description = "The trail is steep and rocky—wear proper hiking shoes"),
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtHapunangBanoiId, category = "Safety Tip", description = "Be cautious around the limestone rock formations to avoid slipping"),
+                GuidelineEntity(guidelineId = UUID.randomUUID().toString(), mountainOwnerId = mtHapunangBanoiId, category = "Best Season", description = "November to February (best for dry weather and clear views)")
             ))
 
 // --- Mt. Maynoba Data ---

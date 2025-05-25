@@ -528,7 +528,7 @@ fun MountainListCard(mountain: Mountain, navController: NavHostController) {
             ) {
                 Text(mountain.name, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.Black,
                     fontFamily = Lato)
-                Text(mountain.difficulty.toString(), fontSize = 14.sp, color = Color.Black, fontFamily = Lato)
+                Text(mountain.difficultySummary.toString(), fontSize = 14.sp, color = Color.Black, fontFamily = Lato)
                 Text(
                     text = mountain.tagline ?: "No tagline available", fontSize = 12.sp, maxLines = 2, overflow = TextOverflow.Ellipsis,
                     color = Color.Black, fontFamily = Lato)
