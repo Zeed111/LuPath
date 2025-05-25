@@ -19,6 +19,6 @@ import java.time.LocalDate
 data class HikePlanEntity(
     @PrimaryKey val hikePlanId: String,
     val mountainOwnerId: String?, // Foreign Key
-    val date: LocalDate // Room needs a TypeConverter for this
-
+    val date: LocalDate, // Room needs a TypeConverter for this
+    val notes: String? = null
 )

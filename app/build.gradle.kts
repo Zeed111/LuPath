@@ -105,6 +105,7 @@ dependencies {
 //    implementation(libs.androidx.room.runtime.android)
     implementation(libs.androidx.room.runtime) // Uses the new alias
     implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.compose.material3)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -6,9 +6,11 @@ import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -322,7 +324,7 @@ fun MountainDetailScreen(
                                 Row(
                                     horizontalArrangement = Arrangement.spacedBy(8.dp), // Space between each characteristic icon
                                     verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.padding(bottom = 4.dp)
+                                    modifier = Modifier.weight(1f).horizontalScroll(rememberScrollState())
                                 ) {
                                     if (characteristics.isNotEmpty()) {
                                         characteristics.forEach { characteristicInfo ->
@@ -336,7 +338,7 @@ fun MountainDetailScreen(
                                     } else {
                                         // Optional: Add a small spacer if no icons are present,
                                         // so the difficulty text alignment remains consistent.
-                                        Spacer(Modifier.height(20.dp)) // Approximate height of an icon row
+//                                        Spacer(Modifier.height(20.dp)) // Approximate height of an icon row
                                     }
                                 }
                             }

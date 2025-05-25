@@ -83,6 +83,19 @@ import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
+import androidx.compose.foundation.clickable
+import androidx.compose.material.ButtonDefaults.elevation
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.CheckboxDefaults.colors
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.core.os.ProfilingRequest
+import androidx.navigation.NavController
+import com.example.lupath.ui.screen.mountainDetails.getDrawableResIdFromString
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.wear.compose.material3.ConfirmationDialog
+import com.example.lupath.helper.ConfirmationDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -92,6 +105,10 @@ fun LuPathListScreen(
 ) {
     val screenScrollState = rememberScrollState()
     val hikePlansList by viewModel.hikePlans.collectAsStateWithLifecycle()
+    var showDeleteConfirmationDialog by remember { mutableStateOf(false) }
+    var planToDelete by remember { mutableStateOf<HikePlan?>(null) }
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     Scaffold(
         topBar = { LuPathTopBar(navController = navController) },
@@ -175,18 +192,22 @@ fun LuPathListScreen(
                     val scope = rememberCoroutineScope() // For launching coroutines from Composable
 
                     PlanCard(
-                        hikePlan = plan, // Pass the whole HikePlan UI model
+                        hikePlan = plan,
+                        navController = navController,// Pass the whole HikePlan UI model
                         onEdit = {
                             val initialDateEpochDay = plan.date.toEpochDay()
-                            navController.navigate(
-                                "datepicker/${plan.mountainId}?hikePlanId=${plan.id}&initialSelectedDateEpochDay=${initialDateEpochDay}"
-                            )},
-                        onDelete = {
-                            scope.launch { // Launch a coroutine to call the suspend function
-                                viewModel.removeHikePlan(plan) // Call the suspend function
-                                // Show Toast after the plan is removed
-                                Toast.makeText(context, "Hike plan deleted", Toast.LENGTH_SHORT).show()
+                            val encodedNotes = try {
+                                URLEncoder.encode(plan.notes ?: "", StandardCharsets.UTF_8.name())
+                            } catch (e: Exception) {
+                                "" // Fallback to empty if encoding fails or notes are null
                             }
+
+                            navController.navigate(
+                                "datepicker/${plan.mountainId}?hikePlanId=${plan.id}&initialSelectedDateEpochDay=${initialDateEpochDay}&notes=${encodedNotes}"
+                            )},
+                        onDeleteRequest = {
+                            planToDelete = plan // Set the plan you intend to delete
+                            showDeleteConfirmationDialog = true // Show the dialog
                         }
                     )
                     Spacer(modifier = Modifier.height(8.dp)) // Spacing between cards
@@ -196,6 +217,25 @@ fun LuPathListScreen(
             item { // Spacer at the very end to ensure content isn't cut off by bottom bar
                 Spacer(modifier = Modifier.height(80.dp)) // Adjust as needed
             }
+        }
+
+        if (showDeleteConfirmationDialog && planToDelete != null) {
+            ConfirmationDialog(
+                dialogTitle = "Confirm Deletion",
+                dialogText = "Are you sure you want to delete the plan for ${planToDelete!!.mountainName} on ${planToDelete!!.date.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy"))}?",
+                onConfirmation = {
+                    scope.launch { // Launch coroutine for DB operation
+                        viewModel.removeHikePlan(planToDelete!!)
+                        Toast.makeText(context, "Hike plan deleted", Toast.LENGTH_SHORT).show()
+                        planToDelete = null // Reset
+                        showDeleteConfirmationDialog = false
+                    }
+                },
+                onDismissRequest = {
+                    planToDelete = null // Reset
+                    showDeleteConfirmationDialog = false
+                }
+            )
         }
     }
 }
@@ -243,15 +283,20 @@ fun LuPathTopBar(navController: NavHostController) {
 @Composable
 fun PlanCard(
     hikePlan: HikePlan,
+    navController: NavHostController,
     onEdit: () -> Unit,
-    onDelete: () -> Unit
+    onDeleteRequest: () -> Unit
 ) {
+    val context = LocalContext.current
     Card(
         shape = RoundedCornerShape(10.dp),
         modifier = Modifier
             .padding(horizontal = 15.dp, vertical = 8.dp)
             .fillMaxWidth()
-            .height(100.dp),
+            .height(100.dp)
+            .clickable {
+                navController.navigate("mountainDetail/${hikePlan.mountainId}")
+        },
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors( // Add the 'colors' parameter
             containerColor = Color(0xFFD9D9D9))
@@ -262,27 +307,60 @@ fun PlanCard(
             .background(Color(0xFFD9D9D9))
         ) {
             Image(
-                painter = painterResource(id = R.drawable.mt_pulag_ex),
-                contentDescription = "mt pulag",
+                painter = if (hikePlan.imageResourceName != null &&
+                    getDrawableResIdFromString(context, hikePlan.imageResourceName) != null)
+                    painterResource(id = getDrawableResIdFromString(context, hikePlan.imageResourceName)!!)
+                else
+                    painterResource(id = R.drawable.mt_pulag_ex), // Fallback placeholder
+                contentDescription = "Image of ${hikePlan.mountainName}",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .fillMaxHeight()
+                    .fillMaxHeight() // Takes full height of the Card's Row
                     .width(100.dp)
             )
 
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(12.dp)
+                    .padding(start = 12.dp, end = 4.dp, top = 8.dp, bottom = 8.dp), // Adjusted padding
+                verticalArrangement = Arrangement.SpaceBetween // Distribute content
             ) {
-                Text(hikePlan.mountainName, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                Text(hikePlan.date.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")), fontSize = 12.sp, color = Color.Black)
+                Column { // Group top info
+                    Text(
+                        hikePlan.mountainName,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        hikePlan.date.format(DateTimeFormatter.ofPattern("MMMM dd, y")),
+                        fontSize = 13.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
+                    )
+                }
+
+                // --- Display Notes ---
+                if (!hikePlan.notes.isNullOrBlank()) {
+                    Spacer(modifier = Modifier.height(3.dp)) // Space above notes
+                    Text(
+                        // text = "Notes: ${hikePlan.notes}", // Adding "Notes: " prefix
+                        text = hikePlan.notes, // Or just the notes directly
+                        fontSize = 13.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                        maxLines = 2, // Show a couple of lines of notes
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
             }
 
             var expanded by remember { mutableStateOf(false) }
 
-            Box(modifier = Modifier.align(Alignment.Top)) {
-                IconButton(onClick = { expanded = true }) {
+            Box(modifier = Modifier.align(Alignment.Top).padding(end = 4.dp)) {
+                IconButton(onClick = { expanded = true }, modifier = Modifier.size(40.dp)) {
                     Icon(Icons.Default.MoreVert, contentDescription = "More Options")
                 }
 
@@ -301,7 +379,7 @@ fun PlanCard(
                         text = { Text("Delete") },
                         onClick = {
                             expanded = false
-                            onDelete()
+                            onDeleteRequest()
                         }
                     )
                 }

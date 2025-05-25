@@ -15,6 +15,8 @@ import com.example.lupath.ui.screen.mountainDetails.MountainDetailScreen
 import com.example.lupath.ui.screen.settings.AboutScreen
 import com.example.lupath.ui.screen.settings.SettingsScreen
 import com.example.lupath.ui.screen.checkList.CheckListScreen
+import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
 
 @Composable
 fun AppNavGraph(navController: NavHostController, startDestination: String, exitApp: () -> Unit) {
@@ -60,7 +62,7 @@ fun AppNavGraph(navController: NavHostController, startDestination: String, exit
 
         composable(
             // Route for DatePickerScreen, now with optional parameters for editing
-            route = "datepicker/{mountainId}?hikePlanId={hikePlanId}&initialSelectedDateEpochDay={initialSelectedDateEpochDay}",
+            route = "datepicker/{mountainId}?hikePlanId={hikePlanId}&initialSelectedDateEpochDay={initialSelectedDateEpochDay}&notes={notes}",
             arguments = listOf(
                 navArgument("mountainId") { type = NavType.StringType },
                 navArgument("hikePlanId") {
@@ -71,19 +73,32 @@ fun AppNavGraph(navController: NavHostController, startDestination: String, exit
                 navArgument("initialSelectedDateEpochDay") {
                     type = NavType.LongType
                     defaultValue = -1L // Use -1L or another sentinel to indicate no date passed
+                },
+                navArgument("notes") {
+                    type = NavType.StringType
+                    nullable = true // This is optional
+                    defaultValue = null
                 }
             )
         ) { backStackEntry ->
             val mountainIdArg = backStackEntry.arguments?.getString("mountainId")
             val hikePlanIdArg = backStackEntry.arguments?.getString("hikePlanId") // Can be null
             val initialDateEpochDayArg = backStackEntry.arguments?.getLong("initialSelectedDateEpochDay")
+            val notesArg = backStackEntry.arguments?.getString("notes")?.let { encodedNotes ->
+                try {
+                    URLDecoder.decode(encodedNotes, StandardCharsets.UTF_8.name())
+                } catch (e: Exception) {
+                    encodedNotes
+                }
+            }
 
             if (mountainIdArg != null) {
                 DatePickerScreen(
                     navController = navController,
                     mountainId = mountainIdArg,
                     hikePlanIdForEdit = hikePlanIdArg, // Pass to DatePickerScreen
-                    initialSelectedDateEpochDay = initialDateEpochDayArg ?: -1L // Pass to DatePickerScreen
+                    initialSelectedDateEpochDay = initialDateEpochDayArg ?: -1L,
+                    initialNotes = notesArg // Pass to DatePickerScreen
                 )
             } else {
                 Text("Error: Mountain ID missing for DatePicker.")

@@ -10,5 +10,6 @@ data class HikePlan(
     val date: LocalDate,
     val difficulty: String, // For display
     // Add other details you might want to quickly display in a HikePlan list
-    val imageResourceName: String? = null // For display
+    val imageResourceName: String? = null,
+    val notes: String?// For display
 )

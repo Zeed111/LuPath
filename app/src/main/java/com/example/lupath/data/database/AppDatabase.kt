@@ -24,7 +24,7 @@ import java.util.UUID
         HikePlanEntity::class // Remove if not used elsewhere
         // HikePlanChecklistLinkEntity::class // Remove if not used elsewhere
     ],
-    version = 8 /* Your current version, increment if schema changed */,
+    version = 9 /* Your current version, increment if schema changed */,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
