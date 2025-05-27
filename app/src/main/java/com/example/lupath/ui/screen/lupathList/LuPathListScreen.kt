@@ -5,7 +5,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,13 +20,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
@@ -46,7 +41,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -56,46 +50,35 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.lupath.R
 import com.example.lupath.data.model.HikePlan
 import com.example.lupath.data.model.HikePlanViewModel
+import com.example.lupath.helper.ConfirmationDialog
 import com.example.lupath.ui.screen.home.HomeBottomNav
+import com.example.lupath.ui.screen.mountainDetails.getDrawableResIdFromString
 import com.example.lupath.ui.theme.GreenDark
 import com.example.lupath.ui.theme.GreenLight
 import com.example.lupath.ui.theme.Lato
 import kotlinx.coroutines.launch
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
-import androidx.compose.foundation.clickable
-import androidx.compose.material.ButtonDefaults.elevation
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.CheckboxDefaults.colors
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.core.os.ProfilingRequest
-import androidx.navigation.NavController
-import com.example.lupath.ui.screen.mountainDetails.getDrawableResIdFromString
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.wear.compose.material3.ConfirmationDialog
-import com.example.lupath.helper.ConfirmationDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -103,7 +86,6 @@ fun LuPathListScreen(
     navController: NavHostController,
     viewModel: HikePlanViewModel = hiltViewModel()
 ) {
-    val screenScrollState = rememberScrollState()
     val hikePlansList by viewModel.hikePlans.collectAsStateWithLifecycle()
     var showDeleteConfirmationDialog by remember { mutableStateOf(false) }
     var planToDelete by remember { mutableStateOf<HikePlan?>(null) }
@@ -190,7 +172,6 @@ fun LuPathListScreen(
                 ) { plan ->
                     val context = LocalContext.current
                     val scope = rememberCoroutineScope() // For launching coroutines from Composable
-
                     PlanCard(
                         hikePlan = plan,
                         navController = navController,// Pass the whole HikePlan UI model
@@ -199,7 +180,7 @@ fun LuPathListScreen(
                             val encodedNotes = try {
                                 URLEncoder.encode(plan.notes ?: "", StandardCharsets.UTF_8.name())
                             } catch (e: Exception) {
-                                "" // Fallback to empty if encoding fails or notes are null
+                                ""
                             }
 
                             navController.navigate(
@@ -210,12 +191,12 @@ fun LuPathListScreen(
                             showDeleteConfirmationDialog = true // Show the dialog
                         }
                     )
-                    Spacer(modifier = Modifier.height(8.dp)) // Spacing between cards
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
             }
 
-            item { // Spacer at the very end to ensure content isn't cut off by bottom bar
-                Spacer(modifier = Modifier.height(80.dp)) // Adjust as needed
+            item {
+                Spacer(modifier = Modifier.height(80.dp))
             }
         }
 
@@ -252,7 +233,7 @@ fun LuPathTopBar(navController: NavHostController) {
     ) {
         IconButton(onClick = {
             navController.navigate("home") {
-                popUpTo(navController.graph.startDestinationId) { inclusive = true } // Clears the back stack
+                popUpTo(navController.graph.startDestinationId) { inclusive = true }
             }
         }) {
             Icon(
@@ -263,7 +244,7 @@ fun LuPathTopBar(navController: NavHostController) {
         }
 
         Image(
-            painter = painterResource(id = R.drawable.lupath), // logo
+            painter = painterResource(id = R.drawable.lupath),
             contentDescription = "Logo",
             modifier = Modifier.size(40.dp)
         )
@@ -293,18 +274,17 @@ fun PlanCard(
         modifier = Modifier
             .padding(horizontal = 15.dp, vertical = 8.dp)
             .fillMaxWidth()
-            .height(100.dp)
             .clickable {
                 navController.navigate("mountainDetail/${hikePlan.mountainId}")
         },
         elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors( // Add the 'colors' parameter
-            containerColor = Color(0xFFD9D9D9))
+        colors = CardDefaults.cardColors(
+            containerColor = GreenLight)
     ) {
         Row(
             modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFD9D9D9))
+            .fillMaxWidth()
+            .background(GreenLight)
         ) {
             Image(
                 painter = if (hikePlan.imageResourceName != null &&
@@ -315,17 +295,17 @@ fun PlanCard(
                 contentDescription = "Image of ${hikePlan.mountainName}",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .fillMaxHeight() // Takes full height of the Card's Row
                     .width(100.dp)
+                    .height(100.dp)
             )
 
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(start = 12.dp, end = 4.dp, top = 8.dp, bottom = 8.dp), // Adjusted padding
-                verticalArrangement = Arrangement.SpaceBetween // Distribute content
+                    .padding(start = 12.dp, end = 4.dp, top = 8.dp, bottom = 8.dp),
+                verticalArrangement = Arrangement.Top
             ) {
-                Column { // Group top info
+                Column {
                     Text(
                         hikePlan.mountainName,
                         fontWeight = FontWeight.Bold,
@@ -344,14 +324,12 @@ fun PlanCard(
 
                 // --- Display Notes ---
                 if (!hikePlan.notes.isNullOrBlank()) {
-                    Spacer(modifier = Modifier.height(3.dp)) // Space above notes
+                    Spacer(modifier = Modifier.height(3.dp))
                     Text(
-                        // text = "Notes: ${hikePlan.notes}", // Adding "Notes: " prefix
-                        text = hikePlan.notes, // Or just the notes directly
+                        // text = "Notes: ${hikePlan.notes}",
+                        text = hikePlan.notes,
                         fontSize = 13.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                        maxLines = 2, // Show a couple of lines of notes
-                        overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.padding(top = 4.dp)
                     )
                 }
@@ -429,13 +407,9 @@ fun CustomCalendarM3Style(
             )
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Removed the Column with pointerInput modifier
-
             DaysOfWeekHeader(daysOfWeek)
             Spacer(modifier = Modifier.height(8.dp))
 
-            // --- Replace LazyVerticalGrid with basic Columns/Rows ---
-            // This will compose all day cells at once. Acceptable if calendar isn't huge.
             Column { // Column to hold the rows of weeks
                 val totalCells = paddingDays + daysInMonth
                 val numRows = (totalCells + 6) / 7 // Calculate number of rows needed
@@ -467,15 +441,13 @@ fun CustomCalendarM3Style(
                             }
                         }
                     }
-                    if (it < numRows - 1) { // Add spacing between weeks if desired
+                    if (it < numRows - 1) {
                         Spacer(modifier = Modifier.height(4.dp))
                     }
                 }
             }
-            // --- End of basic Columns/Rows calendar grid ---
-
-        } // End of Card's Column
-    } // End of Card
+        }
+    }
 }
 
 private fun getWeekDayAbbreviationList(): List<String> {

@@ -13,13 +13,12 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 fun mapPictureReferenceToDrawableRes(
-    context: Context, // Inject or pass context if using getIdentifier
+    context: Context,
     pictureReference: String?
 ): Int? {
     if (pictureReference.isNullOrBlank()) {
         return R.drawable.mt_pulag_ex // Default placeholder if no reference
     }
-    // This is a more robust way to get drawable IDs dynamically
     val resId = context.resources.getIdentifier(pictureReference, "drawable", context.packageName)
     return if (resId != 0) resId else R.drawable.mt_pulag_ex // Fallback if not found
 }
@@ -30,16 +29,16 @@ class HomeViewModel @Inject constructor(
     @ApplicationContext private val applicationContext: Context // Inject context for resource mapping
 ) : ViewModel() {
 
-    // Updated mapping function to populate imageResId
+    // Update mapping function to populate imageResId
     private fun MountainEntity.toMountainUiModel(): Mountain {
         return Mountain(
             id = this.mountainId,
             name = this.mountainName,
             location = this.location,
             masl = this.masl,
-            difficultySummary = this.difficultySummary, // Assumes this field exists in MountainEntity
-            difficulty = this.difficultyText,      // Assumes this field exists in MountainEntity
-            tagline = this.tagline,                // Assumes this field exists in MountainEntity
+            difficultySummary = this.difficultySummary,
+            difficulty = this.difficultyText,
+            tagline = this.tagline,
             hoursToSummit = this.hoursToSummit,
             bestMonthsToHike = this.bestMonthsToHike,
             typeVolcano = this.typeVolcano,
@@ -52,7 +51,7 @@ class HomeViewModel @Inject constructor(
             hikingSeasonDetails = this.hikingSeasonDetails,
             introduction = this.introduction,
             imageResId = mapPictureReferenceToDrawableRes(applicationContext, this.pictureReference), // Populate imageResId
-            pictureReference = this.pictureReference // Keep original string if needed
+            pictureReference = this.pictureReference
         )
     }
 
@@ -66,14 +65,13 @@ class HomeViewModel @Inject constructor(
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
     init {
-        // Combined loading logic
         loadMountains()
     }
 
     private fun loadMountains() {
         viewModelScope.launch {
             searchQuery.collectLatest { query ->
-                mountainDao.getAllMountainsFlow() // Flow<List<MountainEntity>>
+                mountainDao.getAllMountainsFlow()
                     .map { entityList ->
                         val mappedList = entityList.map { it.toMountainUiModel() } // Use the updated mapping
                         if (query.isBlank()) {
@@ -83,7 +81,7 @@ class HomeViewModel @Inject constructor(
                             // Filter based on query
                             val filteredList = mappedList.filter { mountain ->
                                 mountain.name.contains(query, ignoreCase = true) ||
-                                        mountain.location?.contains(query, ignoreCase = true) == true
+                                        mountain.location.contains(query, ignoreCase = true) == true
                             }
                             // Update popular mountains based on filtered list or clear it
                             _popularMountains.value = filteredList.take(5)
@@ -102,10 +100,8 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
-    // Removed separate loadPopularMountains as loadAllMountains now handles the popular list update.
 
     fun onSearchQueryChanged(query: String) {
         _searchQuery.value = query
-        // loadAllMountains() will be re-triggered automatically because it collects searchQuery
     }
 }

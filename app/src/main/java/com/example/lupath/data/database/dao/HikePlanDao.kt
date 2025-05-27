@@ -1,22 +1,27 @@
 package com.example.lupath.data.database.dao
 
-import androidx.room.*
+import androidx.room.ColumnInfo
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Embedded
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
 import com.example.lupath.data.database.entity.HikePlanEntity
-import com.example.lupath.data.database.entity.MountainEntity // If you need to join for mountain name
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
-// Data class to hold HikePlan with Mountain Name for display
 data class HikePlanWithMountainName(
     @Embedded val hikePlan: HikePlanEntity,
     @ColumnInfo(name = "mountainName") val mountainName: String?,
-    @ColumnInfo(name = "pictureReference") val mountainPictureReference: String? // For displaying image
+    @ColumnInfo(name = "pictureReference") val mountainPictureReference: String?
 )
 
 @Dao
 interface HikePlanDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertHikePlan(hikePlan: HikePlanEntity): Long // Returns rowId
+    suspend fun insertHikePlan(hikePlan: HikePlanEntity): Long
 
     @Update
     suspend fun updateHikePlan(hikePlan: HikePlanEntity)
@@ -28,9 +33,8 @@ interface HikePlanDao {
     fun getHikePlanByIdFlow(hikePlanId: String): Flow<HikePlanEntity?>
 
     @Query("SELECT * FROM hike_plans WHERE hikePlanId = :hikePlanId")
-    suspend fun getHikePlanById(hikePlanId: String): HikePlanEntity? // Non-Flow version for direct access
+    suspend fun getHikePlanById(hikePlanId: String): HikePlanEntity?
 
-    // Get all hike plans, ordered by date, and join with mountains table to get mountain name
     @Query("""
         SELECT hp.*, m.mountainName, m.pictureReference
         FROM hike_plans AS hp

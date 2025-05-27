@@ -1,6 +1,5 @@
 package com.example.lupath.ui.screen.datePicker
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -23,7 +22,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DatePicker
@@ -54,17 +52,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import androidx.wear.compose.material3.ConfirmationDialog
 import com.example.lupath.R
 import com.example.lupath.data.model.HikePlanViewModel
+import com.example.lupath.helper.ConfirmationDialog
 import com.example.lupath.ui.theme.GreenDark
 import com.example.lupath.ui.theme.GreenLight
 import com.example.lupath.ui.theme.Lato
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
-import androidx.compose.ui.graphics.vector.ImageVector
-import com.example.lupath.helper.ConfirmationDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,22 +76,19 @@ fun DatePickerScreen(
     val context = LocalContext.current
     val isEditMode = hikePlanIdForEdit != null
 
-    // Initialize DatePickerState
-    // If editing and a valid initial date is passed, use it. Otherwise, no initial selection.
     val initialSelectedMillis = if (isEditMode && initialSelectedDateEpochDay != -1L) {
         LocalDate.ofEpochDay(initialSelectedDateEpochDay).atStartOfDay(ZoneId.of("UTC")).toInstant().toEpochMilli()
     } else {
-        null // No pre-selected date for new plans or if initial date isn't passed for edit
+        null
     }
 
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = initialSelectedMillis,
-        // Optionally, you can set a validator here to disable past dates directly in the picker
-        yearRange = (LocalDate.now().year)..(LocalDate.now().year + 100), // Example year range
+        yearRange = (LocalDate.now().year)..(LocalDate.now().year + 100),
         selectableDates = object : SelectableDates {
             override fun isSelectableDate(utcTimeMillis: Long): Boolean {
                 val selectedLocalDate = Instant.ofEpochMilli(utcTimeMillis)
-                    .atZone(ZoneId.systemDefault()) // Or ZoneId.of("UTC") if picker uses UTC
+                    .atZone(ZoneId.systemDefault())
                     .toLocalDate()
                 return !selectedLocalDate.isBefore(LocalDate.now()) // Allow today and future dates
             }
@@ -131,7 +124,7 @@ fun DatePickerScreen(
                             Toast.makeText(context, "Please select today or a future date.", Toast.LENGTH_LONG).show()
                         } else {
                             // Date is valid (today or future), proceed with action
-                            if (isEditMode && hikePlanIdForEdit != null) {
+                            if (isEditMode) {
                                 tempSelectedDate = date
                                 tempNotesText = currentNotes
                                 showEditConfirmationDialog = true
@@ -179,7 +172,6 @@ fun DatePickerScreen(
                 .verticalScroll(screenScrollState)
                 .padding(bottom = 80.dp)
         ) {
-            // 🔙 Back, Logo, Settings
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -190,7 +182,6 @@ fun DatePickerScreen(
                 IconButton(onClick = { navController.popBackStack() }) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                 }
-//                Text("LuPath", fontWeight = FontWeight.Bold, fontSize = 18.sp)
                 Image(
                     painter = painterResource(id = R.drawable.lupath),
                     contentDescription = "Logo",
@@ -206,7 +197,7 @@ fun DatePickerScreen(
             Text(
                 text = if (isEditMode) "Edit Hike Plan" else "New Hike Plan",
                 modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp),
-                style = MaterialTheme.typography.headlineSmall, // Use theme typography
+                style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 fontFamily = Lato
             )
@@ -245,7 +236,7 @@ fun DatePickerScreen(
             Text(
                 text = "Notes (Optional)",
                 modifier = Modifier.padding(start = 16.dp, bottom = 8.dp),
-                style = MaterialTheme.typography.titleMedium, // Make it a bit more prominent
+                style = MaterialTheme.typography.titleMedium,
                 fontFamily = Lato
             )
             OutlinedTextField(
@@ -254,37 +245,35 @@ fun DatePickerScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
-                    .heightIn(min = 100.dp, max = 200.dp), // Allow multi-line and some growth
+                    .heightIn(min = 100.dp, max = 200.dp),
                 label = { Text("e.g., Hike companions, specific gear, reminders") },
                 placeholder = { Text("Add any details for this hike...")},
                 shape = RoundedCornerShape(8.dp),
-                colors = OutlinedTextFieldDefaults.colors( // Updated for M3 OutlinedTextField
-                    focusedBorderColor = GreenDark, // Or MaterialTheme.colorScheme.primary
-                    unfocusedBorderColor = Color.Gray, // Or MaterialTheme.colorScheme.outline
-                    // Add other color states as needed
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = GreenDark,
+                    unfocusedBorderColor = Color.Gray,
                 ),
-                singleLine = false // Allow multiple lines for notes
+                singleLine = false
             )
-            Spacer(modifier = Modifier.height(16.dp)) // Space after notes
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 
-
-    if (showEditConfirmationDialog && isEditMode && hikePlanIdForEdit != null && tempSelectedDate != null) {
-        val nonNullTempSelectedDate = tempSelectedDate!! // Safe due to check
+    if (showEditConfirmationDialog && isEditMode && tempSelectedDate != null) {
+        val nonNullTempSelectedDate = tempSelectedDate!!
         ConfirmationDialog(
             dialogTitle = "Confirm Changes",
             dialogText = "Are you sure you want to update this hike plan?",
             onConfirmation = {
-                viewModel.updateHikePlanDate( // Ensure this function exists in your ViewModel
+                viewModel.updateHikePlanDate(
                     hikePlanId = hikePlanIdForEdit,
-                    mountainId = mountainId, // Ensure mountainId is in scope
+                    mountainId = mountainId,
                     newDate = nonNullTempSelectedDate,
-                    newNotes = tempNotesText // Ensure tempNotesText is in scope
+                    newNotes = tempNotesText
                 )
                 Toast.makeText(context, "Hike plan updated!", Toast.LENGTH_SHORT).show()
                 showEditConfirmationDialog = false
-                navController.navigate("lupath_list") { // Navigate after confirmation
+                navController.navigate("lupath_list") {
                     popUpTo("lupath_list") { inclusive = true }
                     launchSingleTop = true
                 }

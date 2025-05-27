@@ -25,5 +25,5 @@ interface GuidelineDao {
     fun getGuidelineById(guidelineId: String): Flow<GuidelineEntity?>
 
     @Query("SELECT * FROM guidelines ORDER BY category ASC, description ASC")
-    fun getAllGuidelines(): Flow<List<GuidelineEntity>> // Might not be needed
+    fun getAllGuidelines(): Flow<List<GuidelineEntity>>
 }

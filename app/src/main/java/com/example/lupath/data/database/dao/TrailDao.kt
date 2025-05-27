@@ -25,5 +25,5 @@ interface TrailDao {
     fun getTrailById(trailId: String): Flow<TrailEntity?>
 
     @Query("SELECT * FROM trails ORDER BY name ASC")
-    fun getAllTrails(): Flow<List<TrailEntity>> // Might not be needed
+    fun getAllTrails(): Flow<List<TrailEntity>>
 }

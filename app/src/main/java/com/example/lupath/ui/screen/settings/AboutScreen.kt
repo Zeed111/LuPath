@@ -1,6 +1,5 @@
 package com.example.lupath.ui.screen.settings
 
-import android.text.Layout
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -81,12 +79,12 @@ fun AboutScreen(navController: NavHostController) {
                     .padding(paddingValues)
                     .fillMaxSize()
                     .verticalScroll(scrollState)
-                    .padding(16.dp), // Overall padding for the content
+                    .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
                 Image(
-                    painter = painterResource(id = R.drawable.lupath), // Replace with your actual logo drawable
+                    painter = painterResource(id = R.drawable.lupath),
                     contentDescription = "LuPath App Logo",
                     modifier = Modifier
                         .size(100.dp)
@@ -126,7 +124,7 @@ fun AboutScreen(navController: NavHostController) {
                             "pack everything you need.",
                     style = MaterialTheme.typography.bodyLarge,
                     fontFamily = Lato,
-                    textAlign = TextAlign.Justify, // Justify text for a cleaner look
+                    textAlign = TextAlign.Justify,
                     modifier = Modifier.padding(bottom = 24.dp),
                     color = MaterialTheme.colorScheme.onBackground
                 )
@@ -151,14 +149,14 @@ fun AboutScreen(navController: NavHostController) {
                             .padding(16.dp)
                             .fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp) // Space between developer names
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        val devList = listOf("Raven B. Viilanueva", "Daniel Guteirrez", "Mariel Yanga",
+                        val devList = listOf("Raven Villanueva", "Daniel Reign Gutierrez", "Mariel Yanga",
                             "Lenardo Jualo")
                         devList.forEach { devName ->
                             Text(
                                 text = devName,
-                                style = MaterialTheme.typography.bodyLarge, // More appropriate size
+                                style = MaterialTheme.typography.bodyLarge,
                                 fontWeight = FontWeight.Medium,
                                 fontFamily = Lato,
                                 color = Color.Black

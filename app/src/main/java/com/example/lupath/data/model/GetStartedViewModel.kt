@@ -12,7 +12,7 @@ import androidx.core.content.edit
 
 @HiltViewModel
 class GetStartedViewModel @Inject constructor(
-    private val application: Application
+    application: Application
 ) : ViewModel() {
     private val _welcomeMessage =
         MutableStateFlow("Focus, relax and find your next adventure here in Lupath")
@@ -26,7 +26,6 @@ class GetStartedViewModel @Inject constructor(
     }
 
     fun onGetStartedClicked() {
-        // Later: Save onboarding flag or fetch data
         prefs.edit {
             putBoolean(KEY_GET_STARTED_COMPLETED, true)
         }

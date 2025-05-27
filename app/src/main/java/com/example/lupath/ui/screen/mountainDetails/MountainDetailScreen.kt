@@ -661,6 +661,8 @@ fun DetailsTabContent(
                     modifier = Modifier.padding(bottom = 6.dp),
                     color = MaterialTheme.colorScheme.onSurface
                 )
+            } else {
+
             }
         }
         views?.let {
@@ -678,6 +680,8 @@ fun DetailsTabContent(
                     modifier = Modifier.padding(bottom = 6.dp),
                     color = MaterialTheme.colorScheme.onSurface
                 )
+            } else {
+
             }
         }
         wildlife?.let {
@@ -695,6 +699,8 @@ fun DetailsTabContent(
                     modifier = Modifier.padding(bottom = 6.dp),
                     color = MaterialTheme.colorScheme.onSurface
                 )
+            } else {
+
             }
         }
         features?.let {
@@ -712,6 +718,8 @@ fun DetailsTabContent(
                     modifier = Modifier.padding(bottom = 6.dp),
                     color = MaterialTheme.colorScheme.onSurface
                 )
+            } else {
+                
             }
         }
         DetailItem(label = "Best Season", value = hikingSeason)

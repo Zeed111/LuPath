@@ -7,14 +7,14 @@ data class Mountain(
     val id: String = UUID.randomUUID().toString(), // Unique identifier
     val name: String,
     val location: String,
-    val masl: Int? = null, // Meters Above Sea Level (nullable if can be unknown)
+    val masl: Int? = null,
     val difficultySummary: String?,
-    val difficulty: String? = null, // e.g., "Easy to moderate (4/9)"
-    val tagline: String? = null, // A short descriptive tagline
-    val hoursToSummit: String? = null, // e.g., "4-6 hours round trip" (nullable)
-    val bestMonthsToHike: String? = null, // (nullable)
+    val difficulty: String? = null,
+    val tagline: String? = null,
+    val hoursToSummit: String? = null,
+    val bestMonthsToHike: String? = null,
 
-    // Optional detailed fields from your research (can be nullable)
+
     val typeVolcano: String? = null,
     val trekDurationDetails: String? = null,
     val trailTypeDescription: String? = null,
@@ -27,5 +27,5 @@ data class Mountain(
 
     // For images
     @DrawableRes val imageResId: Int? = null,
-    val pictureReference: String?// For local drawables (e.g., R.drawable.some_image)
+    val pictureReference: String?
 )

@@ -6,5 +6,5 @@ data class ChecklistItem(
     val id: String = UUID.randomUUID().toString(),
     val text: String,
     val isChecked: Boolean = false,
-    val isPreMade: Boolean = false // From your ERD
+    val isPreMade: Boolean = false
 )

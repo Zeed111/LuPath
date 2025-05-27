@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
-// Helper to convert Entity to UI Model (ChecklistItem for your UI)
+// Helper to convert Entity to UI Model
 fun ChecklistItemEntity.toUiModel() = ChecklistItem(
     id = this.itemId,
     text = this.name,
@@ -29,7 +29,6 @@ fun ChecklistItem.toEntity() = ChecklistItemEntity(
 
 @HiltViewModel
 class ChecklistViewModel @Inject constructor(
-    // Assuming Hilt or manual injection of the DAO
     private val checklistItemDao: ChecklistItemDao
 ) : ViewModel() {
 
@@ -60,7 +59,6 @@ class ChecklistViewModel @Inject constructor(
         viewModelScope.launch {
             val updatedItemEntity = itemToToggle.copy(isChecked = !itemToToggle.isChecked).toEntity()
             checklistItemDao.updateItem(updatedItemEntity)
-            // The flows will automatically update because they observe the database
         }
     }
 
@@ -69,7 +67,7 @@ class ChecklistViewModel @Inject constructor(
             viewModelScope.launch {
                 val newItemEntity = ChecklistItemEntity(
                     name = text.trim(),
-                    isPreMade = false, // User-added items are not pre-made
+                    isPreMade = false,
                     isChecked = false
                 )
                 checklistItemDao.insertItem(newItemEntity)

@@ -1,6 +1,5 @@
 package com.example.lupath.ui.screen.home
 
-import android.R.attr.onClick
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,8 +17,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -59,16 +57,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.lupath.R
 import com.example.lupath.data.model.HomeViewModel
-import com.example.lupath.ui.theme.Lato
-import java.net.URLEncoder
 import com.example.lupath.data.model.Mountain
-import androidx.compose.foundation.lazy.items
 import com.example.lupath.ui.theme.GreenLight
+import com.example.lupath.ui.theme.Lato
 
 object Routes {
     const val LUPATH_LIST = "lupath_list"
@@ -89,29 +85,27 @@ fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel =  hil
     ) { padding ->
         HomeContent(
             modifier = Modifier.padding(padding),
-            popularMountains = popularMountainsList, // <<< From ViewModel
-            allMountains = allMountainsList,         // <<< From ViewModel
-            searchQuery = searchQuery,               // <<< From ViewModel
-            onSearchQueryChange = { query -> viewModel.onSearchQueryChanged(query) }, // To ViewModel
-            onMountainClick = { mountainId -> // Central navigation logic
+            popularMountains = popularMountainsList,
+            allMountains = allMountainsList,
+            searchQuery = searchQuery,
+            onSearchQueryChange = { query -> viewModel.onSearchQueryChanged(query) },
+            onMountainClick = { mountainId ->
                 try {
-                    // IDs usually don't need encoding if they are simple strings/UUIDs
                     navController.navigate("mountainDetail/$mountainId")
                 } catch (e: Exception) {
                     println("Navigation error: $e")
-                    // Handle error
                 }
             },
-            navController = navController // Pass if still needed by SearchBar or other parts of HomeContent
+            navController = navController
         )
     }
 }
 
 @Composable
-fun HomeBottomNav(navController: NavHostController,) {
-    // 1. Observe the current back stack entry
+fun HomeBottomNav(navController: NavHostController) {
+    //  Observe the current back stack entry
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    // 2. Get the current route name
+    //  Get the current route name
     val currentRoute = navBackStackEntry?.destination?.route
 
     NavigationBar(
@@ -119,17 +113,12 @@ fun HomeBottomNav(navController: NavHostController,) {
     ) {
         // --- Lupath Item ---
         NavigationBarItem(
-            // 3. Set selected based on current route
             selected = currentRoute == Routes.LUPATH_LIST,
             onClick = {
-                // 4. Navigate only if not already on this screen
                 if (currentRoute != Routes.LUPATH_LIST) {
                     navController.navigate(Routes.LUPATH_LIST) {
-                        // Optional: Pop up to the start destination graph to avoid building up back stack
-                        // popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                         launchSingleTop = true
-                        // Optional: Restore state if popping up
-                        // restoreState = true
+                        restoreState = true
                     }
                 }
             },
@@ -138,16 +127,12 @@ fun HomeBottomNav(navController: NavHostController,) {
                     painter = painterResource(id = R.drawable.lupath),
                     contentDescription = "Lupath",
                     modifier = Modifier.size(37.dp),
-                    tint = if (currentRoute == Routes.LUPATH_LIST) MaterialTheme.colorScheme.onSecondaryContainer else Color.Black // Example selected tint
+                    tint = if (currentRoute == Routes.LUPATH_LIST) MaterialTheme.colorScheme.onSecondaryContainer else Color.Black
                 )
             },
             label = { Text("Lupath", color = Color.Black, fontFamily = Lato) },
             colors = NavigationBarItemDefaults.colors(
-                indicatorColor = Color.Gray // Example indicator color
-                // unselectedIconColor = Color.Black,
-                // selectedIconColor = ..., // Set explicitly if needed
-                // unselectedTextColor = Color.Black,
-                // selectedTextColor = ...
+                indicatorColor = Color.Gray
             )
         )
 
@@ -157,9 +142,8 @@ fun HomeBottomNav(navController: NavHostController,) {
             onClick = {
                 if (currentRoute != Routes.HOME) {
                     navController.navigate(Routes.HOME) {
-                        // popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                         launchSingleTop = true
-                        // restoreState = true
+                        restoreState = true
                     }
                 }
             },
@@ -183,9 +167,8 @@ fun HomeBottomNav(navController: NavHostController,) {
             onClick = {
                 if (currentRoute != Routes.CHECK_LIST) {
                     navController.navigate(Routes.CHECK_LIST) {
-                        // popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                         launchSingleTop = true
-                        // restoreState = true
+                         restoreState = true
                     }
                 }
             },
@@ -194,7 +177,7 @@ fun HomeBottomNav(navController: NavHostController,) {
                     Icons.AutoMirrored.Filled.List,
                     contentDescription = "List",
                     modifier = Modifier.size(37.dp),
-                    tint = if (currentRoute == Routes.CHECK_LIST) MaterialTheme.colorScheme.onSecondaryContainer else Color.Black // Example selected tint
+                    tint = if (currentRoute == Routes.CHECK_LIST) MaterialTheme.colorScheme.onSecondaryContainer else Color.Black
                 )
             },
             label = { Text("List", color = Color.Black, fontFamily = Lato) },
@@ -208,41 +191,34 @@ fun HomeBottomNav(navController: NavHostController,) {
 @Composable
 fun HomeContent(
     modifier: Modifier = Modifier,
-    popularMountains: List<Mountain>, // <<< ACCEPT LIST of popular mountains
-    allMountains: List<Mountain>,     // <<< ACCEPT LIST of all mountains
-    searchQuery: String,              // For the SearchBar
-    onSearchQueryChange: (String) -> Unit, // Callback for SearchBar
-    onMountainClick: (mountainId: String) -> Unit, // Generic click handler for any mountain
-    // Pass navController only if elements DIRECTLY within HomeContent need it for
-    // navigation not related to clicking a mountain in the lists.
-    // Otherwise, onMountainClick is preferred.
-    navController: NavHostController // Optional, depending on needs
+    popularMountains: List<Mountain>,
+    allMountains: List<Mountain>,
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
+    onMountainClick: (mountainId: String) -> Unit,
+    navController: NavHostController
 ) {
     Column(
         modifier = modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState()) // Keep this for overall scrolling if content exceeds screen
-        // Consider removing .padding(4.dp) here and applying specific padding
-        // to SearchBar, PopularMountainsSection, and MountainListSection as needed.
+            .verticalScroll(rememberScrollState())
     ) {
         SearchBar(
             query = searchQuery,
             onQueryChange = onSearchQueryChange,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp) // Example padding
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         )
 
         PopularMountainsSection(
-            popularMountains = popularMountains, // <<< Pass the dynamic list
-            // navController = navController // Pass if PopularMountainCard needs it
-            onMountainClick = onMountainClick, // Or pass the specific click lambda
+            popularMountains = popularMountains,
+            onMountainClick = onMountainClick,
             modifier = Modifier.padding(top = 8.dp)
         )
 
         MountainListSection(
-            allMountains = allMountains, // <<< Pass the dynamic list
-            navController = navController, // Pass if MountainListCard needs it
-//            onMountainClick = onMountainClick, // Or pass the specific click lambda
-            modifier = Modifier.padding(top = 16.dp) // Example spacing
+            allMountains = allMountains,
+            navController = navController,
+            modifier = Modifier.padding(top = 16.dp)
         )
     }
 }
@@ -299,7 +275,7 @@ fun SearchBar(
 
 @Composable
 fun PopularMountainsSection(
-    popularMountains: List<Mountain>, // <<< ACCEPT LIST OF MOUNTAIN OBJECTS
+    popularMountains: List<Mountain>,
     onMountainClick: (mountainId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -311,16 +287,15 @@ fun PopularMountainsSection(
             Text("No popular mountains to display.", modifier = Modifier.padding(vertical = 8.dp))
         } else {
             LazyRow(
-                contentPadding = PaddingValues(end = 16.dp), // Padding for the end of the row
+                contentPadding = PaddingValues(end = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(
                     items = popularMountains,
-                    key = { mountain -> mountain.id } // Use unique ID
-                ) { mountain -> // 'mountain' is now a Mountain object
+                    key = { mountain -> mountain.id }
+                ) { mountain ->
                     PopularMountainCard(
-                        mountain = mountain, // <<< Pass the whole Mountain object
-                        // navController = navController // Pass if needed, or use onClick
+                        mountain = mountain,
                         onClick = {
                             try {
                                 // Navigate using ID
@@ -338,9 +313,9 @@ fun PopularMountainsSection(
 
 @Composable
 fun MountainListSection(
-    allMountains: List<Mountain>, // <<< ACCEPT LIST OF MOUNTAIN OBJECTS
+    allMountains: List<Mountain>,
     navController: NavHostController,
-    modifier: Modifier = Modifier // Add modifier if needed
+    modifier: Modifier = Modifier
 ) {
     var showAll by remember { mutableStateOf(false) }
     val visibleMountains = if (showAll) allMountains else allMountains.take(5)
@@ -350,40 +325,27 @@ fun MountainListSection(
         Spacer(modifier = Modifier.height(8.dp))
 
         if (visibleMountains.isEmpty() && allMountains.isNotEmpty() && !showAll) {
-            // This case handles if take(5) results in an empty list but there are more mountains
-            // (unlikely if allMountains.take(5) is used correctly with a non-empty allMountains)
             Text("No mountains to display in this view.", modifier = Modifier.padding(vertical = 8.dp))
         } else if (allMountains.isEmpty()){
             Text("No mountains available yet.", modifier = Modifier.padding(vertical = 8.dp))
         }
         else {
-            visibleMountains.forEach { mountain -> // 'mountain' is now a Mountain object
+            visibleMountains.forEach { mountain ->
                 MountainListCard(
-                    mountain = mountain, // Pass the whole mountain object
-                    navController = navController // Still needed if MountainListCard navigates directly
-                    // Alternatively, MountainListCard could take an onClick lambda:
-                    // onClick = {
-                    //    try {
-                    //        // Navigate using ID here
-                    //        navController.navigate("mountainDetail/${mountain.id}")
-                    //    } catch (e: Exception) {
-                    //        println("Navigation error: $e")
-                    //    }
-                    // }
+                    mountain = mountain,
+                    navController = navController
                 )
-                Spacer(modifier = Modifier.height(4.dp)) // Slightly less space between cards
+                Spacer(modifier = Modifier.height(4.dp))
             }
         }
 
-        // Show "View More" / "View Less" button only if there are more items than initially shown
         if (allMountains.size > 5) {
             Spacer(modifier = Modifier.height(8.dp))
             TextButton(
                 onClick = { showAll = !showAll },
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                colors = ButtonDefaults.textButtonColors( // Use textButtonColors for better styling
-                    contentColor = Color.Black // Or MaterialTheme.colorScheme.primary
-                    // containerColor is not typically set for TextButton
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = Color.Black
                 )
             ) {
                 Text(
@@ -399,8 +361,8 @@ fun MountainListSection(
 
 @Composable
 fun PopularMountainCard(mountain: Mountain,  onClick: () -> Unit) {
-    val cardHeight = 200.dp // Define a fixed height for all cards
-    val imageHeight = 100.dp // Define a portion of the height for the image
+    val cardHeight = 200.dp
+    val imageHeight = 100.dp
     Card(
         shape = RoundedCornerShape(10.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
@@ -413,7 +375,6 @@ fun PopularMountainCard(mountain: Mountain,  onClick: () -> Unit) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-//                .background(Color(0xFFD9D9D9))
                 .background(GreenLight)
                 .padding(10.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -473,45 +434,23 @@ fun MountainListCard(mountain: Mountain, navController: NavHostController) {
             .height(100.dp)
             .clickable {
                 try {
-                    // Use mountain.id for navigation. IDs are usually safer than names.
-                    // No need to URLEncode if IDs are simple strings/UUIDs without special chars.
                     navController.navigate("mountainDetail/${mountain.id}")
                 } catch (e: Exception) {
                     println("Error navigating to detail: $e")
-                    // Handle error appropriately
                 }
             },
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(
-//            containerColor = Color(0xFFD9D9D9))
                 containerColor = GreenLight)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxSize(),
-//                .background(Color(0xFFD9D9D9)),
             verticalAlignment = Alignment.CenterVertically
         ) {
-//            Box(
-//                modifier = Modifier
-//                    .fillMaxHeight()
-//                    .width(100.dp)
-//                    .background(Color.Gray),
-//                contentAlignment = Alignment.Center
-//            ) {
-//                // TODO: Replace with actual Image composable if imageUrl is provided
-//                // Example:
-//                // if (imageUrl != null) {
-//                //     Image(painter = rememberAsyncImagePainter(imageUrl), contentDescription = mountainName, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
-//                // } else {
-//                //     Icon(Icons.Default.Landscape, contentDescription = "Placeholder", tint = Color.White) // Placeholder Icon
-//                // }
-//                Text("Image", color = Color.White)
-//            }
-
             Image(
                 painter = painterResource(
-                    id = mountain.imageResId ?: R.drawable.mt_pulag_ex // Use the pre-resolved imageResId
+                    id = mountain.imageResId ?: R.drawable.mt_pulag_ex
                 ),
                 contentDescription = "Image of ${mountain.name}",
                 contentScale = ContentScale.Crop,

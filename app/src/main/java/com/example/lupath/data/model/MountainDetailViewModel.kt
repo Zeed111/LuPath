@@ -15,7 +15,6 @@ import javax.inject.Inject // <<< IMPORT & USE
 class MountainDetailViewModel @Inject constructor(
     private val mountainDao: MountainDao,
     private val savedStateHandle: SavedStateHandle
-    // Add application context if needed for factory, or use Hilt for injection
 ) : ViewModel() {
 
     private val mountainId: String = savedStateHandle.get<String>("mountainId") ?: ""
@@ -24,5 +23,3 @@ class MountainDetailViewModel @Inject constructor(
         mountainDao.getMountainWithDetails(mountainId) // This returns a Flow
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 }
-// You'll need a ViewModelProvider.Factory to pass mountainId to the ViewModel constructor
-// if not using Hilt's assisted injection.

@@ -18,6 +18,6 @@ import androidx.room.PrimaryKey
 data class GuidelineEntity(
     @PrimaryKey val guidelineId: String,
     val mountainOwnerId: String, // Foreign Key
-    val category: String, // e.g., "Registration Fee", "Safety Tip", "Environmental Concern"
+    val category: String,
     val description: String
 )

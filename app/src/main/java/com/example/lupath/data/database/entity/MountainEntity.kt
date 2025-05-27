@@ -8,35 +8,35 @@ import androidx.room.PrimaryKey
 data class MountainEntity(
     @PrimaryKey val mountainId: String,
     val mountainName: String,
-    val pictureReference: String?, // Drawable resource name or URL
+    val pictureReference: String?,
     val location: String,
     val masl: Int?,
-    @ColumnInfo(name = "difficulty_text") // More descriptive than just 'difficulty'
+    @ColumnInfo(name = "difficulty_text")
     val difficultySummary: String?,
-    val difficultyText: String, // e.g., "Easy to moderate (4/9)"
-    val hoursToSummit: String,  // e.g., "4-6 hours round trip"
+    val difficultyText: String,
+    val hoursToSummit: String,
     val bestMonthsToHike: String,
 
-    // Detailed descriptive fields from research
+
     val typeVolcano: String? = null,
-    val trekDurationDetails: String? = null, // More detailed than hoursToSummit if needed
+    val trekDurationDetails: String? = null,
     val trailTypeDescription: String? = null,
     val sceneryDescription: String? = null,
     val viewsDescription: String? = null,
     val wildlifeDescription: String? = null,
     val featuresDescription: String? = null,
-    val hikingSeasonDetails: String? = null, // More detailed than bestMonthsToHike
-    val introduction: String? = null, // For longer introductory text
+    val hikingSeasonDetails: String? = null,
+    val introduction: String? = null,
     val tagline: String?,
 
-    val mountainImageRef1: String?, // Drawable name for first carousel image (can be same as pictureReference)
-    val mountainImageRef2: String?, // Drawable name for second carousel image
-    val mountainImageRef3: String?,  // Drawable name for third carousel image
+    //For Image Carousel
+    val mountainImageRef1: String?,
+    val mountainImageRef2: String?,
+    val mountainImageRef3: String?,
 
     val hasSteepSections: Boolean?,     // True if there are significant steep inclines/declines
     val notableWildlife: String?,      // If not blank, can trigger a generic wildlife icon.
-    // You can also store keywords here if you want more specific wildlife icons later.
     val isRocky: Boolean?,             // True if the trail has significant rocky sections
-    val isSlippery: Boolean?,          // True if the trail is known to be slippery (e.g., when wet, loose soil)
-    val isEstablishedTrail: Boolean?  // True if the trail is generally clear and well-defined (for the "Hiker" icon)
+    val isSlippery: Boolean?,          // True if the trail is known to be slippery
+    val isEstablishedTrail: Boolean?  // True if the trail is generally clear and well-defined
 )

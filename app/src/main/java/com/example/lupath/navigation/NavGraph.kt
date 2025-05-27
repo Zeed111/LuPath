@@ -47,19 +47,6 @@ fun AppNavGraph(navController: NavHostController, startDestination: String, exit
             }
         }
 
-//        composable(
-//            route = "datepicker/{mountainId}", // Add mountainId as argument
-//            arguments = listOf(navArgument("mountainId") { type = NavType.StringType })
-//        ) { backStackEntry ->
-//            val mountainIdArg = backStackEntry.arguments?.getString("mountainId")
-//            if (mountainIdArg != null) {
-//                DatePickerScreen(navController = navController, mountainId = mountainIdArg)
-//            } else {
-//                // Handle error: mountainId not found, maybe navigate back or show error
-//                Text("Error: Mountain ID missing.")
-//            }
-//        }
-
         composable(
             // Route for DatePickerScreen, now with optional parameters for editing
             route = "datepicker/{mountainId}?hikePlanId={hikePlanId}&initialSelectedDateEpochDay={initialSelectedDateEpochDay}&notes={notes}",
@@ -67,7 +54,7 @@ fun AppNavGraph(navController: NavHostController, startDestination: String, exit
                 navArgument("mountainId") { type = NavType.StringType },
                 navArgument("hikePlanId") {
                     type = NavType.StringType
-                    nullable = true // This ID is optional, only present when editing
+                    nullable = true
                     defaultValue = null
                 },
                 navArgument("initialSelectedDateEpochDay") {
@@ -76,13 +63,13 @@ fun AppNavGraph(navController: NavHostController, startDestination: String, exit
                 },
                 navArgument("notes") {
                     type = NavType.StringType
-                    nullable = true // This is optional
+                    nullable = true
                     defaultValue = null
                 }
             )
         ) { backStackEntry ->
             val mountainIdArg = backStackEntry.arguments?.getString("mountainId")
-            val hikePlanIdArg = backStackEntry.arguments?.getString("hikePlanId") // Can be null
+            val hikePlanIdArg = backStackEntry.arguments?.getString("hikePlanId")
             val initialDateEpochDayArg = backStackEntry.arguments?.getLong("initialSelectedDateEpochDay")
             val notesArg = backStackEntry.arguments?.getString("notes")?.let { encodedNotes ->
                 try {
@@ -96,9 +83,9 @@ fun AppNavGraph(navController: NavHostController, startDestination: String, exit
                 DatePickerScreen(
                     navController = navController,
                     mountainId = mountainIdArg,
-                    hikePlanIdForEdit = hikePlanIdArg, // Pass to DatePickerScreen
+                    hikePlanIdForEdit = hikePlanIdArg,
                     initialSelectedDateEpochDay = initialDateEpochDayArg ?: -1L,
-                    initialNotes = notesArg // Pass to DatePickerScreen
+                    initialNotes = notesArg
                 )
             } else {
                 Text("Error: Mountain ID missing for DatePicker.")

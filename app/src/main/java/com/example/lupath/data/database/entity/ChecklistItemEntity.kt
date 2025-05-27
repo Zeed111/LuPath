@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.util.UUID
 
-@Entity(tableName = "general_checklist_items") // New table name for clarity
+@Entity(tableName = "general_checklist_items")
 data class ChecklistItemEntity(
     @PrimaryKey val itemId: String = UUID.randomUUID().toString(),
     val name: String,

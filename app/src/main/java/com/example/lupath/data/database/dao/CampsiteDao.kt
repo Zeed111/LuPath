@@ -25,5 +25,5 @@ interface CampsiteDao {
     fun getCampsiteById(campsiteId: String): Flow<CampsiteEntity?>
 
     @Query("SELECT * FROM campsites ORDER BY name ASC")
-    fun getAllCampsites(): Flow<List<CampsiteEntity>> // Might not be needed, but good to have
+    fun getAllCampsites(): Flow<List<CampsiteEntity>>
 }

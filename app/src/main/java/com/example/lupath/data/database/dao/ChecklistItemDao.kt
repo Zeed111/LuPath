@@ -13,10 +13,10 @@ interface ChecklistItemDao {
     suspend fun insertAllItems(items: List<ChecklistItemEntity>)
 
     @Update
-    suspend fun updateItem(item: ChecklistItemEntity) // Used for toggling isChecked
+    suspend fun updateItem(item: ChecklistItemEntity)
 
     @Delete
-    suspend fun deleteItem(item: ChecklistItemEntity) // For deleting personal items
+    suspend fun deleteItem(item: ChecklistItemEntity)
 
     @Query("SELECT * FROM general_checklist_items ORDER BY isPreMade DESC, name ASC")
     fun getAllItemsFlow(): Flow<List<ChecklistItemEntity>>
@@ -27,7 +27,6 @@ interface ChecklistItemDao {
     @Query("SELECT * FROM general_checklist_items WHERE isPreMade = 0 ORDER BY name ASC")
     fun getPersonalItemsFlow(): Flow<List<ChecklistItemEntity>>
 
-    // Optional: if you need to fetch by name (e.g., to check if a personal item already exists)
     @Query("SELECT * FROM general_checklist_items WHERE name = :name LIMIT 1")
     suspend fun findItemByName(name: String): ChecklistItemEntity?
 }

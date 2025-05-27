@@ -12,13 +12,13 @@ import java.time.LocalDate
         entity = MountainEntity::class,
         parentColumns = ["mountainId"],
         childColumns = ["mountainOwnerId"],
-        onDelete = ForeignKey.SET_NULL // Or CASCADE, depending on how you want to handle deletion
+        onDelete = ForeignKey.SET_NULL
     )],
     indices = [Index(value = ["mountainOwnerId"])]
 )
 data class HikePlanEntity(
     @PrimaryKey val hikePlanId: String,
     val mountainOwnerId: String?, // Foreign Key
-    val date: LocalDate, // Room needs a TypeConverter for this
+    val date: LocalDate,
     val notes: String? = null
 )

@@ -4,7 +4,6 @@ import androidx.room.*
 import com.example.lupath.data.database.entity.*
 import kotlinx.coroutines.flow.Flow
 
-// Data class for combined query result
 data class MountainWithDetails(
     @Embedded val mountain: MountainEntity,
     @Relation(
