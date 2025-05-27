@@ -1,31 +1,26 @@
 package com.example.lupath.ui.screen.lupathList
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
@@ -44,33 +39,38 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.lupath.R
 import com.example.lupath.data.model.HikePlan
 import com.example.lupath.data.model.HikePlanViewModel
+import com.example.lupath.helper.ConfirmationDialog
 import com.example.lupath.ui.screen.home.HomeBottomNav
+import com.example.lupath.ui.screen.mountainDetails.getDrawableResIdFromString
 import com.example.lupath.ui.theme.GreenDark
 import com.example.lupath.ui.theme.GreenLight
 import com.example.lupath.ui.theme.Lato
+import kotlinx.coroutines.launch
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -82,10 +82,13 @@ import java.util.Locale
 @Composable
 fun LuPathListScreen(
     navController: NavHostController,
-    viewModel: HikePlanViewModel = viewModel()
+    viewModel: HikePlanViewModel = hiltViewModel()
 ) {
-    val screenScrollState = rememberScrollState()
     val hikePlansList by viewModel.hikePlans.collectAsStateWithLifecycle()
+    var showDeleteConfirmationDialog by remember { mutableStateOf(false) }
+    var planToDelete by remember { mutableStateOf<HikePlan?>(null) }
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     Scaffold(
         topBar = { LuPathTopBar(navController = navController) },
@@ -99,7 +102,7 @@ fun LuPathListScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // --- Header Items ---
-            item { // Title 1
+            item {
                 Text(
                     text = "My LuPath",
                     fontSize = 30.sp,
@@ -109,14 +112,13 @@ fun LuPathListScreen(
                 )
             }
 
-            item { // Title 2
+            item {
                 Text(
                     text = "Calendar",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Medium,
                     fontFamily = Lato,
                     modifier = Modifier
-                        // Align within the LazyColumn width
                         .fillMaxWidth()
                         .padding(top = 20.dp, start = 30.dp, end = 30.dp)
                 )
@@ -134,11 +136,11 @@ fun LuPathListScreen(
                 )
             }
 
-            item { // Spacer Item
+            item {
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            item { // Title 3
+            item {
                 Text(
                     text = "Planned Hikes",
                     fontSize = 20.sp,
@@ -151,25 +153,65 @@ fun LuPathListScreen(
             }
 
             // --- Plan Card Items ---
-            items(
-                items = hikePlansList,
-                key = { plan -> plan.hashCode() } // Use plan.id if available
-            ) { plan ->
-                PlanCard(
-                    mountainName = plan.mountainName,
-                    difficulty = plan.difficulty,
-                    date = plan.date.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")) ?: "No Date",
-                    onEdit = { /* ... */ },
-                    onDelete = { viewModel.removeHikePlan(plan) }
-                )
+            if (hikePlansList.isEmpty()) {
+                item {
+                    Text(
+                        text = "No hikes planned yet.",
+                        modifier = Modifier.padding(16.dp),
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            } else {
+                items(
+                    items = hikePlansList,
+                    key = { plan -> plan.id }
+                ) { plan ->
+                    PlanCard(
+                        hikePlan = plan,
+                        navController = navController,// Pass the whole HikePlan UI model
+                        onEdit = {
+                            val initialDateEpochDay = plan.date.toEpochDay()
+                            val encodedNotes = try {
+                                URLEncoder.encode(plan.notes ?: "", StandardCharsets.UTF_8.name())
+                            } catch (e: Exception) {
+                                throw IllegalStateException("Failed to encode notes for editing.", e)
+                            }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                            navController.navigate(
+                                "datepicker/${plan.mountainId}?hikePlanId=${plan.id}&initialSelectedDateEpochDay=${initialDateEpochDay}&notes=${encodedNotes}"
+                            )},
+                        onDeleteRequest = {
+                            planToDelete = plan
+                            showDeleteConfirmationDialog = true
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
             }
 
-            item { // Spacer at the very end
-                Spacer(modifier = Modifier.height(16.dp))
+            item {
+                Spacer(modifier = Modifier.height(80.dp))
             }
+        }
 
+        if (showDeleteConfirmationDialog && planToDelete != null) {
+            ConfirmationDialog(
+                dialogTitle = "Confirm Deletion",
+                dialogText = "Are you sure you want to delete the plan for ${planToDelete!!.mountainName} on ${planToDelete!!.date.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy"))}?",
+                onConfirmation = {
+                    scope.launch { // Launch coroutine for DB operation
+                        viewModel.removeHikePlan(planToDelete!!)
+                        Toast.makeText(context, "Hike plan deleted", Toast.LENGTH_SHORT).show()
+                        planToDelete = null // Reset
+                        showDeleteConfirmationDialog = false
+                    }
+                },
+                onDismissRequest = {
+                    planToDelete = null // Reset
+                    showDeleteConfirmationDialog = false
+                }
+            )
         }
     }
 }
@@ -179,13 +221,14 @@ fun LuPathTopBar(navController: NavHostController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .statusBarsPadding()
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(onClick = {
             navController.navigate("home") {
-                popUpTo(navController.graph.startDestinationId) { inclusive = true } // Clears the back stack
+                popUpTo(navController.graph.startDestinationId) { inclusive = true }
             }
         }) {
             Icon(
@@ -196,7 +239,7 @@ fun LuPathTopBar(navController: NavHostController) {
         }
 
         Image(
-            painter = painterResource(id = R.drawable.lupath), // logo
+            painter = painterResource(id = R.drawable.lupath),
             contentDescription = "Logo",
             modifier = Modifier.size(40.dp)
         )
@@ -215,50 +258,82 @@ fun LuPathTopBar(navController: NavHostController) {
 
 @Composable
 fun PlanCard(
-    mountainName: String,
-    difficulty: String,
-    date: String,
+    hikePlan: HikePlan,
+    navController: NavHostController,
     onEdit: () -> Unit,
-    onDelete: () -> Unit
+    onDeleteRequest: () -> Unit
 ) {
+    val context = LocalContext.current
     Card(
         shape = RoundedCornerShape(10.dp),
         modifier = Modifier
             .padding(horizontal = 15.dp, vertical = 8.dp)
             .fillMaxWidth()
-            .height(100.dp),
+            .clickable {
+                navController.navigate("mountainDetail/${hikePlan.mountainId}")
+        },
         elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors( // Add the 'colors' parameter
-            containerColor = Color(0xFFD9D9D9))
+        colors = CardDefaults.cardColors(
+            containerColor = GreenLight)
     ) {
         Row(
             modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFD9D9D9))
+            .fillMaxWidth()
+            .background(GreenLight)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.mt_pulag_ex),
-                contentDescription = "mt pulag",
+                painter = if (hikePlan.imageResourceName != null &&
+                    getDrawableResIdFromString(context, hikePlan.imageResourceName) != null)
+                    painterResource(id = getDrawableResIdFromString(context, hikePlan.imageResourceName)!!)
+                else
+                    painterResource(id = R.drawable.mt_pulag_ex), // Fallback placeholder
+                contentDescription = "Image of ${hikePlan.mountainName}",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .fillMaxHeight()
                     .width(100.dp)
+                    .height(100.dp)
             )
 
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(12.dp)
+                    .padding(start = 12.dp, end = 4.dp, top = 8.dp, bottom = 8.dp),
+                verticalArrangement = Arrangement.Top
             ) {
-                Text(mountainName, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                Text(date, fontSize = 12.sp, color = Color.Black)
-                Text("Difficulty: $difficulty", fontSize = 12.sp)
+                Column {
+                    Text(
+                        hikePlan.mountainName,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        hikePlan.date.format(DateTimeFormatter.ofPattern("MMMM dd, y")),
+                        fontSize = 13.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
+                    )
+                }
+
+                // --- Display Notes ---
+                if (!hikePlan.notes.isNullOrBlank()) {
+                    Spacer(modifier = Modifier.height(3.dp))
+                    Text(
+                        // text = "Notes: ${hikePlan.notes}",
+                        text = hikePlan.notes,
+                        fontSize = 13.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
             }
 
             var expanded by remember { mutableStateOf(false) }
 
-            Box(modifier = Modifier.align(Alignment.Top)) {
-                IconButton(onClick = { expanded = true }) {
+            Box(modifier = Modifier.align(Alignment.Top).padding(end = 4.dp)) {
+                IconButton(onClick = { expanded = true }, modifier = Modifier.size(40.dp)) {
                     Icon(Icons.Default.MoreVert, contentDescription = "More Options")
                 }
 
@@ -277,7 +352,7 @@ fun PlanCard(
                         text = { Text("Delete") },
                         onClick = {
                             expanded = false
-                            onDelete()
+                            onDeleteRequest()
                         }
                     )
                 }
@@ -293,8 +368,6 @@ fun CustomCalendarM3Style(
     onDateClick: (LocalDate) -> Unit = {}
 ) {
     var currentMonth by rememberSaveable { mutableStateOf(YearMonth.now()) }
-    // Keep density if needed for swipe threshold, but swipe might be less intuitive now
-    // val density = LocalDensity.current
 
     val onPreviousMonth = { currentMonth = currentMonth.minusMonths(1) }
     val onNextMonth = { currentMonth = currentMonth.plusMonths(1) }
@@ -308,10 +381,6 @@ fun CustomCalendarM3Style(
     val plannedDates = remember(hikePlans, currentMonth) { // Recalculate if plans or month change
         hikePlans.map { it.date }.toSet()
     }
-
-    // Remove swipe state if removing swipe modifier
-    // var swipeOffsetX by remember { mutableFloatStateOf(0f) }
-    // var gestureConsumed by remember { mutableStateOf(false) }
 
     Card(
         modifier = modifier,
@@ -327,13 +396,9 @@ fun CustomCalendarM3Style(
             )
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Removed the Column with pointerInput modifier
-
             DaysOfWeekHeader(daysOfWeek)
             Spacer(modifier = Modifier.height(8.dp))
 
-            // --- Replace LazyVerticalGrid with basic Columns/Rows ---
-            // This will compose all day cells at once. Acceptable if calendar isn't huge.
             Column { // Column to hold the rows of weeks
                 val totalCells = paddingDays + daysInMonth
                 val numRows = (totalCells + 6) / 7 // Calculate number of rows needed
@@ -347,7 +412,6 @@ fun CustomCalendarM3Style(
                         repeat(7) { dayIndex -> // Create each day cell/placeholder
                             val cellIndex = it * 7 + dayIndex
                             if (cellIndex < paddingDays || dayOfMonth > daysInMonth) {
-                                // Empty box for padding or after last day
                                 Box(modifier = Modifier.size(40.dp))
                             } else {
                                 // Actual DayCell
@@ -356,7 +420,6 @@ fun CustomCalendarM3Style(
                                 val isToday = date == LocalDate.now()
                                 DayCell(
                                     day = dayOfMonth,
-                                    date = date,
                                     isPlanned = isPlanned,
                                     isToday = isToday,
                                     onClick = { onDateClick(date) }
@@ -365,15 +428,13 @@ fun CustomCalendarM3Style(
                             }
                         }
                     }
-                    if (it < numRows - 1) { // Add spacing between weeks if desired
+                    if (it < numRows - 1) {
                         Spacer(modifier = Modifier.height(4.dp))
                     }
                 }
             }
-            // --- End of basic Columns/Rows calendar grid ---
-
-        } // End of Card's Column
-    } // End of Card
+        }
+    }
 }
 
 private fun getWeekDayAbbreviationList(): List<String> {
@@ -431,7 +492,6 @@ private fun DaysOfWeekHeader(daysOfWeek: List<String>) {
 @Composable
 private fun DayCell(
     day: Int,
-    date: LocalDate,
     isPlanned: Boolean,
     isToday: Boolean,
     onClick: () -> Unit

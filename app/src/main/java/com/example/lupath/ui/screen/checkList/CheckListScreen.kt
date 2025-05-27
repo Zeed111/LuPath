@@ -12,7 +12,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -20,6 +24,8 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,13 +43,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.lupath.R
 import com.example.lupath.data.model.ChecklistItem
@@ -51,19 +59,12 @@ import com.example.lupath.data.model.ChecklistViewModel
 import com.example.lupath.ui.screen.home.HomeBottomNav
 import com.example.lupath.ui.theme.GreenDark
 import com.example.lupath.ui.theme.GreenLight
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CheckListScreen(
     navController: NavHostController,
-    viewModel: ChecklistViewModel = viewModel()
+    viewModel: ChecklistViewModel = hiltViewModel()
 ) {
     var showAddDialog by rememberSaveable { mutableStateOf(false) }
     val predefinedItemsList by viewModel.predefinedItems.collectAsStateWithLifecycle()
@@ -76,7 +77,6 @@ fun CheckListScreen(
         bottomBar = { HomeBottomNav(navController) }
     ) { paddingValues ->
 
-        // --- Outer Column handles the overall screen scrolling ---
         Column(
             modifier = Modifier
                 .padding(paddingValues)
@@ -84,7 +84,6 @@ fun CheckListScreen(
                 .verticalScroll(screenScrollState)
                 .padding(bottom = 16.dp)
         ) {
-            // --- Card Container for the Checklist ---
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -95,8 +94,6 @@ fun CheckListScreen(
                     containerColor = Color(0xFFF0F0F0)
                 )
             ) {
-                // --- Column for content *inside* the Card ---
-                // --- This inner Column is NOT scrollable itself ---
                 Column(
                     modifier = Modifier
                         .padding(horizontal = 16.dp, vertical = 16.dp),
@@ -117,11 +114,9 @@ fun CheckListScreen(
                     predefinedItemsList.forEach { item ->
                         ChecklistItemRow(
                             item = item, // Pass the ChecklistItem object
-                            onCheckedChange = { isChecked -> // Receive boolean from Checkbox/Row click
-                                // Tell ViewModel to toggle based on the object
-                                viewModel.togglePredefinedItemChecked(item)
+                            onCheckedChange = {
+                                viewModel.toggleItemChecked(item) // ViewModel uses the item's current state
                             }
-                            // No onDelete for predefined
                         )
                     }
 
@@ -150,9 +145,8 @@ fun CheckListScreen(
                         personalItemsList.forEach { item ->
                             ChecklistItemRow(
                                 item = item, // Pass the ChecklistItem object
-                                onCheckedChange = { isChecked -> // Receive boolean from Checkbox/Row click
-                                    // Tell ViewModel to toggle based on the object
-                                    viewModel.togglePersonalItemChecked(item)
+                                onCheckedChange = {
+                                    viewModel.toggleItemChecked(item)
                                 },
                                 onDelete = { viewModel.removePersonalItem(item) } // Pass the object
                             )
@@ -165,18 +159,16 @@ fun CheckListScreen(
                         onClick = { showAddDialog = true }
                     )
 
-                } // End of inner Column (inside Card)
-            } // End of Card
-        } // End of Outer Scrollable Column
-    } // End of Scaffold
-
-    // --- Dialog remains the same ---
+                }
+            }
+        }
+    }
     if (showAddDialog) {
         AddChecklistItemDialog(
             onDismiss = { showAddDialog = false },
             onConfirm = { text ->
                 viewModel.addPersonalItem(text)
-                showAddDialog = false // Dismiss after adding
+                showAddDialog = false
             }
         )
     }
@@ -187,6 +179,7 @@ fun LuPathTopBar(navController: NavHostController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .statusBarsPadding()
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -247,7 +240,7 @@ fun ChecklistItemRow(
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.weight(1f)
         )
-        // Show delete button only if callback is provided
+
         if (onDelete != null) {
             IconButton(onClick = onDelete, modifier = Modifier.size(32.dp)) {
                 Icon(
@@ -306,16 +299,14 @@ fun AddChecklistItemDialog(
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
-                    // Colors when the TextField is focused (being typed in)
+
                     focusedBorderColor = GreenDark,
                     focusedLabelColor = GreenDark,
                     cursorColor = GreenDark,
 
-                    // Colors when the TextField is not focused
                     unfocusedBorderColor = GreenDark,
                     unfocusedLabelColor = GreenDark,
 
-                    // Text color
                     focusedTextColor = Color.Black,
                     unfocusedTextColor = Color.Black
                 )
@@ -329,7 +320,7 @@ fun AddChecklistItemDialog(
                         onDismiss()
                     }
                 },
-                enabled = text.isNotBlank() // Enable button only if text is entered
+                enabled = text.isNotBlank()
             ) {
                 Text("Add", color = Color.Black)
             }

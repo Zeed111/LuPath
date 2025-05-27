@@ -1,10 +1,24 @@
-import org.jetbrains.kotlin.cli.js.klib.TopDownAnalyzerFacadeForJSIR.platform
-import org.jetbrains.kotlin.cli.js.klib.TopDownAnalyzerFacadeForWasmJs.platform
+import java.io.FileInputStream
+import java.util.Properties
+
+// Define a variable for the keystore.properties file
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+// Create a new Properties object
+val keystoreProperties = Properties()
+
+// Load the properties if the file exists
+if (keystorePropertiesFile.exists()) {
+    FileInputStream(keystorePropertiesFile).use { stream ->
+        keystoreProperties.load(stream)
+    }
+}
 
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
 }
 
 android {
@@ -22,13 +36,40 @@ android {
         setProperty("archivesBaseName", "LuPath-$versionName")
     }
 
+    signingConfigs {
+        getByName("debug") {
+            // Android Studio manages the debug keystore by default.
+        }
+        create("release") {
+            if (keystorePropertiesFile.exists() &&
+                keystoreProperties.containsKey("storeFile") &&
+                keystoreProperties.containsKey("storePassword") &&
+                keystoreProperties.containsKey("keyAlias") &&
+                keystoreProperties.containsKey("keyPassword")) {
+
+                storeFile = file(keystoreProperties.getProperty("storeFile"))
+                storePassword = keystoreProperties.getProperty("storePassword")
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+            } else {
+                println("Warning: keystore.properties not found or missing required entries (storeFile, storePassword, keyAlias, keyPassword). Release build will not be signed with a release key.")
+                // Optionally, throw an exception to fail the build if properties are missing:
+                // throw GradleException("keystore.properties is missing or incomplete for the release build. Required keys: storeFile, storePassword, keyAlias, keyPassword.")
+            }
+        }
+    }
+
     buildTypes {
-        release {
-            isMinifyEnabled = false
+        getByName("release") {
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
+        }
+        getByName("debug") {
+            // signingConfig = signingConfigs.getByName("debug") // This is usually default
         }
     }
     compileOptions {
@@ -60,6 +101,11 @@ dependencies {
     implementation(libs.accompanist.pager)
     implementation(libs.accompanist.pager.indicators)
     implementation(libs.kotlinx.coroutines.android)
+//    implementation(libs.androidx.room.common.jvm)
+//    implementation(libs.androidx.room.runtime.android)
+    implementation(libs.androidx.room.runtime) // Uses the new alias
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.compose.material3)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -67,4 +113,8 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation(libs.hilt.android)
+    implementation(libs.hilt.navigation.compose)
+    ksp(libs.hilt.compiler)
+    ksp(libs.androidx.room.compiler)
 }

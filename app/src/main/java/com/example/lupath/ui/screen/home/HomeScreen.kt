@@ -1,11 +1,13 @@
 package com.example.lupath.ui.screen.home
 
+import android.net.http.SslCertificate.saveState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -14,8 +16,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -52,11 +56,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.lupath.R
+import com.example.lupath.data.model.HomeViewModel
+import com.example.lupath.data.model.Mountain
+import com.example.lupath.ui.theme.GreenLight
 import com.example.lupath.ui.theme.Lato
-import java.net.URLEncoder
 
 object Routes {
     const val LUPATH_LIST = "lupath_list"
@@ -65,21 +74,39 @@ object Routes {
 }
 
 @Composable
-fun HomeScreen(navController: NavHostController) {
+fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel =  hiltViewModel()) {
+    val popularMountainsList by viewModel.popularMountains.collectAsStateWithLifecycle()
+    val allMountainsList by viewModel.allMountains.collectAsStateWithLifecycle()
+    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
+
     Scaffold(
         containerColor = Color.White,
         topBar = { HomeTopBar(navController = navController) },
         bottomBar = { HomeBottomNav(navController) }
     ) { padding ->
-        HomeContent(Modifier.padding(padding), navController = navController)
+        HomeContent(
+            modifier = Modifier.padding(padding),
+            popularMountains = popularMountainsList,
+            allMountains = allMountainsList,
+            searchQuery = searchQuery,
+            onSearchQueryChange = { query -> viewModel.onSearchQueryChanged(query) },
+            onMountainClick = { mountainId ->
+                try {
+                    navController.navigate("mountainDetail/$mountainId")
+                } catch (e: Exception) {
+                    println("Navigation error: $e")
+                }
+            },
+            navController = navController
+        )
     }
 }
 
 @Composable
-fun HomeBottomNav(navController: NavHostController,) {
-    // 1. Observe the current back stack entry
+fun HomeBottomNav(navController: NavHostController) {
+    //  Observe the current back stack entry
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    // 2. Get the current route name
+    //  Get the current route name
     val currentRoute = navBackStackEntry?.destination?.route
 
     NavigationBar(
@@ -87,17 +114,12 @@ fun HomeBottomNav(navController: NavHostController,) {
     ) {
         // --- Lupath Item ---
         NavigationBarItem(
-            // 3. Set selected based on current route
             selected = currentRoute == Routes.LUPATH_LIST,
             onClick = {
-                // 4. Navigate only if not already on this screen
                 if (currentRoute != Routes.LUPATH_LIST) {
                     navController.navigate(Routes.LUPATH_LIST) {
-                        // Optional: Pop up to the start destination graph to avoid building up back stack
-                        // popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                         launchSingleTop = true
-                        // Optional: Restore state if popping up
-                        // restoreState = true
+                        restoreState = true
                     }
                 }
             },
@@ -106,16 +128,12 @@ fun HomeBottomNav(navController: NavHostController,) {
                     painter = painterResource(id = R.drawable.lupath),
                     contentDescription = "Lupath",
                     modifier = Modifier.size(37.dp),
-                    tint = if (currentRoute == Routes.LUPATH_LIST) MaterialTheme.colorScheme.onSecondaryContainer else Color.Black // Example selected tint
+                    tint = if (currentRoute == Routes.LUPATH_LIST) MaterialTheme.colorScheme.onSecondaryContainer else Color.Black
                 )
             },
             label = { Text("Lupath", color = Color.Black, fontFamily = Lato) },
             colors = NavigationBarItemDefaults.colors(
-                indicatorColor = Color.Gray // Example indicator color
-                // unselectedIconColor = Color.Black,
-                // selectedIconColor = ..., // Set explicitly if needed
-                // unselectedTextColor = Color.Black,
-                // selectedTextColor = ...
+                indicatorColor = Color.Gray
             )
         )
 
@@ -125,9 +143,8 @@ fun HomeBottomNav(navController: NavHostController,) {
             onClick = {
                 if (currentRoute != Routes.HOME) {
                     navController.navigate(Routes.HOME) {
-                        // popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                         launchSingleTop = true
-                        // restoreState = true
+                        restoreState = true
                     }
                 }
             },
@@ -151,9 +168,8 @@ fun HomeBottomNav(navController: NavHostController,) {
             onClick = {
                 if (currentRoute != Routes.CHECK_LIST) {
                     navController.navigate(Routes.CHECK_LIST) {
-                        // popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                         launchSingleTop = true
-                        // restoreState = true
+                        restoreState = true
                     }
                 }
             },
@@ -162,7 +178,7 @@ fun HomeBottomNav(navController: NavHostController,) {
                     Icons.AutoMirrored.Filled.List,
                     contentDescription = "List",
                     modifier = Modifier.size(37.dp),
-                    tint = if (currentRoute == Routes.CHECK_LIST) MaterialTheme.colorScheme.onSecondaryContainer else Color.Black // Example selected tint
+                    tint = if (currentRoute == Routes.CHECK_LIST) MaterialTheme.colorScheme.onSecondaryContainer else Color.Black
                 )
             },
             label = { Text("List", color = Color.Black, fontFamily = Lato) },
@@ -174,16 +190,35 @@ fun HomeBottomNav(navController: NavHostController,) {
 }
 
 @Composable
-fun HomeContent(modifier: Modifier = Modifier, navController: NavHostController) {
+fun HomeContent(
+    modifier: Modifier = Modifier,
+    popularMountains: List<Mountain>,
+    allMountains: List<Mountain>,
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
+    onMountainClick: (mountainId: String) -> Unit,
+    navController: NavHostController
+) {
     Column(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(4.dp)
     ) {
-        SearchBar()
-        PopularMountainsSection(navController = navController)
-        MountainListSection(navController = navController)
+        SearchBar(
+            query = searchQuery,
+            onQueryChange = onSearchQueryChange,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+        )
+
+        PopularMountainsSection(
+            popularMountains = popularMountains,
+            onMountainClick = onMountainClick
+        )
+
+        MountainListSection(
+            allMountains = allMountains,
+            navController = navController
+        )
     }
 }
 
@@ -196,6 +231,7 @@ fun HomeTopBar(navController: NavHostController) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .statusBarsPadding()
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -220,39 +256,64 @@ fun HomeTopBar(navController: NavHostController) {
 }
 
 @Composable
-fun SearchBar() {
+fun SearchBar(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
     OutlinedTextField(
-        value = "",
-        onValueChange = {},
+        value = query,
+        onValueChange = onQueryChange, // Call the lambda to update ViewModel
         placeholder = { Text("Search for mountains...", fontFamily = Lato) },
         shape = RoundedCornerShape(15.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) }
+        modifier = modifier.fillMaxWidth(),
+        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+        singleLine = true
     )
 }
 
 @Composable
-fun PopularMountainsSection(navController: NavHostController) {
+fun PopularMountainsSection(
+    popularMountains: List<Mountain>,
+    onMountainClick: (mountainId: String) -> Unit
+) {
     Column(modifier = Modifier.padding(16.dp)) {
         Text("Popular Mountains", fontWeight = FontWeight.Bold, fontSize = 18.sp, fontFamily = Lato)
         Spacer(modifier = Modifier.height(8.dp))
-        LazyRow {
-            items(5) { index ->
-                PopularMountainCard(name = "Mt. Popular $index", location = "Location $index",
-                    navController = navController)
+
+        if (popularMountains.isEmpty()) {
+            Text("No popular mountains to display.", modifier = Modifier.padding(vertical = 8.dp))
+        } else {
+            LazyRow(
+                contentPadding = PaddingValues(end = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(
+                    items = popularMountains,
+                    key = { mountain -> mountain.id }
+                ) { mountain ->
+                    PopularMountainCard(
+                        mountain = mountain,
+                        onClick = {
+                            try {
+                                // Navigate using ID
+                                onMountainClick(mountain.id)
+                            } catch (e: Exception) {
+                                println("Navigation error: $e")
+                            }
+                        }
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-fun MountainListSection(navController: NavHostController) {
-    val allMountains = listOf(
-        "Mt. Pulag", "Mt. Apo", "Mt. Batulao", "Mt. Ulap", "Mt. Maculot",
-        "Mt. Arayat", "Mt. Mayon", "Mt. Pico de Loro"
-    )
+fun MountainListSection(
+    allMountains: List<Mountain>,
+    navController: NavHostController
+) {
     var showAll by remember { mutableStateOf(false) }
     val visibleMountains = if (showAll) allMountains else allMountains.take(5)
 
@@ -260,82 +321,120 @@ fun MountainListSection(navController: NavHostController) {
         Text("All Mountains", fontWeight = FontWeight.Bold, fontSize = 18.sp, fontFamily = Lato)
         Spacer(modifier = Modifier.height(8.dp))
 
-        visibleMountains.forEach { mountain ->
-            MountainListCard(
-                name = mountain,
-                difficulty = "Beginner friendly",
-                description = "A beautiful mountain with scenic views and easy trails.",
-                navController = navController
-            )
+        if (visibleMountains.isEmpty() && allMountains.isNotEmpty() && !showAll) {
+            Text("No mountains to display in this view.", modifier = Modifier.padding(vertical = 8.dp))
+        } else if (allMountains.isEmpty()){
+            Text("No mountains available yet.", modifier = Modifier.padding(vertical = 8.dp))
+        }
+        else {
+            visibleMountains.forEach { mountain ->
+                MountainListCard(
+                    mountain = mountain,
+                    navController = navController
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+            }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
-        TextButton(
-            onClick = { showAll = !showAll },
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            colors = ButtonDefaults.buttonColors(
-                contentColor = Color.Black,
-                containerColor = (Color(0xFFD9D9D9))
-            )
-        ) {
-            Text(
-                text = if (showAll) "View Less" else "View More",
-                fontWeight = FontWeight.Bold,
-                fontSize = 15.sp,
-                fontFamily = Lato
-            )
+        if (allMountains.size > 5) {
+            Spacer(modifier = Modifier.height(8.dp))
+            TextButton(
+                onClick = { showAll = !showAll },
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = Color.Black
+                )
+            ) {
+                Text(
+                    text = if (showAll) "View Less" else "View More",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 15.sp,
+                    fontFamily = Lato
+                )
+            }
         }
     }
 }
 
 @Composable
-fun PopularMountainCard(name: String, location: String, navController: NavHostController) {
+fun PopularMountainCard(mountain: Mountain,  onClick: () -> Unit) {
+    val cardHeight = 200.dp
+    val imageHeight = 100.dp
     Card(
         shape = RoundedCornerShape(10.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         modifier = Modifier
             .width(150.dp)
+            .height(cardHeight)
             .padding(end = 16.dp)
-            .clickable {
-                navController.navigate("mountainDetail/${URLEncoder.encode(name, "UTF-8")}")
-            }
+            .clickable (onClick = onClick)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFD9D9D9))
+                .background(GreenLight)
                 .padding(10.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-//            Box(
-//                modifier = Modifier
-//                    .size(100.dp)
-//                    .background(Color.DarkGray, RoundedCornerShape(8.dp)),
-//                contentAlignment = Alignment.Center
-//            ) {
-//                Text("Image", color = Color.White)
-//            }
-
-            Image(
-                painter = painterResource(id = R.drawable.mt_pulag_ex),
-                contentDescription = "mt pulag",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(100.dp)
-                    .clip(RoundedCornerShape(8.dp))
-            )
+            if (mountain.imageResId != null) { // Check for actual image
+                Image(
+                    painter = painterResource(id = mountain.imageResId),
+                    contentDescription = mountain.name,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(imageHeight)
+                        .clip(RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp))
+                )
+            } else { // Fallback placeholder
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(imageHeight)
+                        .background(Color.DarkGray),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("Image", color = Color.White)
+                }
+            }
 
             Spacer(Modifier.height(8.dp))
 
-            Text(name, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color.Black,
-                fontFamily = Lato)
-            Text(location, fontSize = 12.sp, color = Color.Black, fontFamily = Lato)
+            Text(mountain.name,
+                fontWeight = FontWeight.Bold,
+                fontSize = 14.sp,
+                color = Color.Black,
+                fontFamily = Lato,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                minLines = 1
+            )
+
+            Text(
+                text = mountain.difficultySummary.toString(),
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium,
+                color = Color.DarkGray,
+                fontFamily = Lato,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Spacer(modifier = Modifier.height(2.dp))
+
+            Text(mountain.location ?: " ",
+                fontSize = 11.sp,
+                color = Color.DarkGray,
+                fontFamily = Lato,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
     }
 }
 
 @Composable
-fun MountainListCard(name: String, difficulty: String, description: String, navController: NavHostController) {
+fun MountainListCard(mountain: Mountain, navController: NavHostController) {
     Card(
         shape = RoundedCornerShape(10.dp),
         modifier = Modifier
@@ -343,38 +442,26 @@ fun MountainListCard(name: String, difficulty: String, description: String, navC
             .fillMaxWidth()
             .height(100.dp)
             .clickable {
-                navController.navigate("mountainDetail/${URLEncoder.encode(name, "UTF-8")}")
+                try {
+                    navController.navigate("mountainDetail/${mountain.id}")
+                } catch (e: Exception) {
+                    println("Error navigating to detail: $e")
+                }
             },
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFD9D9D9))
+                containerColor = GreenLight)
     ) {
         Row(
             modifier = Modifier
-                .fillMaxSize()
-                .background(Color(0xFFD9D9D9)),
+                .fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-//            Box(
-//                modifier = Modifier
-//                    .fillMaxHeight()
-//                    .width(100.dp)
-//                    .background(Color.Gray),
-//                contentAlignment = Alignment.Center
-//            ) {
-//                // TODO: Replace with actual Image composable if imageUrl is provided
-//                // Example:
-//                // if (imageUrl != null) {
-//                //     Image(painter = rememberAsyncImagePainter(imageUrl), contentDescription = mountainName, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
-//                // } else {
-//                //     Icon(Icons.Default.Landscape, contentDescription = "Placeholder", tint = Color.White) // Placeholder Icon
-//                // }
-//                Text("Image", color = Color.White)
-//            }
-
             Image(
-                painter = painterResource(id = R.drawable.mt_pulag_ex),
-                contentDescription = "mt pulag",
+                painter = painterResource(
+                    id = mountain.imageResId ?: R.drawable.mt_pulag_ex
+                ),
+                contentDescription = "Image of ${mountain.name}",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxHeight()
@@ -387,10 +474,11 @@ fun MountainListCard(name: String, difficulty: String, description: String, navC
                     .padding(12.dp)
 
             ) {
-                Text(name, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.Black,
+                Text(mountain.name, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.Black,
                     fontFamily = Lato)
-                Text(difficulty, fontSize = 14.sp, color = Color.Black, fontFamily = Lato)
-                Text(description, fontSize = 12.sp, maxLines = 2, overflow = TextOverflow.Ellipsis,
+                Text(mountain.difficultySummary.toString(), fontSize = 14.sp, color = Color.Black, fontFamily = Lato)
+                Text(
+                    text = mountain.tagline ?: "No tagline available", fontSize = 12.sp, maxLines = 2, overflow = TextOverflow.Ellipsis,
                     color = Color.Black, fontFamily = Lato)
             }
         }

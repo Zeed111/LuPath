@@ -38,7 +38,7 @@ import com.example.lupath.ui.theme.Lato
 @Composable
 fun SettingsScreen(
     navController: NavHostController,
-    onAboutPress: () -> Unit, // Callback for About item click
+    onAboutPress: () -> Unit,
     onExitApp: () -> Unit
 ) {
     Scaffold(
@@ -54,7 +54,7 @@ fun SettingsScreen(
                             navController.navigate("home") {
                                 popUpTo(navController.graph.startDestinationId) { inclusive = true }
                             }
-                    }) { // Call the passed-in handler
+                    }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"
@@ -62,7 +62,7 @@ fun SettingsScreen(
                     }
                 },
                 actions = {
-                    Spacer(modifier = Modifier.width(48.dp)) // Match navigation icon width
+                    Spacer(modifier = Modifier.width(48.dp))
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.White
