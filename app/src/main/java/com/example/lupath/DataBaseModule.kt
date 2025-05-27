@@ -2,8 +2,7 @@ package com.example.lupath
 
 import android.content.Context
 import com.example.lupath.data.database.AppDatabase
-import com.example.lupath.data.database.dao.* // Example DAO
-// ... import other DAOs ...
+import com.example.lupath.data.database.dao.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
