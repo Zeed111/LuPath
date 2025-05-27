@@ -1,5 +1,6 @@
 package com.example.lupath.ui.screen.home
 
+import android.net.http.SslCertificate.saveState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -168,7 +169,7 @@ fun HomeBottomNav(navController: NavHostController) {
                 if (currentRoute != Routes.CHECK_LIST) {
                     navController.navigate(Routes.CHECK_LIST) {
                         launchSingleTop = true
-                         restoreState = true
+                        restoreState = true
                     }
                 }
             },
@@ -211,14 +212,12 @@ fun HomeContent(
 
         PopularMountainsSection(
             popularMountains = popularMountains,
-            onMountainClick = onMountainClick,
-            modifier = Modifier.padding(top = 8.dp)
+            onMountainClick = onMountainClick
         )
 
         MountainListSection(
             allMountains = allMountains,
-            navController = navController,
-            modifier = Modifier.padding(top = 16.dp)
+            navController = navController
         )
     }
 }
@@ -276,8 +275,7 @@ fun SearchBar(
 @Composable
 fun PopularMountainsSection(
     popularMountains: List<Mountain>,
-    onMountainClick: (mountainId: String) -> Unit,
-    modifier: Modifier = Modifier
+    onMountainClick: (mountainId: String) -> Unit
 ) {
     Column(modifier = Modifier.padding(16.dp)) {
         Text("Popular Mountains", fontWeight = FontWeight.Bold, fontSize = 18.sp, fontFamily = Lato)
@@ -314,8 +312,7 @@ fun PopularMountainsSection(
 @Composable
 fun MountainListSection(
     allMountains: List<Mountain>,
-    navController: NavHostController,
-    modifier: Modifier = Modifier
+    navController: NavHostController
 ) {
     var showAll by remember { mutableStateOf(false) }
     val visibleMountains = if (showAll) allMountains else allMountains.take(5)
@@ -408,17 +405,29 @@ fun PopularMountainCard(mountain: Mountain,  onClick: () -> Unit) {
                 fontSize = 14.sp,
                 color = Color.Black,
                 fontFamily = Lato,
-                maxLines = 2, // Allow location to take up to 2 lines
+                maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 minLines = 1
             )
-            Text(mountain.location,
+
+            Text(
+                text = mountain.difficultySummary.toString(),
                 fontSize = 12.sp,
-                color = Color.Black,
+                fontWeight = FontWeight.Medium,
+                color = Color.DarkGray,
                 fontFamily = Lato,
-                maxLines = 2, // Allow location to take up to 2 lines
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Spacer(modifier = Modifier.height(2.dp))
+
+            Text(mountain.location ?: " ",
+                fontSize = 11.sp,
+                color = Color.DarkGray,
+                fontFamily = Lato,
+                maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
-                minLines = 1
             )
         }
     }

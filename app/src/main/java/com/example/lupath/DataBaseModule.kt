@@ -18,7 +18,7 @@ object DatabaseModule {
     @Singleton
     @Provides
     fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
-        return AppDatabase.getDatabase(context) // Your existing getDatabase method
+        return AppDatabase.getDatabase(context)
     }
 
     @Singleton
@@ -26,8 +26,6 @@ object DatabaseModule {
     fun provideMountainDao(database: AppDatabase): MountainDao {
         return database.mountainDao()
     }
-
-    // @Provides functions for other DAOs...
 
     @Singleton
     @Provides
@@ -41,23 +39,21 @@ object DatabaseModule {
         return appDatabase.checklistItemDao()
     }
 
-    // --- Add @Provides functions for your other DAOs here ---
-
     @Singleton
     @Provides
-    fun provideCampsiteDao(appDatabase: AppDatabase): CampsiteDao { // <<< Provide CampsiteDao
+    fun provideCampsiteDao(appDatabase: AppDatabase): CampsiteDao {
         return appDatabase.campsiteDao()
     }
 
     @Singleton
     @Provides
-    fun provideTrailDao(appDatabase: AppDatabase): TrailDao {       // <<< Provide TrailDao
+    fun provideTrailDao(appDatabase: AppDatabase): TrailDao {
         return appDatabase.trailDao()
     }
 
     @Singleton
     @Provides
-    fun provideGuidelineDao(appDatabase: AppDatabase): GuidelineDao { // <<< Provide GuidelineDao
+    fun provideGuidelineDao(appDatabase: AppDatabase): GuidelineDao {
         return appDatabase.guidelineDao()
     }
 }

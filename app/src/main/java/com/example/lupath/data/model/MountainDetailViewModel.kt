@@ -1,15 +1,15 @@
 package com.example.lupath.data.model
 
-import androidx.lifecycle.SavedStateHandle // For receiving navigation arguments with Hilt
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lupath.data.database.dao.MountainDao
 import com.example.lupath.data.database.dao.MountainWithDetails
-import dagger.hilt.android.lifecycle.HiltViewModel // <<< IMPORT & ANNOTATE
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
-import javax.inject.Inject // <<< IMPORT & USE
+import javax.inject.Inject
 
 @HiltViewModel
 class MountainDetailViewModel @Inject constructor(

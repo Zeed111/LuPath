@@ -77,7 +77,6 @@ fun CheckListScreen(
         bottomBar = { HomeBottomNav(navController) }
     ) { paddingValues ->
 
-        // --- Outer Column handles the overall screen scrolling ---
         Column(
             modifier = Modifier
                 .padding(paddingValues)
@@ -85,7 +84,6 @@ fun CheckListScreen(
                 .verticalScroll(screenScrollState)
                 .padding(bottom = 16.dp)
         ) {
-            // --- Card Container for the Checklist ---
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -96,8 +94,6 @@ fun CheckListScreen(
                     containerColor = Color(0xFFF0F0F0)
                 )
             ) {
-                // --- Column for content *inside* the Card ---
-                // --- This inner Column is NOT scrollable itself ---
                 Column(
                     modifier = Modifier
                         .padding(horizontal = 16.dp, vertical = 16.dp),
@@ -167,8 +163,6 @@ fun CheckListScreen(
             }
         }
     }
-
-    // --- Dialog remains the same ---
     if (showAddDialog) {
         AddChecklistItemDialog(
             onDismiss = { showAddDialog = false },

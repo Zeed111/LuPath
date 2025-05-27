@@ -10,11 +10,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -104,7 +102,7 @@ fun LuPathListScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // --- Header Items ---
-            item { // Title 1
+            item {
                 Text(
                     text = "My LuPath",
                     fontSize = 30.sp,
@@ -114,14 +112,13 @@ fun LuPathListScreen(
                 )
             }
 
-            item { // Title 2
+            item {
                 Text(
                     text = "Calendar",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Medium,
                     fontFamily = Lato,
                     modifier = Modifier
-                        // Align within the LazyColumn width
                         .fillMaxWidth()
                         .padding(top = 20.dp, start = 30.dp, end = 30.dp)
                 )
@@ -139,11 +136,11 @@ fun LuPathListScreen(
                 )
             }
 
-            item { // Spacer Item
+            item {
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            item { // Title 3
+            item {
                 Text(
                     text = "Planned Hikes",
                     fontSize = 20.sp,
@@ -168,10 +165,8 @@ fun LuPathListScreen(
             } else {
                 items(
                     items = hikePlansList,
-                    key = { plan -> plan.id } // Use a stable unique ID for the key
+                    key = { plan -> plan.id }
                 ) { plan ->
-                    val context = LocalContext.current
-                    val scope = rememberCoroutineScope() // For launching coroutines from Composable
                     PlanCard(
                         hikePlan = plan,
                         navController = navController,// Pass the whole HikePlan UI model
@@ -180,15 +175,15 @@ fun LuPathListScreen(
                             val encodedNotes = try {
                                 URLEncoder.encode(plan.notes ?: "", StandardCharsets.UTF_8.name())
                             } catch (e: Exception) {
-                                ""
+                                throw IllegalStateException("Failed to encode notes for editing.", e)
                             }
 
                             navController.navigate(
                                 "datepicker/${plan.mountainId}?hikePlanId=${plan.id}&initialSelectedDateEpochDay=${initialDateEpochDay}&notes=${encodedNotes}"
                             )},
                         onDeleteRequest = {
-                            planToDelete = plan // Set the plan you intend to delete
-                            showDeleteConfirmationDialog = true // Show the dialog
+                            planToDelete = plan
+                            showDeleteConfirmationDialog = true
                         }
                     )
                     Spacer(modifier = Modifier.height(8.dp))
@@ -373,8 +368,6 @@ fun CustomCalendarM3Style(
     onDateClick: (LocalDate) -> Unit = {}
 ) {
     var currentMonth by rememberSaveable { mutableStateOf(YearMonth.now()) }
-    // Keep density if needed for swipe threshold, but swipe might be less intuitive now
-    // val density = LocalDensity.current
 
     val onPreviousMonth = { currentMonth = currentMonth.minusMonths(1) }
     val onNextMonth = { currentMonth = currentMonth.plusMonths(1) }
@@ -388,10 +381,6 @@ fun CustomCalendarM3Style(
     val plannedDates = remember(hikePlans, currentMonth) { // Recalculate if plans or month change
         hikePlans.map { it.date }.toSet()
     }
-
-    // Remove swipe state if removing swipe modifier
-    // var swipeOffsetX by remember { mutableFloatStateOf(0f) }
-    // var gestureConsumed by remember { mutableStateOf(false) }
 
     Card(
         modifier = modifier,
@@ -423,7 +412,6 @@ fun CustomCalendarM3Style(
                         repeat(7) { dayIndex -> // Create each day cell/placeholder
                             val cellIndex = it * 7 + dayIndex
                             if (cellIndex < paddingDays || dayOfMonth > daysInMonth) {
-                                // Empty box for padding or after last day
                                 Box(modifier = Modifier.size(40.dp))
                             } else {
                                 // Actual DayCell
@@ -432,7 +420,6 @@ fun CustomCalendarM3Style(
                                 val isToday = date == LocalDate.now()
                                 DayCell(
                                     day = dayOfMonth,
-                                    date = date,
                                     isPlanned = isPlanned,
                                     isToday = isToday,
                                     onClick = { onDateClick(date) }
@@ -505,7 +492,6 @@ private fun DaysOfWeekHeader(daysOfWeek: List<String>) {
 @Composable
 private fun DayCell(
     day: Int,
-    date: LocalDate,
     isPlanned: Boolean,
     isToday: Boolean,
     onClick: () -> Unit

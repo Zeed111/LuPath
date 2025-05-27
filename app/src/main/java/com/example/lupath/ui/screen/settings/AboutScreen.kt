@@ -151,8 +151,8 @@ fun AboutScreen(navController: NavHostController) {
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        val devList = listOf("Raven Villanueva", "Daniel Reign Gutierrez", "Mariel Yanga",
-                            "Lenardo Jualo")
+                        val devList = listOf("Raven B. Villanueva", "Daniel Reign C. Gutierrez", "Mariel A. Yanga",
+                            "Lenardo R. Jualo")
                         devList.forEach { devName ->
                             Text(
                                 text = devName,

@@ -1,6 +1,5 @@
 package com.example.lupath
 
-import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -17,7 +16,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
-        val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
         val hasCompletedGetStarted = prefs.getBoolean(GetStartedViewModel.KEY_GET_STARTED_COMPLETED, false)
         val startDestination = if (hasCompletedGetStarted) "home" else "get_started"
 
