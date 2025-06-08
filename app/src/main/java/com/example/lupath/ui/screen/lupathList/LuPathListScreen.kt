@@ -38,6 +38,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -89,6 +90,17 @@ fun LuPathListScreen(
     var planToDelete by remember { mutableStateOf<HikePlan?>(null) }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    var selectedDateFilter by remember { mutableStateOf<LocalDate?>(null) }
+
+    val displayedHikePlans by remember(hikePlansList,selectedDateFilter) {
+        derivedStateOf {
+            if (selectedDateFilter != null) {
+                hikePlansList.filter { it.date == selectedDateFilter }
+            } else {
+                hikePlansList
+            }
+        }
+    }
 
     Scaffold(
         topBar = { LuPathTopBar(navController = navController) },
@@ -130,8 +142,13 @@ fun LuPathListScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 8.dp),
+                    selectedDate = selectedDateFilter,
                     onDateClick = { clickedDate ->
-                        println("Clicked on date: $clickedDate")
+                        selectedDateFilter = if (selectedDateFilter == clickedDate){
+                            null
+                        }else{
+                            clickedDate
+                        }
                     }
                 )
             }
@@ -153,10 +170,15 @@ fun LuPathListScreen(
             }
 
             // --- Plan Card Items ---
-            if (hikePlansList.isEmpty()) {
+            if (displayedHikePlans.isEmpty()) {
                 item {
+                    val emptyText = if (selectedDateFilter != null) {
+                        "No hikes planned for this date."
+                    } else {
+                        "No hikes planned yet. Find a mountain to explore!"
+                    }
                     Text(
-                        text = "No hikes planned yet.",
+                        text = emptyText,
                         modifier = Modifier.padding(16.dp),
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.bodyLarge
@@ -164,7 +186,7 @@ fun LuPathListScreen(
                 }
             } else {
                 items(
-                    items = hikePlansList,
+                    items = displayedHikePlans,
                     key = { plan -> plan.id }
                 ) { plan ->
                     PlanCard(
@@ -365,7 +387,8 @@ fun PlanCard(
 fun CustomCalendarM3Style(
     hikePlans: List<HikePlan>,
     modifier: Modifier = Modifier,
-    onDateClick: (LocalDate) -> Unit = {}
+    selectedDate: LocalDate?,
+    onDateClick: (LocalDate) -> Unit
 ) {
     var currentMonth by rememberSaveable { mutableStateOf(YearMonth.now()) }
 
@@ -422,6 +445,7 @@ fun CustomCalendarM3Style(
                                     day = dayOfMonth,
                                     isPlanned = isPlanned,
                                     isToday = isToday,
+                                    isSelectedDate = date == selectedDate,
                                     onClick = { onDateClick(date) }
                                 )
                                 dayOfMonth++ // Increment day
@@ -494,19 +518,24 @@ private fun DayCell(
     day: Int,
     isPlanned: Boolean,
     isToday: Boolean,
+    isSelectedDate: Boolean,
     onClick: () -> Unit
 ) {
     val backgroundColor = when {
+        isSelectedDate -> GreenDark
         isPlanned -> GreenLight
         else -> Color.Transparent
     }
     val contentColor = when {
+        isSelectedDate -> Color.Black
         isPlanned -> Color.Black
         isToday -> Color.Black
         else -> MaterialTheme.colorScheme.onSurface
     }
-    val borderModifier = if (isToday && !isPlanned) {
+    val borderModifier = if (isToday && !isSelectedDate) {
         Modifier.border(1.dp, GreenDark, CircleShape)
+    } else if (isSelectedDate) {
+        Modifier
     } else {
         Modifier
     }
