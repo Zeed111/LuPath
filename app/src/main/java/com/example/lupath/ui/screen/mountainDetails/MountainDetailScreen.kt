@@ -9,9 +9,11 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,6 +21,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -41,6 +44,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -49,6 +54,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -173,7 +180,7 @@ fun MountainDetailScreen(
                             .padding(top = 32.dp, start = 16.dp, end = 16.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        // You could check for an error state in your ViewModel
+                        // check for an error state in your ViewModel
                         // if (viewModel.hasError) { Text("Failed to load details.") } else {
                         CircularProgressIndicator() // Show loading indicator
                         // }
@@ -214,7 +221,9 @@ fun MountainDetailScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.Top
                     ) {
-                        Column(modifier = Modifier.weight(0.6f)) {
+                        Column(modifier = Modifier
+                            .weight(0.6f)
+                        ) {
                             Text(
                                 mountain.mountainName,
                                 fontWeight = FontWeight.Bold, fontSize = 20.sp,
@@ -229,16 +238,27 @@ fun MountainDetailScreen(
 
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.weight(0.4f)
+                            modifier = Modifier
+                                .weight(0.4f)
+                                .clipToBounds()
                         ) {
                             val characteristics = remember(mountain) { // Recompute if mountain changes
                                 listOfNotNull(
                                     if (mountain.isEstablishedTrail == true) CharacteristicDisplayInfo("trail_icon", "Established Trail") else null,
                                     if (mountain.isRocky == true) CharacteristicDisplayInfo("rocky_icon", "Rocky") else null,
-                                    if (mountain.isSlippery == true) CharacteristicDisplayInfo("your_slippery_icon_name", "Slippery") else null,
+                                    if (mountain.isSlippery == true) CharacteristicDisplayInfo("slippery_icon", "Slippery") else null,
                                     if (mountain.hasSteepSections == true) CharacteristicDisplayInfo("steep_icon", "Steep") else null,
                                     if (!mountain.notableWildlife.isNullOrBlank()) CharacteristicDisplayInfo("wildlife_icon", "Wildlife") else null
                                 )
+                            }
+
+                            val iconRowScrollState = rememberScrollState()
+
+                            // this is for the gradient
+                            val showEndGradient by remember {
+                                derivedStateOf {
+                                    iconRowScrollState.value < iconRowScrollState.maxValue // True if scrollState.value < scrollState.maxValue
+                                }
                             }
 
                             Row(
@@ -262,21 +282,47 @@ fun MountainDetailScreen(
 
                                 Spacer(modifier = Modifier.width(12.dp))
 
-                                // Row for the actual characteristic icons
-                                Row(
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.weight(1f).horizontalScroll(rememberScrollState())
+                                // Row for the characteristic icons
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(IntrinsicSize.Min)
                                 ) {
-                                    if (characteristics.isNotEmpty()) {
-                                        characteristics.forEach { characteristicInfo ->
-                                            CharacteristicIcon( // Your composable for displaying custom drawables
-                                                drawableName = characteristicInfo.customDrawableName,
-                                                label = characteristicInfo.label
+                                    Row(
+                                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier
+                                            .wrapContentWidth()
+                                            .horizontalScroll(iconRowScrollState
                                             )
+                                    ) {
+                                        if (characteristics.isNotEmpty()) {
+                                            characteristics.forEach { characteristicInfo ->
+                                                CharacteristicIcon( // composable for displaying custom drawables
+                                                    drawableName = characteristicInfo.customDrawableName,
+                                                    label = characteristicInfo.label
+                                                )
+                                            }
+                                        } else {
+                                            Spacer(Modifier.height(20.dp))
                                         }
-                                    } else {
-                                        Spacer(Modifier.height(20.dp))
+                                    }
+
+                                    if (showEndGradient) {
+                                        Box(
+                                            modifier = Modifier
+                                                .align(Alignment.CenterEnd)
+                                                .width(48.dp)
+                                                .fillMaxHeight()
+                                                .background(
+                                                    brush = Brush.horizontalGradient(
+                                                        colors = listOf(
+                                                            Color.Transparent,
+                                                            MaterialTheme.colorScheme.background
+                                                        )
+                                                    )
+                                                )
+                                        )
                                     }
                                 }
                             }
@@ -374,7 +420,7 @@ fun CharacteristicIcon(
             Image(
                 painter = painterResource(id = imageResId),
                 contentDescription = label,
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier.size(21.dp),
                 contentScale = ContentScale.Fit
             )
         }
